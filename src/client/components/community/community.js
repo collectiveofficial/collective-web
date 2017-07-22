@@ -3,11 +3,11 @@ import {
   Route,
   Link
 } from 'react-router-dom';
-import s from './About.css';
+import s from './community.css';
 import Header from '../header/Header.js';
 import Footer from '../footer/Footer.js';
 
-class About extends Component {
+class community extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -20,9 +20,9 @@ class About extends Component {
         <Header />
         <div className={s.root}>
           <div className={s.container}>
-            <h1 className={s.banner}>About us</h1>
+            <h1 className={s.banner}>Community</h1>
             <div className={s.card}>
-              Hey we wanna change things and this is how we do it
+              Here is where we keep a pinterest like message board for food related topics, that sort of thing, newsletter, outreach
             </div>
           </div>
         </div>
@@ -32,4 +32,4 @@ class About extends Component {
   }
 }
 
-export default About;
+export default community;

@@ -3,11 +3,11 @@ import {
   Route,
   Link
 } from 'react-router-dom';
-import s from './About.css';
+import s from './foodwiki.css';
 import Header from '../header/Header.js';
 import Footer from '../footer/Footer.js';
 
-class About extends Component {
+class foodwiki extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -20,9 +20,9 @@ class About extends Component {
         <Header />
         <div className={s.root}>
           <div className={s.container}>
-            <h1 className={s.banner}>About us</h1>
+            <h1 className={s.banner}>Food Wiki</h1>
             <div className={s.card}>
-              Hey we wanna change things and this is how we do it
+              Here is where we compile a database of recipes, storage intructions, etc., for all the produce we provide
             </div>
           </div>
         </div>
@@ -32,4 +32,4 @@ class About extends Component {
   }
 }
 
-export default About;
+export default foodwiki;
