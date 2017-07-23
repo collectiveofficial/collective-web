@@ -4,10 +4,11 @@
   "description": "Collective",
   "main": "index.js",
   "scripts": {
-    "start": "node src/server/index.js",
+    "start": "sequelize db:migrate && node server/index.js",
     "start-dev": "concurrently \"npm run server\" \"npm run client\"",
     "client": "webpack -d --watch",
-    "server": "nodemon src/server/index.js",
+    "server": "if [ \"$NODE_ENV\" == \"production\" ]; then node src/server/index.js; else nodemon src/server/index.js; fi",
+    "init-sequelize": "sequelize init",
     "lint": "eslint --init",
     "build": "webpack -p",
     "heroku-postbuild": "webpack -p --config ./webpack.config.js --progress"
@@ -36,6 +37,7 @@
     "express": "^4.15.0",
     "jquery": "^3.2.1",
     "nodemon": "^1.11.0",
+    "pg": "^6.4.1",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-modal": "^1.9.7",
@@ -44,6 +46,7 @@
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
     "sequelize": "^3.30.4",
+    "sequelize-cli": "^2.7.0",
     "style-loader": "^0.18.2",
     "webpack": "^2.6.1"
   },

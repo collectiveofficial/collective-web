@@ -3,6 +3,24 @@
   "scripts": {
   },
   "env": {
+    "NODE_ENV": {
+      "required": true
+    },
+    "DATABASE_URL": {
+      "required": true
+    },
+    "DATABASE_USERNAME": {
+      "required": true
+    },
+    "DATABASE_PASS": {
+      "required": true
+    },
+    "DATABASE_NAME": {
+      "required": true
+    },
+    "HOST": {
+      "required": true
+    }
   },
   "formation": {
   },
