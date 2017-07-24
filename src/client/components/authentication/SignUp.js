@@ -37,45 +37,46 @@ class RegisterForm extends React.Component {
          <input
            value={this.state.firstName}
            placeholder='First Name'
-           onChangeText={(firstName) => this.setState({firstName})}
+           onChange={(firstName) => this.setState({firstName})}
            autoCapitalize='none'
+           type="text"
          />
          <div>
          <input
            value={this.state.lastName}
            placeholder='Last Name'
-           onChangeText={(lastName) => this.setState({lastName})}
+           onChange={(lastName) => this.setState({lastName})}
            autoCapitalize='none'
+           type="text"
          />
        </div>
        <div>
          <input
            value={this.state.email}
            placeholder='Email'
-           onChangeText={(email) => this.setState({email})}
+           onChange={(email) => this.setState({email})}
            autoCapitalize='none'
+           type="email"
          />
        </div>
        <div>
          <input
            keyboardType='phone-pad'
            placeholder='(XXX)XXX-XXXX'
-           onChangeText={(phoneNumber) => this.setState({phoneNumber})}
+           onChange={(phoneNumber) => this.setState({phoneNumber})}
            value={this.state.phoneNumber}
            autoCapitalize='none'
          />
          <div>
          <input
-          secureTextEntry={true}
           placeholder='password'
-          onChangeText={(passwordInput) => this.setState({passwordInput})}
+          onChange={(passwordInput) => this.setState({passwordInput})}
           value={this.state.passwordInput}
           autoCapitalize='none'
         />
       </div>
       <div>
         <input
-          secureTextEntry={true}
           placeholder='repeat password'
           autoCapitalize='none'
         />
@@ -163,7 +164,7 @@ class SignUp extends React.Component {
             <button
               className={s.loginBtn}
               id         = "btn-social-login"
-              whenClicked = {this.handleFBLogin}>
+              onClick = {this.handleFBLogin}>
               Sign up with Facebook
             </button>
           </div>
