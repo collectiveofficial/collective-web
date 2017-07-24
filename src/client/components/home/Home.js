@@ -61,7 +61,26 @@ class Provider extends React.Component {
   }
 }
 
-
+class ToggleButton extends React.Component {
+  constructor( props ) {
+      super( props );
+      this.state = {
+      condition: false
+    };
+    this.handleClick = this.handleClick.bind(this);
+  }
+  handleClick() {
+    this.setState({condition: !this.state.condition});
+  }
+  render() {
+    return (
+      <div onClick={this.handleClick} className={this.state.condition ? s.toggled: s.ballot}>
+        <img src={foodMaster[this.props.food.split(' ').join('')]}></img>
+        <div>{this.props.food}</div>
+      </div>
+    )
+  }
+}
 
 class Voting extends React.Component {
   constructor( props ) {
@@ -84,6 +103,9 @@ class Voting extends React.Component {
     closeModal() {
       this.setState({modalIsOpen: false});
     }
+    handleClick() {
+      this.setState({condition: !this.state.condition});
+    }
   render () {
       return (
         <div>
@@ -97,10 +119,7 @@ class Voting extends React.Component {
                       contentLabel="Example Modal">
                       <div className={s.flexcontainer}>
                         {this.props.items.map((x) => (
-                          <div className={s.ballot}>
-                            <img src={foodMaster[x.split(' ').join('')]}></img>
-                            <div>{x}</div>
-                          </div>
+                          <ToggleButton food={x} />
                       ))}
                       </div>
                       </Modal>

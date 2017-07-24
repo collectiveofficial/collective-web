@@ -28,7 +28,9 @@ class LoginForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: ''
+      value: '',
+      emailInput: '',
+      passwordInput: ''
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -50,17 +52,18 @@ class LoginForm extends React.Component {
         <div>
         <input
              placeholder='email'
-             onChangeText={(emailInput) => this.setState({emailInput})}
+             onChange={(emailInput) => this.setState({emailInput})}
              value={this.state.emailInput}
+             type="text"
              autoCapitalize='none'
            />
          </div>
          <div>
            <input
-             secureTextEntry={true}
              placeholder='password'
-             onChangeText={(passwordInput) => this.setState({passwordInput})}
+             onChange={(passwordInput) => this.setState({passwordInput})}
              value={this.state.passwordInput}
+             type="text"
              autoCapitalize='none'
            />
          </div>
@@ -87,7 +90,7 @@ class Login extends React.Component {
     loadFbLoginApi() {
       window.fbAsyncInit = function() {
       FB.init({
-        appId      : '115864652385379',
+        appId      : "",
         xfbml      : true,
         version    : 'v2.10'
       });
@@ -147,7 +150,7 @@ class Login extends React.Component {
             <button
               className={s.loginBtn}
               id         = "btn-social-login"
-              whenClicked = {this.handleFBLogin}>
+              onClick = {this.handleFBLogin}>
               Login with Facebook
             </button>
           </div>
