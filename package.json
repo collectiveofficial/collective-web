@@ -4,10 +4,10 @@
   "description": "Collective",
   "main": "index.js",
   "scripts": {
-    "start": "sequelize db:migrate && npm run server",
+    "start": "sequelize db:migrate && node src/server/index.js",
     "start-dev": "concurrently \"npm run server\" \"npm run client\"",
     "client": "webpack -d --watch",
-    "server": "if \"$NODE_ENV\"; then node src/server/index.js; else nodemon src/server/index.js; fi",
+    "server": "nodemon src/server/index.js",
     "init-sequelize": "sequelize init",
     "lint": "eslint --init",
     "build": "webpack -p",
