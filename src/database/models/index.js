@@ -9,8 +9,7 @@ const config = require(__dirname + '/../config/config.js')[env];
 const db = {};
 
 let sequelize;
-console.log('THIS IS THE ENV: ', env);
-console.log('config.use_env_variable: ', config.use_env_variable);
+
 if (config.use_env_variable) {
   sequelize = new Sequelize(config.use_env_variable);
 } else {
@@ -35,5 +34,3 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 module.exports = db;
-
-// sequelize model:create --name User --attributes "firstName:string, lastName:string, email:string, phoneNumber:string, birthday:string, streetAddress:string, aptSuite:string, city:string, state:string, zipCode:integer, fullAddress:string, subscribed:boolean, userGroupId:integer"
