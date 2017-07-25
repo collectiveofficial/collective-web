@@ -1,15 +1,20 @@
 {
   "name": "collective-web",
   "scripts": {
+    "postdeploy": "
+      if [ \"$HEROKU_APP_NAME\" ];then
+        \"$DATABASE_NAME\" = $(heroku config:get DATABASE_NAME -a \"$HEROKU_APP_NAME\");
+        \"$DATABASE_USERNAME\" = $(heroku config:get DATABASE_USERNAME -a \"$HEROKU_APP_NAME\");
+        \"$DATABASE_PASS\" = $(heroku config:get DATABASE_PASS -a \"$HEROKU_APP_NAME\");
+        \"$DATABASE_URL\" = $(heroku config:get DATABASE_URL -a \"$HEROKU_APP_NAME\");
+        \"$HOST\" = $(heroku config:get HOST -a \"$HEROKU_APP_NAME\");
+    "
   },
   "env": {
     "HEROKU_APP_NAME": {
       "required": true
     },
     "NODE_ENV": {
-      "required": true
-    },
-    "DATABASE_URL": {
       "required": true
     },
     "DATABASE_USERNAME": {
