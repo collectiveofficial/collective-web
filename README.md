@@ -59,7 +59,7 @@ Inside psql:
 Outside psql:
 * drop database (DANGEROUS)
 ```
-* dropdb collective
+dropdb collective
 ```
 * If doing sql queries in terminal, you must put double quotes for the table name
 ```
