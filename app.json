@@ -3,11 +3,17 @@
   "scripts": {
   },
   "env": {
+    "HEROKU_APP_NAME": {
+      "required": true
+    },
+    "NODE_ENV": {
+      "required": true
+    }
   },
   "formation": {
   },
   "addons": [
-
+    "heroku-postgresql:hobby-dev"
   ],
   "buildpacks": [
     {
