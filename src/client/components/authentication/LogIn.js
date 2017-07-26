@@ -3,26 +3,10 @@ import {
   Route,
   Link
 } from 'react-router-dom';
+import firebase from 'firebase';
 import s from './Login.css';
 import Header from '../header/Header.js';
 import Footer from '../footer/Footer.js';
-
-
-// class LogIn extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//     };
-//   }
-//
-//   render() {
-//     return (
-//       <div>
-//         <h1>Fuck you johnny and fuck you too matt and you too person</h1>
-//       </div>
-//     );
-//   }
-// }
 
 class LoginForm extends React.Component {
   constructor(props) {
@@ -30,7 +14,7 @@ class LoginForm extends React.Component {
     this.state = {
       value: '',
       emailInput: '',
-      passwordInput: ''
+      passwordInput: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -73,73 +57,41 @@ class LoginForm extends React.Component {
   }
 }
 
-
-
 class Login extends React.Component {
   constructor(props) {
-      super(props);
-      this.state = {
+    super(props);
+    this.state = {
 
-      };
-    }
-
-    componentDidMount() {
-      this.loadFbLoginApi();
-    }
-
-    loadFbLoginApi() {
-      window.fbAsyncInit = function() {
-      FB.init({
-        appId      : "",
-        xfbml      : true,
-        version    : 'v2.10'
-      });
-      FB.AppEvents.logPageView();
     };
-
-    (function(d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) return;
-      js = d.createElement(s); js.id = id;
-      js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.10&appId=115864652385379";
-      fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-  }
-
-
-
-      testAPI() {
-        console.log('Welcome!  Fetching your information.... ');
-        FB.api('/me', function(response) {
-        console.log('Successful login for: ' + response.name);
-        document.getElementById('status').innerHTML =
-          'Thanks for logging in, ' + response.name + '!';
-        });
-      }
-
-      statusChangeCallback(response) {
-        console.log('statusChangeCallback');
-        console.log(response);
-        if (response.status === 'connected') {
-          this.testAPI();
-        } else if (response.status === 'not_authorized') {
-            console.log("Please log into this app.");
-        } else {
-            console.log("Please log into this facebook.");
-        }
-      }
-
-  checkLoginState() {
-    FB.getLoginStatus(function(response) {
-        this.statusChangeCallback(response);
-    }.bind(this));
+    this.handleFBLogin = this.handleFBLogin.bind(this);
   }
 
   handleFBLogin() {
-    FB.login(this.checkLoginState());
+    const provider = new firebase.auth.FacebookAuthProvider();
+    provider.addScope('email, public_profile, user_friends');
+    firebase.auth().signInWithPopup(provider)
+    .then((result) => {
+      // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+      var token = result.credential.accessToken;
+      console.log('token', token);
+      const user = result.user;
+      console.log('user: ', user);
+      // ...
+      // The signed-in user info.
+    }).catch((error) => {
+      console.error(error);
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.email;
+      // The firebase.auth.AuthCredential type that was used.
+      const credential = error.credential;
+      // ...
+    });
   }
 
-  render () {
+  render() {
     return (
       <div>
         <Header />
@@ -149,8 +101,8 @@ class Login extends React.Component {
             <LoginForm />
             <button
               className={s.loginBtn}
-              id         = "btn-social-login"
-              onClick = {this.handleFBLogin}>
+              id="btn-social-login"
+              onClick={this.handleFBLogin}>
               Login with Facebook
             </button>
           </div>

@@ -3,6 +3,7 @@ import {
   Route,
   Link
 } from 'react-router-dom';
+import { Button } from 'semantic-ui-react';
 import s from './Header.css';
 
 class Header extends Component {
