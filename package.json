@@ -53,8 +53,6 @@
     "react-router-dom": "^4.1.2",
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
-    "semantic-ui-css": "^2.2.11",
-    "semantic-ui-react": "^0.71.2",
     "sequelize": "^3.30.4",
     "sequelize-cli": "^2.7.0",
     "style-loader": "^0.18.2",
