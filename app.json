@@ -8,6 +8,15 @@
     },
     "NODE_ENV": {
       "required": true
+    },
+    "TWILIO_ACCOUNT_SID": {
+      "required": true
+    },
+    "TWILIO_AUTH_TOKEN": {
+      "required": true
+    },
+    "TWILIO_PHONE_NUMBER": {
+      "required": true
     }
   },
   "formation": {

@@ -54,7 +54,7 @@ module.exports = {
       //   }
       // };
       // '00 56 9 27 7 * *'
-      const job1 = new cron.CronJob('00 43 9 * * *', () => {
+      const job1 = new cron.CronJob('00 52 12 * * *', () => {
         /* runs once at the specified date. */
         console.log('job 1 ticked');
         const accountSid = process.env.TWILIO_ACCOUNT_SID; // Your Account SID from www.twilio.com/console
@@ -65,7 +65,7 @@ module.exports = {
         client.messages.create({
           body: 'Collective here! Best Food Forward\'s food voting is ending on Friday, 7/28/17. Make sure to get your votes in!',
           to: '+14083244163',  // Text this number
-          from: '+15103409533', // From a valid Twilio number
+          from: `+${process.env.TWILIO_PHONE_NUMBER}`, // From a valid Twilio number
         })
         .then((message) => console.log(message.sid));
       }, () => {
