@@ -54,7 +54,7 @@ module.exports = {
       //   }
       // };
       // '00 56 9 27 7 * *'
-      const job1 = new cron.CronJob('00 52 12 * * *', () => {
+      const job1 = new cron.CronJob('00 03 13 * * *', () => {
         /* runs once at the specified date. */
         console.log('job 1 ticked');
         const accountSid = process.env.TWILIO_ACCOUNT_SID; // Your Account SID from www.twilio.com/console
