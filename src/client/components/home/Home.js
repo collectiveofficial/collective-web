@@ -6,129 +6,12 @@ import {
 import Header from '../header/Header.js';
 import Footer from '../footer/Footer.js';
 import Modal from 'react-modal';
-
 import s from './Home.css';
+import Provider from './Provider.js';
+import Voting from './Voting.js';
+import { Card, CardMedia, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
+import {Button} from 'react-toolbox/lib/button';
 
-const foodMaster = {Apples: "https://newenglandapples.files.wordpress.com/2014/10/img_5595.jpg",
-Bananas: "https://timedotcom.files.wordpress.com/2017/05/amazonfreebananas-em-86304874.jpg?w=720",
-Mangos: "http://www.multivu.com/players/English/72762525-MCI-eyes-revolution-mango-trade/gallery//image/b07adc25-5812-4dfd-aac3-3373579d586c.jpg",
-SweetPotatoes: "https://i2.wp.com/bonnieplants.com/wp-content/uploads/2011/10/sweet-potatoes-harvest.jpg?ssl=1",
-Pears: "http://www.canned-fresh.com/live/media/2012/02/pears2.jpg",
-Potatoes: "https://upload.wikimedia.org/wikipedia/commons/a/ab/Patates.jpg",
-Kiwis: "http://cdn.thealternativedaily.com/wp-content/uploads/2013/11/kiwi.jpg",
-Oranges: "http://grapplergourmet.com/wp-content/uploads/2015/03/piles.jpg",
-Avocadoes: "http://jenknoedl.com/wp-content/uploads/2015/11/20150115-avocados-brown-1.jpg"
-}
-
-class Provider extends React.Component {
-  constructor( props ) {
-      super( props );
-      this.state = {
-      modalIsOpen: false
-    };
-    this.openModal = this.openModal.bind(this);
-    this.afterOpenModal = this.afterOpenModal.bind(this);
-    this.closeModal = this.closeModal.bind(this);
-}
-    openModal() {
-      this.setState({modalIsOpen: true});
-    }
-    afterOpenModal() {
-      // references are now sync'd and can be accessed.
-      // this.subtitle.style.color = '#f00';
-    }
-    closeModal() {
-      this.setState({modalIsOpen: false});
-    }
-  render () {
-      return (
-          <div className={s.cont}>
-              <a className={s.link} onClick={() => {this.openModal()}}>Provider Info</a>
-              <div>
-                  <Modal
-                      isOpen={this.state.modalIsOpen}
-                      onAfterOpen={this.afterOpenModal}
-                      onRequestClose={this.closeModal}
-                      contentLabel="Example Modal">
-                      <div>
-                        <h1>{this.props.provider}</h1>
-                        Information about our awesome provider
-                      </div>
-                      </Modal>
-              </div>
-          </div>
-      )
-  }
-}
-
-class ToggleButton extends React.Component {
-  constructor( props ) {
-      super( props );
-      this.state = {
-      condition: false
-    };
-    this.handleClick = this.handleClick.bind(this);
-  }
-  handleClick() {
-    this.setState({condition: !this.state.condition});
-  }
-  render() {
-    return (
-      <div onClick={this.handleClick} className={this.state.condition ? s.toggled: s.ballot}>
-        <img src={foodMaster[this.props.food.split(' ').join('')]}></img>
-        <div>{this.props.food}</div>
-      </div>
-    )
-  }
-}
-
-class Voting extends React.Component {
-  constructor( props ) {
-      super( props );
-      this.state = {
-      modalIsOpen: false
-    };
-    this.openModal = this.openModal.bind(this);
-    this.afterOpenModal = this.afterOpenModal.bind(this);
-    this.closeModal = this.closeModal.bind(this);
-}
-    openModal() {
-      console.log('test')
-      this.setState({modalIsOpen: true});
-    }
-    afterOpenModal() {
-      // references are now sync'd and can be accessed.
-      // this.subtitle.style.color = '#f00';
-    }
-    closeModal() {
-      this.setState({modalIsOpen: false});
-    }
-    handleClick() {
-      this.setState({condition: !this.state.condition});
-    }
-  render () {
-      return (
-        <div>
-          <div className={s.cont}>
-              <a className={s.link} onClick={() => {this.openModal()}}>Vote</a>
-              <div>
-                  <Modal
-                      isOpen={this.state.modalIsOpen}
-                      onAfterOpen={this.afterOpenModal}
-                      onRequestClose={this.closeModal}
-                      contentLabel="Example Modal">
-                      <div className={s.flexcontainer}>
-                        {this.props.items.map((x) => (
-                          <ToggleButton food={x} />
-                      ))}
-                      </div>
-                      </Modal>
-              </div>
-          </div>
-        </div>
-      )
-  }
-}
 
 // style={{overlay : {position: 'fixed', top: 600, left: 600, right: 600, bottom: 600,
 //     backgroundColor: '#888888'}, content : {position: 'absolute', top: '40px', left: '40px',
@@ -139,7 +22,16 @@ class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      date: "2 September 2017",
+      date: "26 August 2017 from 9am to Noon",
+      vote: "Voting window is from 21 August to 25 August",
+      remainingCalendar: [
+        ['9 September 2017',  "Voting window is from 27 August to 7 September"],
+      ['23 September 2017',  "Voting window is from 10 September to 21 September"],
+      ['7 October 2017',  "Voting window is from 24 September to 5 October"],
+      ['28 October 2017',  "Voting window is from 8 October to 26 October"],
+      ['10 November 2017', "Voting window is from 29 October to 8 November"],
+      ['2 December 2017',  "Voting window is from 11 November to 30 November"]
+      ],
       items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
       provider: "DNO Produce",
       //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
@@ -152,18 +44,36 @@ class Home extends React.Component {
         <Header />
         <div className={s.root}>
           <div className={s.container}>
-            <h1 className={s.banner}>Upcoming Bulk Buys</h1>
-            <div className={s.card}>
-              <h2 className={s.date}>{this.state.date}</h2>
+            <div className={s.headcont}>
+              <div>
+                <a href="https://hidden-reef-85880.herokuapp.com/" target="/blank">
+                  <img className={s.head} src='https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/15726586_926945357406132_4915279900008217763_n.jpg?oh=9ecd45f3cf6d31be1f7837c120853bd9&oe=5A046CFF'/>
+                </a>
+              </div>
+              <h1 className={s.banner}>Upcoming Bulk Buys</h1>
+            </div>
+            <Card style={{width: "800px", margin: "0 0 30px 0"}}>
+              <CardTitle
+                title={this.state.date}
+                subtitle={this.state.vote}
+              />
               <iframe
                 className={s.map}
                 src={this.state.location}
                 ></iframe>
-              <div className={s.links}>
-                <Voting items={this.state.items}/>
-                <Provider provider={this.state.provider}/>
-              </div>
-            </div>
+                <div className={s.links}>
+                  <Link className={s.link} to="/voting">Vote and Pay</Link>
+                  <Provider provider={this.state.provider}/>
+                </div>
+            </Card>
+            {this.state.remainingCalendar.map((x) => (
+              <Card style={{width: "800px", margin: "0 0 30px 0"}}>
+              <CardTitle
+                title={x[0]}
+                subtitle={x[1]}
+               />
+              </Card>
+            ))}
           </div>
         </div>
         <Footer />

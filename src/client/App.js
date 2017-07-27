@@ -10,6 +10,7 @@ import SignUp from './components/authentication/SignUp.js';
 import About from './components/about/About.js';
 import foodwiki from './components/foodwiki/foodwiki.js';
 import community from './components/community/community.js';
+import Voting from './components/home/Voting.js';
 import config from './config.js';
 
 class App extends Component {
@@ -32,6 +33,7 @@ class App extends Component {
         <Route path="/about" component={About} />
         <Route path="/foodwiki" component={foodwiki} />
         <Route path="/community" component={community} />
+        <Route path="/voting" component={Voting} />
       </div>
     );
   }
