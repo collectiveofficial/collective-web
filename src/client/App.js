@@ -7,6 +7,8 @@ import firebase from 'firebase';
 import Home from './components/home/Home.js';
 import LogIn from './components/authentication/LogIn.js';
 import SignUp from './components/authentication/SignUp.js';
+import Howitworks from './components/authentication/Howitworks.js';
+import Payment from './components/authentication/Payment.js';
 import About from './components/about/About.js';
 import foodwiki from './components/foodwiki/foodwiki.js';
 import community from './components/community/community.js';
@@ -34,6 +36,8 @@ class App extends Component {
         <Route path="/foodwiki" component={foodwiki} />
         <Route path="/community" component={community} />
         <Route path="/voting" component={Voting} />
+        <Route path="/howitworks" component={Howitworks} />
+        <Route path="/payment" component={Payment} />
       </div>
     );
   }
