@@ -81,7 +81,7 @@ class RegisterForm extends React.Component {
           value={this.state.passwordRepeat}
          />
        <div>
-        <input type="submit" value="Submit" className={s.submit}/>
+        <Link to="/payment"><input type="submit" value="Submit" className={s.submit}/></Link>
       </div>
       </form>
     );
