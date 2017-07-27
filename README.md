@@ -13,8 +13,10 @@ npm install
 Store environment variables by creating a .env file and write:
 ```
 DATABASE_USERNAME=YOUR_MAC_USER_NAME
-DATABASE_PASS=your_new_password
+DATABASE_PASS=YOUR_NEW_PASSWORD
 DATABASE_NAME=collective
+TWILIO_ACCOUNT_SID=YOUR_TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN=YOUR_TWILIO_AUTH_TOKEN
 ```
 
 To start development, run:
