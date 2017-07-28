@@ -3,10 +3,10 @@ import {
   Route,
   Link
 } from 'react-router-dom';
-import firebase from 'firebase';
 import s from './Register.css';
 import Header from '../header/Header.js';
 import Footer from '../footer/Footer.js';
+import { ref, firebaseAuth } from '../../config'
 
 class RegisterForm extends React.Component {
   constructor(props) {
@@ -103,9 +103,9 @@ class SignUp extends React.Component {
   }
 
   async handleFBSignUp() {
-    const provider = await new firebase.auth.FacebookAuthProvider();
+    const provider = await new firebaseAuth.FacebookAuthProvider();
     await provider.addScope('email, public_profile, user_friends');
-    const result = await firebase.auth().signInWithPopup(provider);
+    const result = await firebaseAuth().signInWithPopup(provider);
     const token = result.credential.accessToken;
     // const user = result.user;
     // await this.setState({ email: user.email });

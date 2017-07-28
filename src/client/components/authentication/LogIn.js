@@ -3,7 +3,7 @@ import {
   Route,
   Link
 } from 'react-router-dom';
-import firebase from 'firebase';
+import { ref, firebaseAuth } from '../../config'
 import s from './Login.css';
 import Header from '../header/Header.js';
 import Footer from '../footer/Footer.js';
@@ -67,9 +67,9 @@ class Login extends React.Component {
   }
 
   handleFBLogin() {
-    const provider = new firebase.auth.FacebookAuthProvider();
+    const provider = new firebaseAuth.FacebookAuthProvider();
     provider.addScope('email, public_profile, user_friends');
-    firebase.auth().signInWithPopup(provider)
+    firebaseAuth().signInWithPopup(provider)
     .then((result) => {
       // This gives you a Facebook Access Token. You can use it to access the Facebook API.
       var token = result.credential.accessToken;
@@ -85,7 +85,7 @@ class Login extends React.Component {
       const errorMessage = error.message;
       // The email of the user's account used.
       const email = error.email;
-      // The firebase.auth.AuthCredential type that was used.
+      // The firebaseAuth.AuthCredential type that was used.
       const credential = error.credential;
       // ...
     });
