@@ -47,6 +47,7 @@
     "jquery": "^3.2.1",
     "nodemon": "^1.11.0",
     "pg": "^6.4.1",
+    "pg-hstore": "^2.3.2",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-modal": "^1.9.7",
