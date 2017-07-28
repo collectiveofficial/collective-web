@@ -5,8 +5,6 @@ import {
 } from 'react-router-dom';
 import firebase from 'firebase';
 import s from './Howitworks.css';
-import Header from '../header/Header.js';
-import Footer from '../footer/Footer.js';
 import LoginForm from './LoginForm.js';
 
 class Howitworks extends React.Component {
@@ -19,10 +17,8 @@ class Howitworks extends React.Component {
   render() {
     return(
       <div>
-        <Header />
         <div>How it works dude</div>
         <Link to="/"><input type="submit" value="Let's get started!" className={s.submit}/></Link>
-        <Footer />
       </div>
     )
   }

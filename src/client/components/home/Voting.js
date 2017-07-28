@@ -5,8 +5,6 @@ import {
 } from 'react-router-dom';
 import Modal from 'react-modal';
 import s from './Home.css';
-import Header from '../header/Header.js';
-import Footer from '../footer/Footer.js';
 import ToggleButton from './ToggleButton.js';
 
 const foodMaster = {Apples: "https://newenglandapples.files.wordpress.com/2014/10/img_5595.jpg",
@@ -50,7 +48,6 @@ class Voting extends React.Component {
   render () {
       return (
         <div>
-          <Header />
           <div className={s.cont}>
                   {/* <Modal
                       isOpen={this.state.modalIsOpen}
@@ -69,7 +66,6 @@ class Voting extends React.Component {
                         ))}
                       </div>
               </div>
-              <Footer />
           </div>
       )
   }

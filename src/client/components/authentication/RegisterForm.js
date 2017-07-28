@@ -7,9 +7,6 @@ import firebase from 'firebase';
 import s from './Register.css';
 import Input from 'react-toolbox/lib/input';
 
-
-
-
 class RegisterForm extends React.Component {
   constructor(props) {
     super(props);
@@ -55,12 +52,6 @@ class RegisterForm extends React.Component {
           value={this.state.lastName}
           onChange={(lastName) => this.setState({lastName})}
         />
-       <Input
-          type='email'
-          label='Email address'
-          onChange={(emailInput) => this.setState({emailInput})}
-          value={this.state.emailInput}
-        />
         <Input
          type='tel'
          label='Cell phone'
@@ -68,18 +59,6 @@ class RegisterForm extends React.Component {
          onChange={(phoneNumber) => this.setState({phoneNumber})}
          value={this.state.phoneNumber}
         />
-        <Input
-         type='password'
-         label='Password'
-         onChange={(passwordInput) => this.setState({passwordInput})}
-         value={this.state.passwordInput}
-        />
-        <Input
-          type='password'
-          label='Repeat Password'
-          onChange={(passwordInput) => this.setState({passwordRepeat})}
-          value={this.state.passwordRepeat}
-         />
        <div>
         <Link to="/payment"><input type="submit" value="Submit" className={s.submit}/></Link>
       </div>

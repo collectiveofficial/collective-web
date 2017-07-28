@@ -5,8 +5,6 @@ import {
 } from 'react-router-dom';
 import { ref, firebaseAuth } from '../../config'
 import s from './Login.css';
-import Header from '../header/Header.js';
-import Footer from '../footer/Footer.js';
 import LoginForm from './LoginForm.js';
 
 class Login extends React.Component {
@@ -46,7 +44,6 @@ class Login extends React.Component {
   render() {
     return (
       <div>
-        <Header />
         <div className={s.root}>
           <div className={s.container}>
             <LoginForm />
@@ -58,7 +55,6 @@ class Login extends React.Component {
             </button>
           </div>
         </div>
-        <Footer />
     </div>
     );
   }
