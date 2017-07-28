@@ -9,11 +9,22 @@
     align-items: center;
 }
 
+.head {
+  align-self: center;
+  max-width: 40%;
+  height: auto;
+}
+
 .modal {
   font-family: 'Lato', sans-serif;
 }
 
 .card {
+  width: 800px;
+  font-family: 'Roboto', sans-serif;
+}
+
+/*.card {
   border: 1px solid #b3b3b3;
   border-top: 0px;
   border-bottom: 1px solid #e6e6e6;
@@ -27,7 +38,7 @@
   display:'flex';
   align-items: 'center';
   justify-content: center;
-}
+}*/
 
 .links {
   display: flex;
@@ -40,7 +51,7 @@
 }
 
 .map {
-  width: 90%;
+  width: 100%;
   height: 400px;
   background-color: grey;
   height: 450;
@@ -48,6 +59,11 @@
   margin: 10px;
   border: 3px solid #228B22;
   align-self: center;
+}
+
+.headcont {
+  display: flex;
+  flex-direction: row;
 }
 
 img {
@@ -98,6 +114,7 @@ img {
   -webkit-user-select: none; /* Chrome/Safari */
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE10+ */
+  background-color: white;
 }
 
 .toggled {
@@ -147,6 +164,9 @@ img {
    /* valid values are: flex-start, flex-end, space-between, space-around, stretch */
    -webkit-align-content: flex-end;
    align-content: flex-end;
+   background-image: url("https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/18011134_1016663535100980_507325607316796514_n.jpg?oh=6330a124653656d58dff6c30ba98b336&oe=59FB0B51");
+   background-size: cover;
+   flex: 1;
 }
 
 .root {
@@ -154,17 +174,23 @@ img {
   padding-right: 20px;
   display: flex;
   justify-content: center;
-  background-image: url("https://scontent-lax3-2.xx.fbcdn.net/v/t31.0-8/16836148_967219183378749_6214123780522592225_o.jpg?oh=b436dd404a8ef16ee559236f0769a0c5&oe=59FD45A7");
+  background-image: url("https://scontent-sjc2-1.xx.fbcdn.net/v/t31.0-8/16722816_967218253378842_633864775433504773_o.jpg?oh=5146d613341e96a1b888e8c9157691f3&oe=59F6E8B3");
   background-size: cover;
   flex: 1;
 }
 
 .cont {
   font-family: "Lato", sans-serif;
+  /*background-image: url("https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/18011134_1016663535100980_507325607316796514_n.jpg?oh=6330a124653656d58dff6c30ba98b336&oe=59FB0B51");
+  background-size: cover;
+  flex: 1;*/
 }
 
 .container {
   margin: 0 auto;
   padding: 0 0 40px;
   max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
