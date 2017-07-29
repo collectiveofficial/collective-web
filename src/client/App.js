@@ -59,7 +59,6 @@ class App extends Component {
       <MuiThemeProvider>
         <div>
           <Header />
-          <Route path="/register-form" component={RegisterForm} />
           <Route path="/login" component={LogIn} />
           <Route path="/home" component={Home} />
           <Route path="/about" component={About} />

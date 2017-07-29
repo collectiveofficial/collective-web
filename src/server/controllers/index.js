@@ -1,7 +1,6 @@
 const path = require('path');
 const request = require('request-promise');
 const dotenv = require('dotenv').config();
-var firebase = require("firebase");
 const db = require(__dirname + '/../../database/models/index.js')
 const twilio = require('twilio');
 const cron = require('cron');
@@ -12,6 +11,35 @@ module.exports = {
     get(req, res) {
       console.log('the server works');
       res.json('settings');
+    },
+  },
+  validateEmail: {
+    post(req, res) {
+      const emailInput = req.body.emailInput;
+      const validateEmail = (email) => {
+        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+      };
+      if (validateEmail(emailInput)) {
+        res.json({ emailValidated: true });
+      } else {
+        res.json({ emailValidated: false });
+      }
+    },
+  },
+  validatePassword: {
+    post(req, res) {
+      const passwordInput = req.body.passwordInput;
+      // Minimum eight characters, at least one letter and one number. No special characters.
+      const validatePassword = (password) => {
+        const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        return re.test(password);
+      };
+      if (validatePassword(passwordInput)) {
+        res.json({ passwordValidated: true });
+      } else {
+        res.json({ passwordValidated: false });
+      }
     },
   },
   facebookAuth: {
