@@ -49,8 +49,8 @@ class SignUp extends React.Component {
     }
   }
 
-  validatePassword() {
-    fetch('/auth/password', {
+  async validatePassword() {
+    const response = await fetch('/auth/password', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -60,21 +60,19 @@ class SignUp extends React.Component {
         passwordInput: this.state.passwordInput,
       }),
     })
-    .then((response) => {
-      if (response.passwordValidated) {
-        this.setState({ isPasswordValidated: true });
-      } else {
-        this.setState({ isPasswordValidated: false });
-      }
-    })
-    .catch(err => console.error(err));
+    const responseData = await response.json();
+    if (responseData.passwordValidated) {
+      await this.setState({ isPasswordValidated: true });
+    } else {
+      await this.setState({ isPasswordValidated: false });
+    }
   }
 
-  handleEmailContinue() {
-    this.validateEmail();
-    this.validatePassword();
+  async handleEmailContinue() {
+    await this.validateEmail();
+    await this.validatePassword();
     if (this.state.isEmailValidated && this.state.isPasswordValidated) {
-      this.setState({ userAllowedContinue: true });
+      await this.setState({ userAllowedContinue: true });
     }
   }
 
@@ -135,7 +133,7 @@ class SignUp extends React.Component {
                                 type="email"
                                 hintText="Email"
                                 style={styles.iconStyles}
-                                onChange={(event) => this.setState({ emailInput: event.target.value }, () => { console.log(this.state.emailInput) })}
+                                onChange={(event) => this.setState({ emailInput: event.target.value })}
                               />
                             }
                     content="Hmm...that doesn't look like an email address."
@@ -146,10 +144,11 @@ class SignUp extends React.Component {
                   <LockOutline />
                   <Popup
                     trigger={<TextField
+                                // ref="password"
                                 type='password'
                                 hintText='Password'
                                 style={styles.iconStyles}
-                                onChange={(passwordInput) => this.setState({ passwordInput: event.target.value }, () => { console.log(this.state.passwordInput) })}
+                                onChange={(event) => this.setState({ passwordInput: event.target.value })}
                               />
                             }
                     content="Your password is too short! You need at least 8 characters!"

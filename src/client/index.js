@@ -2,7 +2,8 @@ import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { HashRouter as Router } from 'react-router-dom';
+import createBrowserHistory from 'history/createBrowserHistory'
 
 // if (process.env.NODE_ENV !== 'production') {
 //   const {whyDidYouUpdate} = require('why-did-you-update');
@@ -17,8 +18,10 @@ import { BrowserRouter as Router } from 'react-router-dom';
 //   whyDidYouUpdate(React);
 // }
 
+const history = createBrowserHistory();
+
 ReactDOM.render((
-  <Router>
+  <Router history={history}>
     <App />
   </Router>
 ), document.getElementById('root'));

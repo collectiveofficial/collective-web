@@ -32,10 +32,10 @@ module.exports = {
       const passwordInput = req.body.passwordInput;
       // Minimum eight characters, at least one letter and one number. No special characters.
       const validatePassword = (password) => {
-        const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        const re = /^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*)$/;
         return re.test(password);
       };
-      if (validatePassword(passwordInput)) {
+      if (!validatePassword(passwordInput)) {
         res.json({ passwordValidated: true });
       } else {
         res.json({ passwordValidated: false });
