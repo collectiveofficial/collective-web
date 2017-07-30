@@ -12,18 +12,37 @@ import Payment from './components/authentication/Payment.js';
 import About from './components/about/About.js';
 import foodwiki from './components/foodwiki/foodwiki.js';
 import community from './components/community/community.js';
+import { ref, firebaseAuth } from './config';
 import Voting from './components/home/Voting.js';
-import config from './config.js';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      authed: false,
+      loading: true,
     };
   }
 
-  componentDidMount() {
-    firebase.initializeApp(config);
+  componentDidMount () {
+    this.removeListener = firebaseAuth().onAuthStateChanged((user) => {
+      if (user) { // is signed in
+        console.log('Logged in')
+        this.setState({
+          authed: true,
+          loading: false,
+        })
+      } else { // isn't signed in
+        this.setState({
+          authed: false,
+          loading: false
+        })
+      }
+    })
+  }
+
+  componentWillUnmount () {
+    this.removeListener()
   }
 
   render() {
