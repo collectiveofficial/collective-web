@@ -19,9 +19,7 @@ import { ref, firebaseAuth } from './config';
 import Voting from './components/home/Voting.js';
 import Header from './components/header/Header.js';
 import Footer from './components/footer/Footer.js';
-import config from './config.js';
 
-firebase.initializeApp(config);
 initReactFastclick();
 
 class App extends Component {

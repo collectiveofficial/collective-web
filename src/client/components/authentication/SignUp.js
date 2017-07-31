@@ -99,6 +99,7 @@ class SignUp extends React.Component {
     await this.setState({ facebookData: responseData.facebook_payload }, () => {
       console.log('this.state.facebookData: ', this.state.facebookData);
     });
+    await this.setState({ userAllowedContinue: true });
   }
 
   render() {

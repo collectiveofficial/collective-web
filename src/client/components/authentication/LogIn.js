@@ -3,7 +3,7 @@ import {
   Route,
   Link
 } from 'react-router-dom';
-import { ref, firebaseAuth } from '../../config'
+import { ref, firebaseAuth } from './../../config'
 import s from './Login.css';
 import LoginForm from './LoginForm.js';
 
