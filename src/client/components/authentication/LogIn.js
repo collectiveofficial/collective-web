@@ -3,53 +3,163 @@ import {
   Route,
   Link
 } from 'react-router-dom';
+import TextField from 'material-ui/TextField';
+import MailOutline from 'material-ui/svg-icons/communication/mail-outline';
+import LockOutline from 'material-ui/svg-icons/action/lock-outline';
+import RaisedButton from 'material-ui/RaisedButton';
+import { Icon, Popup } from 'semantic-ui-react';
 import { ref, firebaseAuth } from '../../config'
 import s from './Login.css';
-import Header from '../header/Header.js';
-import Footer from '../footer/Footer.js';
-import LoginForm from './LoginForm.js';
 
 class Login extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-
+      emailInput: '',
+      passwordInput: '',
+      userCredentialsValidated: false,
+      isEmailValidated: '',
+      isPasswordValidated: '',
     };
+    this.handleEmailContinue = this.handleEmailContinue.bind(this);
     this.handleFBLogin = this.handleFBLogin.bind(this);
+    this.validateEmail = this.validateEmail.bind(this);
+    this.validatePassword = this.validatePassword.bind(this);
   }
 
-  handleFBLogin() {
-    const provider = new firebaseAuth.FacebookAuthProvider();
-    provider.addScope('email, public_profile, user_friends');
-    firebaseAuth().signInWithPopup(provider)
-    .then((result) => {
-      // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-      var token = result.credential.accessToken;
-      console.log('token', token);
-      const user = result.user;
-      console.log('user: ', user);
-      // ...
-      // The signed-in user info.
-    }).catch((error) => {
-      console.error(error);
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.email;
-      // The firebaseAuth.AuthCredential type that was used.
-      const credential = error.credential;
-      // ...
+  async validateEmail() {
+    const response = await fetch('/auth/email', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: JSON.stringify({
+        emailInput: this.state.emailInput,
+      }),
+    });
+    const responseData = await response.json();
+    await console.log('responseData: ', responseData);
+    if (responseData.emailValidated) {
+      await this.setState({ isEmailValidated: true });
+    } else {
+      await console.log('response.emailValidated: ', response.emailValidated);
+      await this.setState({ isEmailValidated: false });
+    }
+  }
+
+  async validatePassword() {
+    const response = await fetch('/auth/password', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: JSON.stringify({
+        passwordInput: this.state.passwordInput,
+      }),
+    })
+    const responseData = await response.json();
+    if (responseData.passwordValidated) {
+      await this.setState({ isPasswordValidated: true });
+    } else {
+      await this.setState({ isPasswordValidated: false });
+    }
+  }
+
+  async handleEmailContinue() {
+    await this.validateEmail();
+    await this.validatePassword();
+    if (this.state.isEmailValidated && this.state.isPasswordValidated) {
+      await this.setState({ userCredentialsValidated: true }, () => {
+        console.log('user credentials validated: ', this.state.userCredentialsValidated);
+      });
+    }
+  }
+
+  async handleFBLogin() {
+    const provider = await new firebaseAuth.FacebookAuthProvider();
+    await provider.addScope('email, public_profile, user_friends');
+    const result = await firebaseAuth().signInWithPopup(provider);
+    const token = result.credential.accessToken;
+    // const user = result.user;
+    // await this.setState({ email: user.email });
+    // await this.setState({ photoURL: user.photoURL });
+    const response = await fetch('/auth/facebook', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: JSON.stringify({
+        facebook_token: token,
+      }),
+    });
+    const responseData = await response.json();
+    await console.log(responseData);
+    await this.setState({ facebookData: responseData.facebook_payload }, () => {
+      console.log('this.state.facebookData: ', this.state.facebookData);
+    });
+    await this.setState({ userCredentialsValidated: true }, () => {
+      console.log('user credentials validated: ', this.state.userCredentialsValidated);
     });
   }
 
   render() {
+    const styles = {
+      iconStyles: {
+        marginLeft: 10,
+      },
+      or: {
+        marginTop: '3%',
+        marginBottom: '3%',
+      },
+    };
     return (
       <div>
-        <Header />
         <div className={s.root}>
           <div className={s.container}>
-            <LoginForm />
+            <img
+              src="https://previews.123rf.com/images/arbuzu/arbuzu1410/arbuzu141000209/32592691-Letter-C-eco-leaves-logo-icon-design-template-elements-Vector-color-sign--Stock-Vector.jpg"
+              alt="collective logo"
+              height="30"
+              width="30"
+            />
+            <h2>Log in to see more</h2>
+            <div>
+              <MailOutline />
+              <Popup
+                trigger={<TextField
+                            type="email"
+                            hintText="Email"
+                            style={styles.iconStyles}
+                            onChange={(event) => this.setState({ emailInput: event.target.value })}
+                          />
+                        }
+                content="Hmm...that doesn't look like an email address."
+                open={this.state.isEmailValidated === false}
+                offset={20}
+                position="right center"
+              /><br />
+              <LockOutline />
+              <Popup
+                trigger={<TextField
+                            // ref="password"
+                            type="password"
+                            hintText="Password"
+                            style={styles.iconStyles}
+                            onChange={(event) => this.setState({ passwordInput: event.target.value })}
+                          />
+                        }
+                content="Your password needs a minimum of 8 characters with at least one uppercasee letter, one lowercase letter and one number."
+                open={(this.state.isPasswordValidated === false && this.state.isEmailValidated === true)}
+                offset={20}
+                position="right center"
+              /><br />
+            </div>
+            <RaisedButton label="Log in" primary={true} onClick={this.handleEmailContinue} />
+            {/* <LoginForm /> */}
+            <div style={styles.or}>OR</div>
             <button
               className={s.loginBtn}
               id="btn-social-login"
@@ -58,7 +168,6 @@ class Login extends React.Component {
             </button>
           </div>
         </div>
-        <Footer />
     </div>
     );
   }
