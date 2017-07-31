@@ -12,13 +12,7 @@ import MenuItem from 'material-ui/MenuItem';
 import schools from './universities_list.js';
 
 injectTapEventPlugin();
-const items = [
-  <MenuItem key={1} value={1} primaryText="Never" />,
-  <MenuItem key={2} value={2} primaryText="Every Night" />,
-  <MenuItem key={3} value={3} primaryText="Weeknights" />,
-  <MenuItem key={4} value={4} primaryText="Weekends" />,
-  <MenuItem key={5} value={5} primaryText="Weekly" />,
-];
+
 class RegisterForm extends React.Component {
   constructor(props) {
     super(props);
@@ -35,7 +29,7 @@ class RegisterForm extends React.Component {
       streetAddress: '',
       aptSuite: '',
       city: '',
-      state: '',
+      state: null,
       zipCode: '',
       schools: '',
       school: null,
@@ -43,7 +37,8 @@ class RegisterForm extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleTheChange = this.handleTheChange.bind(this);
+    this.handleSchoolChange = this.handleSchoolChange.bind(this);
+    this.handleStateChange = this.handleStateChange.bind(this);
   }
 
   componentWillMount() {
@@ -66,42 +61,45 @@ class RegisterForm extends React.Component {
     alert('A name was submitted: ' + this.state.value);
   }
 
-  handleTheChange (event, index, value) {
+  handleSchoolChange (event, index, value) {
     this.setState({ school: value });
   }
 
+  handleStateChange (event, index, value) {
+    this.setState({ state: value });
+  }
+
   render() {
+    const styles = {
+      dropDown: {
+        'text-align': 'left',
+      },
+    };
     return (
       <form onSubmit={this.handleSubmit}>
         <TextField
           type='text'
-          // hintText='First Name'
           floatingLabelText="First Name"
           floatingLabelFixed={true}
           onChange={(event) => this.setState({ firstName: event.target.value })}
         /><br />
         <TextField
           type='text'
-          // hintText='Last Name'
           floatingLabelText="Last Name"
           floatingLabelFixed={true}
           onChange={(event) => this.setState({ lastName: event.target.value })}
         /><br />
         <SelectField
+          type='text'
           value={this.state.school}
-          onChange={this.handleTheChange}
+          onChange={this.handleSchoolChange}
           floatingLabelText="School"
-          // floatingLabelFixed={true}
-          // hintText="Hint text"
+          floatingLabelFixed={true}
+          style={styles.dropDown}
         >
           {this.state.schools.map((school, key) => {
             return <MenuItem key={key} value={school} primaryText={school} />
           })}
-          {/* <MenuItem key={1} value={1} primaryText="Never" />
-          <MenuItem key={2} value={2} primaryText="Every Night" />
-          <MenuItem key={3} value={3} primaryText="Weeknights" />
-          <MenuItem key={4} value={4} primaryText="Weekends" />
-          <MenuItem key={5} value={5} primaryText="Weekly" /> */}
         </SelectField>
         <br />
         <TextField
@@ -117,31 +115,41 @@ class RegisterForm extends React.Component {
          onChange={(event) => this.setState({ phoneNumber: event.target.value })}
         /><br />
         <TextField
-         type='tel'
+         type='text'
          floatingLabelText="Street Address"
          floatingLabelFixed={true}
          onChange={(event) => this.setState({ streetAddress: event.target.value })}
         /><br />
         <TextField
-         type='tel'
+         type='text'
          floatingLabelText="Apt #/Suite"
          floatingLabelFixed={true}
          onChange={(event) => this.setState({ aptSuite: event.target.value })}
         /><br />
         <TextField
-         type='tel'
+         type='text'
          floatingLabelText="City"
          floatingLabelFixed={true}
          onChange={(event) => this.setState({ city: event.target.value })}
         /><br />
+        <SelectField
+          type='text'
+          value={this.state.state}
+          onChange={this.handleStateChange}
+          floatingLabelText="State"
+          floatingLabelFixed={true}
+          style={styles.dropDown}
+        >
+          {['AK','AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','GU','HI',
+          'IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MH','MI','MN','MO',
+          'MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA',
+          'PR','PW','RI','SC','SD','TN','TX','UT','VA','VI','VT','WA','WI',
+          'WV','WY'].map((state, key) => {
+            return <MenuItem key={key} value={state} primaryText={state} />
+          })}
+        </SelectField><br />
         <TextField
-         type='tel'
-         floatingLabelText="State"
-         floatingLabelFixed={true}
-         onChange={(event) => this.setState({ state: event.target.value })}
-        /><br />
-        <TextField
-         type='tel'
+         type='text'
          floatingLabelText="Zip Code"
          floatingLabelFixed={true}
          onChange={(event) => this.setState({ zipCode: event.target.value })}
