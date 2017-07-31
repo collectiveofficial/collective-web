@@ -5,7 +5,6 @@ import {
 } from 'react-router-dom';
 import firebase from 'firebase';
 import s from './Howitworks.css';
-import LoginForm from './LoginForm.js';
 
 class Howitworks extends React.Component {
   constructor(props) {

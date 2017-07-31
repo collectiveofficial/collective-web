@@ -7,10 +7,10 @@ import TextField from 'material-ui/TextField';
 import MailOutline from 'material-ui/svg-icons/communication/mail-outline';
 import LockOutline from 'material-ui/svg-icons/action/lock-outline';
 import RaisedButton from 'material-ui/RaisedButton';
-import { Icon, Popup } from 'semantic-ui-react'
+import { Icon, Popup } from 'semantic-ui-react';
 import s from './Register.css';
 import RegisterForm from './RegisterForm.js';
-import { ref, firebaseAuth } from '../../config'
+import { ref, firebaseAuth } from '../../config';
 
 
 class SignUp extends React.Component {
@@ -26,6 +26,7 @@ class SignUp extends React.Component {
     this.handleEmailContinue = this.handleEmailContinue.bind(this);
     this.handleFBSignUp = this.handleFBSignUp.bind(this);
     this.validateEmail = this.validateEmail.bind(this);
+    this.validatePassword = this.validatePassword.bind(this);
   }
 
   async validateEmail() {
@@ -146,8 +147,8 @@ class SignUp extends React.Component {
                   <Popup
                     trigger={<TextField
                                 // ref="password"
-                                type='password'
-                                hintText='Password'
+                                type="password"
+                                hintText="Create New Password"
                                 style={styles.iconStyles}
                                 onChange={(event) => this.setState({ passwordInput: event.target.value })}
                               />

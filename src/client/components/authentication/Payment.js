@@ -5,7 +5,6 @@ import {
 } from 'react-router-dom';
 import firebase from 'firebase';
 import s from './Payment.css';
-import LoginForm from './LoginForm.js';
 
 class Payment extends React.Component {
   constructor(props) {

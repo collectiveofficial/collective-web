@@ -52,14 +52,8 @@ class RegisterForm extends React.Component {
       const newlines = /\r?\n|\r/g;
       return school.replace(parantheses, '').replace(newlines, '').trim();
     };
-    console.log(typeof schools.universities);
-    for (let key in schools) {
-      console.log('key: ', key, ': ', schools[key]);
-    }
     var xschools = schools.schools['universities'].map(transformSchoolData);
-    this.setState({ schools: xschools }, () => {
-      console.log(this.state.schools);
-    });
+    this.setState({ schools: xschools });
   }
 
   handleChange(event) {
