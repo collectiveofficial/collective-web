@@ -4,8 +4,6 @@ import {
   Link
 } from 'react-router-dom';
 import s from './About.css';
-import Header from '../header/Header.js';
-import Footer from '../footer/Footer.js';
 
 class About extends Component {
   constructor(props) {
@@ -17,7 +15,6 @@ class About extends Component {
   render() {
     return (
       <div>
-        <Header />
         <div className={s.root}>
           <div className={s.container}>
             <h1 className={s.banner}>About us</h1>
@@ -26,7 +23,6 @@ class About extends Component {
             </div>
           </div>
         </div>
-        <Footer />
     </div>
     );
   }

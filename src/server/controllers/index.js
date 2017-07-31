@@ -1,15 +1,45 @@
 const path = require('path');
 const request = require('request-promise');
 const dotenv = require('dotenv').config();
-var firebase = require("firebase");
+const db = require(__dirname + '/../../database/models/index.js')
 const twilio = require('twilio');
 const cron = require('cron');
+
 
 module.exports = {
   settings: {
     get(req, res) {
       console.log('the server works');
       res.json('settings');
+    },
+  },
+  validateEmail: {
+    post(req, res) {
+      const emailInput = req.body.emailInput;
+      const validateEmail = (email) => {
+        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+      };
+      if (validateEmail(emailInput)) {
+        res.json({ emailValidated: true });
+      } else {
+        res.json({ emailValidated: false });
+      }
+    },
+  },
+  validatePassword: {
+    post(req, res) {
+      const passwordInput = req.body.passwordInput;
+      // Minimum eight characters, at least one letter and one number.
+      const validatePassword = (password) => {
+        const re = /^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*)$/;
+        return re.test(password);
+      };
+      if (!validatePassword(passwordInput)) {
+        res.json({ passwordValidated: true });
+      } else {
+        res.json({ passwordValidated: false });
+      }
     },
   },
   facebookAuth: {
@@ -27,8 +57,22 @@ module.exports = {
       // Get the user's name using Facebook's Graph API
       request(options)
       .then((response) => {
-        response = JSON.parse(response); //NOTE TO SELF 2: Yes we're idiots
-        console.log('response from graph API: ', response);
+        response = JSON.parse(response);
+        db.User.create({
+          firstName: response.first_name,
+          lastName: response.last_name,
+          email: response.email,
+          phoneNumber: null,
+          birthday: null,
+          streetAddress: null,
+          aptSuite: null,
+          city: null,
+          state: null,
+          zipCode: null,
+          fullAddress: null,
+          subscribed: false,
+          userGroupId: null
+      })
         res.json({
           facebook_payload: response,
         });
