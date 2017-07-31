@@ -9,6 +9,7 @@ import s from './Register.css';
 import TextField from 'material-ui/TextField';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import RaisedButton from 'material-ui/RaisedButton';
 import schools from './universities_list.js';
 
 injectTapEventPlugin();
@@ -21,10 +22,6 @@ class RegisterForm extends React.Component {
       lastName: '',
       email: '',
       phoneNumber: '',
-      passwordInput: '',
-      passwordRepeat: '',
-      photoURL: '',
-      facebookData: '',
       birthday: '',
       streetAddress: '',
       aptSuite: '',
@@ -39,6 +36,8 @@ class RegisterForm extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleSchoolChange = this.handleSchoolChange.bind(this);
     this.handleStateChange = this.handleStateChange.bind(this);
+    this.transferUserSignup = this.transferUserSignup.bind(this);
+    this.submitUserInfo = this.submitUserInfo.bind(this);
   }
 
   componentWillMount() {
@@ -49,6 +48,20 @@ class RegisterForm extends React.Component {
     };
     var xschools = schools.schools['universities'].map(transformSchoolData);
     this.setState({ schools: xschools });
+  }
+
+  componentDidMount() {
+    this.transferUserSignup();
+  }
+
+  async transferUserSignup() {
+    if (this.props.userWantsEmailSignup) {
+      await this.setState({ email: this.props.emailInput });
+    } else {
+      await this.setState({ email: this.props.facebookData.email });
+      await this.setState({ firstName: this.props.facebookData.first_name });
+      await this.setState({ lastName: this.props.facebookData.last_name });
+    }
   }
 
   handleChange(event) {
@@ -69,6 +82,30 @@ class RegisterForm extends React.Component {
     this.setState({ state: value });
   }
 
+  async submitUserInfo() {
+    const response = await fetch('/auth/submit', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: JSON.stringify({
+        email: this.state.email,
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        school: this.state.school,
+        phoneNumber: this.state.phoneNumber,
+        birthday: this.state.birthday,
+        streetAddress: this.state.streetAddress,
+        aptSuite: this.state.aptSuite,
+        city: this.state.city,
+        state: this.state.state,
+        zipCode: this.state.zipCode,
+      }),
+    })
+    const responseData = await response.json();
+  }
+
   render() {
     const styles = {
       dropDown: {
@@ -79,15 +116,24 @@ class RegisterForm extends React.Component {
       <form onSubmit={this.handleSubmit}>
         <TextField
           type='text'
+          value={this.state.firstName}
           floatingLabelText="First Name"
           floatingLabelFixed={true}
           onChange={(event) => this.setState({ firstName: event.target.value })}
         /><br />
         <TextField
           type='text'
+          value={this.state.lastName}
           floatingLabelText="Last Name"
           floatingLabelFixed={true}
           onChange={(event) => this.setState({ lastName: event.target.value })}
+        /><br />
+        <TextField
+          type='text'
+          value={this.state.email}
+          floatingLabelText="Email"
+          floatingLabelFixed={true}
+          onChange={(event) => this.setState({ email: event.target.value })}
         /><br />
         <SelectField
           type='text'
@@ -155,7 +201,8 @@ class RegisterForm extends React.Component {
          onChange={(event) => this.setState({ zipCode: event.target.value })}
         /><br />
        <div>
-        <Link to="/payment"><input type="submit" value="Submit" className={s.submit}/></Link>
+        <Link to="/payment"><RaisedButton label="Submit" secondary={true} onClick={this.submitUserInfo} /><br /><br />
+        </Link>
       </div>
       </form>
     );
