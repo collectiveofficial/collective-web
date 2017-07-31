@@ -30,7 +30,7 @@ module.exports = {
   validatePassword: {
     post(req, res) {
       const passwordInput = req.body.passwordInput;
-      // Minimum eight characters, at least one letter and one number. No special characters.
+      // Minimum eight characters, at least one letter and one number.
       const validatePassword = (password) => {
         const re = /^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*)$/;
         return re.test(password);

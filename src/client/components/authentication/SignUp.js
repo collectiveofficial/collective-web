@@ -152,7 +152,7 @@ class SignUp extends React.Component {
                                 onChange={(event) => this.setState({ passwordInput: event.target.value })}
                               />
                             }
-                    content="Your password is too short! You need at least 8 characters!"
+                    content="Your password needs a minimum of 8 characters with at least one uppercasee letter, one lowercase letter and one number."
                     open={(this.state.isPasswordValidated === false && this.state.isEmailValidated === true)}
                     offset={20}
                     position="right center"
