@@ -97,12 +97,27 @@ class Login extends React.Component {
     });
     const responseData = await response.json();
     await console.log(responseData);
+    // Need user authorization
     await this.setState({ facebookData: responseData.facebook_payload }, () => {
       console.log('this.state.facebookData: ', this.state.facebookData);
     });
     await this.setState({ userCredentialsValidated: true }, () => {
       console.log('user credentials validated: ', this.state.userCredentialsValidated);
     });
+    const idToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+    const firebaseResponse = await fetch('/auth/basic/home', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: JSON.stringify({
+        idToken
+      }),
+    })
+    const firebaseResponseData = await firebaseResponse.json();
+    console.log('responseData: ', firebaseResponseData);
+    // await this.logIn();
   }
 
   render() {
@@ -117,25 +132,28 @@ class Login extends React.Component {
     };
     return (
       <div>
-        <div className={s.root}>
-          <div className={s.container}>
-            <img
-              src="https://previews.123rf.com/images/arbuzu/arbuzu1410/arbuzu141000209/32592691-Letter-C-eco-leaves-logo-icon-design-template-elements-Vector-color-sign--Stock-Vector.jpg"
-              alt="collective logo"
-              height="30"
-              width="30"
-            />
-            <h2>Log in to see more</h2>
-            <div>
-              <MailOutline />
-              <Popup
-                trigger={<TextField
-                            type="email"
-                            hintText="Email"
-                            style={styles.iconStyles}
-                            onChange={(event) => this.setState({ emailInput: event.target.value })}
-                          />
-                        }
+        {this.props.authed ?
+          <div></div>
+          :
+          <div className={s.root}>
+            <div className={s.container}>
+              <img
+                src="https://previews.123rf.com/images/arbuzu/arbuzu1410/arbuzu141000209/32592691-Letter-C-eco-leaves-logo-icon-design-template-elements-Vector-color-sign--Stock-Vector.jpg"
+                alt="collective logo"
+                height="30"
+                width="30"
+              />
+              <h2>Log in to see more</h2>
+              <div>
+                <MailOutline />
+                <Popup
+                  trigger={<TextField
+                    type="email"
+                    hintText="Email"
+                    style={styles.iconStyles}
+                    onChange={(event) => this.setState({ emailInput: event.target.value })}
+                  />
+                }
                 content="Hmm...that doesn't look like an email address."
                 open={this.state.isEmailValidated === false}
                 offset={20}
@@ -144,30 +162,31 @@ class Login extends React.Component {
               <LockOutline />
               <Popup
                 trigger={<TextField
-                            // ref="password"
-                            type="password"
-                            hintText="Password"
-                            style={styles.iconStyles}
-                            onChange={(event) => this.setState({ passwordInput: event.target.value })}
-                          />
-                        }
-                content="Your password needs a minimum of 8 characters with at least one uppercasee letter, one lowercase letter and one number."
-                open={(this.state.isPasswordValidated === false && this.state.isEmailValidated === true)}
-                offset={20}
-                position="right center"
-              /><br />
-            </div>
-            <RaisedButton label="Log in" primary={true} onClick={this.handleEmailContinue} />
-            {/* <LoginForm /> */}
-            <div style={styles.or}>OR</div>
-            <button
-              className={s.loginBtn}
-              id="btn-social-login"
-              onClick={this.handleFBLogin}>
-              Login with Facebook
-            </button>
+                  // ref="password"
+                  type="password"
+                  hintText="Password"
+                  style={styles.iconStyles}
+                  onChange={(event) => this.setState({ passwordInput: event.target.value })}
+                />
+              }
+              content="Your password needs a minimum of 8 characters with at least one uppercasee letter, one lowercase letter and one number."
+              open={(this.state.isPasswordValidated === false && this.state.isEmailValidated === true)}
+              offset={20}
+              position="right center"
+            /><br />
           </div>
+          <RaisedButton label="Log in" primary={true} onClick={this.handleEmailContinue} />
+          {/* <LoginForm /> */}
+          <div style={styles.or}>OR</div>
+          <button
+            className={s.loginBtn}
+            id="btn-social-login"
+            onClick={this.handleFBLogin}>
+            Login with Facebook
+          </button>
         </div>
+      </div>
+        }
     </div>
     );
   }

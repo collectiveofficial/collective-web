@@ -1,4 +1,4 @@
-import { ref, firebaseAuth } from '../config'
+import { ref, firebaseAuth } from '../config';
 
 export function createNativeUser (email, pw) {
   return firebaseAuth().createUserWithEmailAndPassword(email, pw)

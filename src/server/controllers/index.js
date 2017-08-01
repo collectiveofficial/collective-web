@@ -4,8 +4,33 @@ const dotenv = require('dotenv').config();
 const twilio = require('twilio');
 const cron = require('cron');
 const userUtil = require('../models/user');
+const admin = require('firebase-admin');
+
+const firebaseAdminApp = admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY,
+  }),
+  databaseURL: process.env.FIREBASE_DATABASE_URL,
+});
+
+console.log(firebaseAdminApp);
 
 module.exports = {
+  authorizeBasicUser: {
+    post(req, res) {
+      admin.auth().verifyIdToken(req.body.idToken)
+      .then(function(decodedToken) {
+        var uid = decodedToken.uid;
+        res.json({ isLoggedIn: true });
+        // lookup database
+      }).catch(function(error) {
+        // Handle error
+        console.log(error);
+      });
+    },
+  },
   settings: {
     get(req, res) {
       console.log('the server works');
