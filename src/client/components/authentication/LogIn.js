@@ -132,7 +132,7 @@ class Login extends React.Component {
     };
     return (
       <div>
-        {this.props.authed ?
+        {this.props.authenticated ?
           <div></div>
           :
           <div className={s.root}>

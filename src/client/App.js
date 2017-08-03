@@ -27,12 +27,13 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      authed: false,
+      authenticated: false,
       loading: true,
       homePath: '/home',
       signupPath: '/',
     };
     this.logOut = this.logOut.bind(this);
+    this.showUser = this.showUser.bind(this);
     // this.logIn = this.logIn.bind(this);
   }
 
@@ -41,18 +42,18 @@ class App extends Component {
       if (user) { // is signed in
         console.log('Logged in');
         this.setState({
-          authed: true,
+          authenticated: true,
           // need another state to check authorization for dynamic routing
           loading: false,
-          homePath: '/',
-          signupPath: '/signup',
+          // homePath: '/',
+          // signupPath: '/signup',
         });
       } else { // isn't signed in
         this.setState({
-          authed: false,
+          authenticated: false,
           loading: false,
-          homePath: '/home',
-          signupPath: '/',
+          // homePath: '/home',
+          // signupPath: '/',
         });
       }
     });
@@ -64,12 +65,17 @@ class App extends Component {
 
   async logOut() {
     await nativeLogout();
+    await console.log('User after log out', firebaseAuth().currentUser);
+  }
+
+  async showUser() {
+    await console.log(await firebaseAuth().currentUser);
   }
 
   // async logIn() {
   //   await console.log('Logged in');
   //   await this.setState({
-  //     authed: true,
+  //     authenticated: true,
   //     loading: false,
   //     homePath: '/',
   //     signupPath: '/signup',
@@ -80,8 +86,8 @@ class App extends Component {
     return (
       <MuiThemeProvider>
         <div>
-          <Header authed={this.state.authed} logOut={this.logOut} />
-          <Route path="/login" component={() => <LogIn authed={this.authed} />} />
+          <Header authenticated={this.state.authenticated} logOut={this.logOut} showUser={this.showUser}/>
+          <Route path="/login" component={() => <LogIn authenticated={this.authenticated} />} />
           <Route path={this.state.homePath} component={Home} />
           <Route path="/about" component={About} />
           <Route path="/foodwiki" component={foodwiki} />

@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 var injectTapEventPlugin = require("react-tap-event-plugin");
 import {
   Route,
-  Link
+  Link,
+  Redirect
 } from 'react-router-dom';
 import firebase from 'firebase';
 import s from './Register.css';
@@ -26,10 +27,22 @@ class RegisterForm extends React.Component {
       streetAddress: '',
       aptSuite: '',
       city: '',
-      state: null,
+      state: '',
+      // state: null,
       zipCode: '',
       schools: '',
-      school: null,
+      school: '',
+      // school: null,
+      isFirstNameEmpty: false,
+      isLastNameEmpty: false,
+      isPhoneNumberEmpty: false,
+      isBirthdayEmpty: false,
+      isStreetAddressEmpty: false,
+      isCityEmpty: false,
+      isStateEmpty: false,
+      isZipCodeEmpty: false,
+      isSchoolEmpty: false,
+      userAuthorized: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -38,6 +51,7 @@ class RegisterForm extends React.Component {
     this.handleStateChange = this.handleStateChange.bind(this);
     this.transferUserSignup = this.transferUserSignup.bind(this);
     this.submitUserInfo = this.submitUserInfo.bind(this);
+    this.areThereEmptyFields = this.areThereEmptyFields.bind(this);
   }
 
   componentWillMount() {
@@ -82,33 +96,81 @@ class RegisterForm extends React.Component {
     this.setState({ state: value });
   }
 
+  async areThereEmptyFields() {
+    await this.setState({ isFirstNameEmpty: false });
+    await this.setState({ isLastNameEmpty: false });
+    await this.setState({ isPhoneNumberEmpty: false });
+    await this.setState({ isBirthdayEmpty: false });
+    await this.setState({ isStreetAddressEmpty: false });
+    await this.setState({ isCityEmpty: false });
+    await this.setState({ isStateEmpty: false });
+    await this.setState({ isZipCodeEmpty: false });
+    await this.setState({ isSchoolEmpty: false });
+
+    if (this.state.firstName.length === 0) {
+      await this.setState({ isFirstNameEmpty: true });
+    }
+    if (this.state.lastName.length === 0) {
+      await this.setState({ isLastNameEmpty: true });
+    }
+    if (this.state.phoneNumber.length === 0) {
+      await this.setState({ isPhoneNumberEmpty: true });
+    }
+    if (this.state.birthday.length === 0) {
+      await this.setState({ isBirthdayEmpty: true });
+    }
+    if (this.state.streetAddress.length === 0) {
+      await this.setState({ isStreetAddressEmpty: true });
+    }
+    if (this.state.city.length === 0) {
+      await this.setState({ isCityEmpty: true });
+    }
+    if (this.state.state.length === 0) {
+      await this.setState({ isStateEmpty: true });
+    }
+    if (this.state.zipCode.length === 0) {
+      await this.setState({ isZipCodeEmpty: true });
+    }
+    if (this.state.school.length === 0) {
+      await this.setState({ isSchoolEmpty: true });
+    }
+    return (this.state.isFirstNameEmpty || this.state.isLastNameEmpty || this.state.isPhoneNumberEmpty || this.state.isBirthdayEmpty ||
+    this.state.isStreetAddressEmpty || this.state.isCityEmpty || this.state.isStateEmpty || this.state.isZipCodeEmpty || this.state.isSchoolEmpty);
+  }
+
   async submitUserInfo() {
-    const response = await fetch('/auth/submit', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8'
-      },
-      body: JSON.stringify({
-        email: this.state.email,
-        firstName: this.state.firstName,
-        lastName: this.state.lastName,
-        school: this.state.school,
-        phoneNumber: this.state.phoneNumber,
-        birthday: this.state.birthday,
-        streetAddress: this.state.streetAddress,
-        aptSuite: this.state.aptSuite,
-        city: this.state.city,
-        state: this.state.state,
-        zipCode: this.state.zipCode,
-      }),
-    })
-    const responseData = await response.json();
+    const areThereEmptyFields = await this.areThereEmptyFields();
+    await console.log('areThereEmptyFields: ', areThereEmptyFields);
+    if (areThereEmptyFields === false) {
+      await console.log('areThereEmptyFields: ', areThereEmptyFields);
+      const response = await fetch('/auth/submit', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify({
+          email: this.state.email,
+          firstName: this.state.firstName,
+          lastName: this.state.lastName,
+          school: this.state.school,
+          phoneNumber: this.state.phoneNumber,
+          birthday: this.state.birthday,
+          streetAddress: this.state.streetAddress,
+          aptSuite: this.state.aptSuite,
+          city: this.state.city,
+          state: this.state.state,
+          zipCode: this.state.zipCode,
+        }),
+      })
+      const responseData = await response.json();
+      await this.setState({ userAuthorized: true });
+    }
   }
 
   render() {
     const styles = {
-      dropDown: {
+      field: {
         'text-align': 'left',
       },
     };
@@ -119,21 +181,18 @@ class RegisterForm extends React.Component {
           value={this.state.firstName}
           floatingLabelText="First Name"
           floatingLabelFixed={true}
+          style={styles.field}
           onChange={(event) => this.setState({ firstName: event.target.value })}
+          errorText={this.state.isFirstNameEmpty ? 'First name is required' : ''}
         /><br />
         <TextField
           type='text'
           value={this.state.lastName}
           floatingLabelText="Last Name"
           floatingLabelFixed={true}
+          style={styles.field}
           onChange={(event) => this.setState({ lastName: event.target.value })}
-        /><br />
-        <TextField
-          type='text'
-          value={this.state.email}
-          floatingLabelText="Email"
-          floatingLabelFixed={true}
-          onChange={(event) => this.setState({ email: event.target.value })}
+          errorText={this.state.isLastNameEmpty ? 'Last name is required' : ''}
         /><br />
         <SelectField
           type='text'
@@ -141,7 +200,8 @@ class RegisterForm extends React.Component {
           onChange={this.handleSchoolChange}
           floatingLabelText="School"
           floatingLabelFixed={true}
-          style={styles.dropDown}
+          style={styles.field}
+          errorText={this.state.isSchoolEmpty ? 'School is required' : ''}
         >
           {this.state.schools.map((school, key) => {
             return <MenuItem key={key} value={school} primaryText={school} />
@@ -152,31 +212,40 @@ class RegisterForm extends React.Component {
          type='date'
          floatingLabelText="Date of Birth"
          floatingLabelFixed={true}
+         style={styles.field}
          onChange={(event) => this.setState({ birthday: event.target.value })}
+         errorText={this.state.isBirthdayEmpty ? 'Birthday is required' : ''}
         /><br />
         <TextField
          type='tel'
          floatingLabelText="Cell Phone"
          floatingLabelFixed={true}
+         style={styles.field}
          onChange={(event) => this.setState({ phoneNumber: event.target.value })}
+         errorText={this.state.isPhoneNumberEmpty ? 'Phone number is required' : ''}
         /><br />
         <TextField
          type='text'
          floatingLabelText="Street Address"
          floatingLabelFixed={true}
+         style={styles.field}
          onChange={(event) => this.setState({ streetAddress: event.target.value })}
+         errorText={this.state.isStreetAddressEmpty ? 'Street address is required' : ''}
         /><br />
         <TextField
          type='text'
          floatingLabelText="Apt #/Suite"
          floatingLabelFixed={true}
+         style={styles.field}
          onChange={(event) => this.setState({ aptSuite: event.target.value })}
         /><br />
         <TextField
          type='text'
          floatingLabelText="City"
          floatingLabelFixed={true}
+         style={styles.field}
          onChange={(event) => this.setState({ city: event.target.value })}
+         errorText={this.state.isCityEmpty ? 'City is required' : ''}
         /><br />
         <SelectField
           type='text'
@@ -184,7 +253,8 @@ class RegisterForm extends React.Component {
           onChange={this.handleStateChange}
           floatingLabelText="State"
           floatingLabelFixed={true}
-          style={styles.dropDown}
+          style={styles.field}
+          errorText={this.state.isStateEmpty ? 'State is required' : ''}
         >
           {['AK','AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','GU','HI',
           'IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MH','MI','MN','MO',
@@ -198,11 +268,17 @@ class RegisterForm extends React.Component {
          type='text'
          floatingLabelText="Zip Code"
          floatingLabelFixed={true}
+         style={styles.field}
          onChange={(event) => this.setState({ zipCode: event.target.value })}
+         errorText={this.state.isZipCodeEmpty ? 'Zip code is required' : ''}
         /><br />
        <div>
-        <Link to="/payment"><RaisedButton label="Submit" secondary={true} onClick={this.submitUserInfo} /><br /><br />
-        </Link>
+        <RaisedButton label="Submit" primary={true} onClick={this.submitUserInfo} /><br /><br />
+        {this.state.userAuthorized ?
+          <Redirect to="/payment"/>
+          :
+          <div></div>
+        }
       </div>
       </form>
     );
