@@ -42,7 +42,7 @@ class Head extends Component {
             <Modal trigger={<div className={s.link}>How it works</div>}>
               <Modal.Header>How it works</Modal.Header>
               <Modal.Content image>
-                <Image wrapped size='large' src='https://scontent-sjc2-1.xx.fbcdn.net/v/t31.0-8/20543885_10203394818707430_3468504837222731456_o.jpg?oh=9da059cb55b752e2440478a2df39293a&oe=5A2E7096' />
+                <Image wrapped size='medium' src='https://scontent-sjc2-1.xx.fbcdn.net/v/t31.0-8/20543885_10203394818707430_3468504837222731456_o.jpg?oh=9da059cb55b752e2440478a2df39293a&oe=5A2E7096' />
                 <Modal.Description>
                   <Header>The whole process works in four easy steps</Header>
                   <p>1. You vote and pay for the food you want.</p>
