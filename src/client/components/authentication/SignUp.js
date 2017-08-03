@@ -7,11 +7,12 @@ import TextField from 'material-ui/TextField';
 import MailOutline from 'material-ui/svg-icons/communication/mail-outline';
 import LockOutline from 'material-ui/svg-icons/action/lock-outline';
 import RaisedButton from 'material-ui/RaisedButton';
+import { Tabs, Tab } from 'material-ui/Tabs';
 import { Icon, Popup } from 'semantic-ui-react';
 import s from './Register.css';
 import RegisterForm from './RegisterForm.js';
 import { ref, firebaseAuth } from '../../config';
-
+import { createNativeUser } from '../../utils/auth.js';
 
 class SignUp extends React.Component {
   constructor(props) {
@@ -20,34 +21,44 @@ class SignUp extends React.Component {
       emailInput: '',
       passwordInput: '',
       userAllowedContinue: false,
-      isEmailValidated: '',
       isPasswordValidated: '',
+      userWantsEmailSignup: false,
+      facebookData: '',
+      isInvalidEmail: '',
+      isWeakPassword: '',
+      isEmailAlreadyInUse: '',
     };
     this.handleEmailContinue = this.handleEmailContinue.bind(this);
     this.handleFBSignUp = this.handleFBSignUp.bind(this);
-    this.validateEmail = this.validateEmail.bind(this);
     this.validatePassword = this.validatePassword.bind(this);
+    this.createNativeUser = this.createNativeUser.bind(this);
+    this.resetErrorStates = this.resetErrorStates.bind(this);
   }
 
-  async validateEmail() {
-    const response = await fetch('/auth/email', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8'
-      },
-      body: JSON.stringify({
-        emailInput: this.state.emailInput,
-      }),
+  async createNativeUser (email, pw) {
+    await this.setState({ hasFirebaseChecked: true });
+    return firebaseAuth().createUserWithEmailAndPassword(email, pw)
+    .catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      if (errorCode === 'auth/invalid-email') {
+        this.setState({ isInvalidEmail: true });
+      } else {
+        this.setState({ isInvalidEmail: false });
+      }
+      if (errorCode === 'auth/email-already-in-use') {
+        this.setState({ isEmailAlreadyInUse: true });
+      } else {
+        this.setState({ isEmailAlreadyInUse: false });
+      }
+      if (errorCode === 'auth/weak-password') {
+        this.setState({ isWeakPassword: true });
+      } else {
+        this.setState({ isWeakPassword: false });
+      }
+      console.log(error);
     });
-    const responseData = await response.json();
-    await console.log('responseData: ', responseData);
-    if (responseData.emailValidated) {
-      await this.setState({ isEmailValidated: true });
-    } else {
-      await console.log('response.emailValidated: ', response.emailValidated);
-      await this.setState({ isEmailValidated: false });
-    }
   }
 
   async validatePassword() {
@@ -69,10 +80,22 @@ class SignUp extends React.Component {
     }
   }
 
+  resetErrorStates() {
+    this.setState({ isPasswordValidated: '' });
+    this.setState({ isInvalidEmail: '' });
+    this.setState({ isEmailAlreadyInUse: '' });
+  }
+
   async handleEmailContinue() {
-    await this.validateEmail();
+    await this.resetErrorStates();
     await this.validatePassword();
-    if (this.state.isEmailValidated && this.state.isPasswordValidated) {
+    if (this.state.isPasswordValidated) {
+      await this.createNativeUser(this.state.emailInput, this.state.passwordInput);
+    }
+    const isValidLogin = !(this.state.isInvalidEmail || this.state.isEmailAlreadyInUse);
+    if (isValidLogin && this.state.isPasswordValidated) {
+      console.log('this.state.isEmailAlreadyInUse; ', this.state.isEmailAlreadyInUse);
+      await this.setState({ userWantsEmailSignup: true });
       await this.setState({ userAllowedContinue: true });
     }
   }
@@ -82,9 +105,6 @@ class SignUp extends React.Component {
     await provider.addScope('email, public_profile, user_friends');
     const result = await firebaseAuth().signInWithPopup(provider);
     const token = result.credential.accessToken;
-    // const user = result.user;
-    // await this.setState({ email: user.email });
-    // await this.setState({ photoURL: user.photoURL });
     const response = await fetch('/auth/facebook', {
       method: 'POST',
       headers: {
@@ -101,6 +121,19 @@ class SignUp extends React.Component {
       console.log('this.state.facebookData: ', this.state.facebookData);
     });
     await this.setState({ userAllowedContinue: true });
+    const idToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+    const firebaseResponse = await fetch('/auth/basic/home', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        idToken,
+      }),
+    });
+    const firebaseResponseData = await firebaseResponse.json();
+    console.log('responseData: ', firebaseResponseData);
   }
 
   render() {
@@ -112,13 +145,24 @@ class SignUp extends React.Component {
         marginTop: '3%',
         marginBottom: '3%',
       },
+      headline: {
+        fontSize: 24,
+        paddingTop: 16,
+        marginBottom: 12,
+        fontWeight: 400,
+      },
     };
     return (
       <div>
         <div className={s.root}>
           <div className={s.container}>
             {this.state.userAllowedContinue ?
-              <RegisterForm />
+              <RegisterForm
+                userWantsEmailSignup={this.state.userWantsEmailSignup}
+                emailInput={this.state.emailInput}
+                passwordInput={this.state.passwordInput}
+                facebookData={this.state.facebookData}
+              />
               :
               <div>
                 <img
@@ -129,37 +173,80 @@ class SignUp extends React.Component {
                 />
                 <h2>Welcome to Collective!</h2>
                 <div>
-                  <MailOutline />
-                  <Popup
-                    trigger={<TextField
-                                type="email"
-                                hintText="Email"
-                                style={styles.iconStyles}
-                                onChange={(event) => this.setState({ emailInput: event.target.value })}
-                              />
-                            }
-                    content="Hmm...that doesn't look like an email address."
-                    open={this.state.isEmailValidated === false}
+                  {this.state.isEmailAlreadyInUse === true ?
+                    <div>
+                    <MailOutline />
+                    <Popup
+                      trigger={<TextField
+                        type="email"
+                        hintText="Email"
+                        style={styles.iconStyles}
+                        onChange={(event) => this.setState({ emailInput: event.target.value }, () => {console.log(this.state.emailInput)})}
+                      />
+                    }
+                    content="This email is already in use"
+                    open={this.state.isEmailAlreadyInUse === true}
                     offset={20}
                     position="right center"
-                  /><br />
-                  <LockOutline />
-                  <Popup
-                    trigger={<TextField
-                                // ref="password"
-                                type="password"
-                                hintText="Create New Password"
-                                style={styles.iconStyles}
-                                onChange={(event) => this.setState({ passwordInput: event.target.value })}
-                              />
-                            }
-                    content="Your password needs a minimum of 8 characters with at least one uppercasee letter, one lowercase letter and one number."
-                    open={(this.state.isPasswordValidated === false && this.state.isEmailValidated === true)}
-                    offset={20}
-                    position="right center"
-                  /><br />
+                    /><br />
+                    </div>
+                    :
+                    <div>
+                    <MailOutline />
+                    <Popup
+                      trigger={
+                        <TextField
+                          type="email"
+                          hintText="Email"
+                          style={styles.iconStyles}
+                          onChange={(event) => this.setState({ emailInput: event.target.value }, () => {console.log(this.state.emailInput)})}
+                        />
+                    }
+                      content="Hmm...that doesn't look like an email address."
+                      open={this.state.isInvalidEmail === true}
+                      offset={20}
+                      position="right center"
+                    /><br />
+                  </div>
+                  }
+                  {this.state.isWeakPassword ?
+                    <div>
+                      <LockOutline />
+                      <Popup
+                        trigger={<TextField
+                          type="password"
+                          hintText="Create New Password"
+                          style={styles.iconStyles}
+                          onChange={(event) => this.setState({ passwordInput: event.target.value })}
+                        />
+                        }
+                        content="The password is too weak."
+                        open={(this.state.isWeakPassword === true && this.state.isInvalidEmail === false && this.state.isEmailAlreadyInUse === false)}
+                        offset={20}
+                        position="right center"
+                      /><br />
+                    </div>
+                    :
+                    <div>
+                      <LockOutline />
+                      <Popup
+                        trigger={<TextField
+                          type="password"
+                          hintText="Create New Password"
+                          style={styles.iconStyles}
+                          onChange={(event) => this.setState({ passwordInput: event.target.value })}
+                        />
+                      }
+                      content="Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number."
+                      open={(this.state.isPasswordValidated === false)}
+                      // open={(this.state.isPasswordValidated === false && this.state.isInvalidEmail === false && this.state.isEmailAlreadyInUse === false)}
+                      offset={20}
+                      position="right center"
+                    /><br />
+                  </div>
+                  }
                 </div>
-                <RaisedButton label="Continue" primary={true} onClick={this.handleEmailContinue} />
+                <RaisedButton label="Continue" primary={true} onClick={this.handleEmailContinue} /><br /><br />
                 <div style={styles.or}>OR</div>
                 <button
                   className={s.loginBtn}

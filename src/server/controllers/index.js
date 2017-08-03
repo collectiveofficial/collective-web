@@ -1,12 +1,37 @@
 const path = require('path');
 const request = require('request-promise');
 const dotenv = require('dotenv').config();
-const db = require(__dirname + '/../../database/models/index.js')
 const twilio = require('twilio');
 const cron = require('cron');
+const userUtil = require('../models/user');
+const admin = require('firebase-admin');
 
+const firebaseAdminApp = admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    // privateKey: process.env.FIREBASE_PRIVATE_KEY,
+    privateKey: process.env.NODE_ENV === 'production' ? JSON.parse(process.env.FIREBASE_PRIVATE_KEY) : process.env.FIREBASE_PRIVATE_KEY,
+  }),
+  databaseURL: process.env.FIREBASE_DATABASE_URL,
+});
+
+console.log(firebaseAdminApp);
 
 module.exports = {
+  authorizeBasicUser: {
+    post(req, res) {
+      admin.auth().verifyIdToken(req.body.idToken)
+      .then(function(decodedToken) {
+        var uid = decodedToken.uid;
+        res.json({ isLoggedIn: true });
+        // lookup database
+      }).catch(function(error) {
+        // Handle error
+        console.log(error);
+      });
+    },
+  },
   settings: {
     get(req, res) {
       console.log('the server works');
@@ -58,26 +83,17 @@ module.exports = {
       request(options)
       .then((response) => {
         response = JSON.parse(response);
-        db.User.create({
-          firstName: response.first_name,
-          lastName: response.last_name,
-          email: response.email,
-          phoneNumber: null,
-          birthday: null,
-          streetAddress: null,
-          aptSuite: null,
-          city: null,
-          state: null,
-          zipCode: null,
-          fullAddress: null,
-          subscribed: false,
-          userGroupId: null
-      })
         res.json({
           facebook_payload: response,
         });
       })
       .catch(err => console.log(err));
+    },
+  },
+  submitUserInfo: {
+    post(req, res) {
+      userUtil.addUser(req.body);
+      res.json({ userSignedUp: true });
     },
   },
   voteNotification: {

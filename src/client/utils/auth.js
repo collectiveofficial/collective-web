@@ -1,8 +1,19 @@
-import { ref, firebaseAuth } from '../config'
+import { ref, firebaseAuth } from '../config';
 
 export function createNativeUser (email, pw) {
   return firebaseAuth().createUserWithEmailAndPassword(email, pw)
-    .then(saveUser)
+  // .catch(function(error) {
+  //   // Handle Errors here.
+  //   var errorCode = error.code;
+  //   var errorMessage = error.message;
+  //   if (errorCode == 'auth/weak-password') {
+  //     alert('The password is too weak.');
+  //   } else {
+  //     alert(errorMessage);
+  //   }
+  //   console.log(error);
+  // });
+    // .then(saveUser)
 }
 
 export function nativeLogout () {
