@@ -19,7 +19,7 @@ class foodwiki extends Component {
           <div className={s.container}>
             <h1 className={s.banner}>Food Wiki</h1>
             <div className={s.card}>
-              Here is where we compile a database of recipes, storage intructions, etc., for all the produce we provide
+              Thanks for checking out our food wiki page! We are currently building it to be a fantastic resource for anyone to look up instructions on recipes, food preparation, and storage. We will keep you updated on when this is fully functional. But, for now, check out these links which can provide decent resources about any food related questions you may have.
             </div>
           </div>
         </div>
