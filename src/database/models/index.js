@@ -11,12 +11,20 @@ const db = {};
 let sequelize;
 
 if (env === 'production') {
-  sequelize = new Sequelize(process.env.DATABASE_URL, {
+// if (config.use_env_variable) {
+  const match = process.env.DATABASE_URL.match(/postgres:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
+  sequelize = new Sequelize(match[5], match[1], match[2], {
     dialect: 'postgres',
+    protocol: 'postgres',
+    port: match[4],
+    host: match[3],
+    logging: false,
     dialectOptions: {
       ssl: true,
     },
   });
+  // sequelize = new Sequelize(process.env.DATABASE_URL, {
+  // sequelize = new Sequelize(config.use_env_variable, config);
 } else {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
