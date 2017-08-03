@@ -1,15 +1,70 @@
 const path = require('path');
 const request = require('request-promise');
 const dotenv = require('dotenv').config();
-var firebase = require("firebase");
 const twilio = require('twilio');
 const cron = require('cron');
+const userUtil = require('../models/user');
+const admin = require('firebase-admin');
+
+const firebaseAdminApp = admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    // privateKey: process.env.FIREBASE_PRIVATE_KEY,
+    privateKey: process.env.NODE_ENV === 'production' ? JSON.parse(process.env.FIREBASE_PRIVATE_KEY) : process.env.FIREBASE_PRIVATE_KEY,
+  }),
+  databaseURL: process.env.FIREBASE_DATABASE_URL,
+});
+
+console.log(firebaseAdminApp);
 
 module.exports = {
+  authorizeBasicUser: {
+    post(req, res) {
+      admin.auth().verifyIdToken(req.body.idToken)
+      .then(function(decodedToken) {
+        var uid = decodedToken.uid;
+        res.json({ isLoggedIn: true });
+        // lookup database
+      }).catch(function(error) {
+        // Handle error
+        console.log(error);
+      });
+    },
+  },
   settings: {
     get(req, res) {
       console.log('the server works');
       res.json('settings');
+    },
+  },
+  validateEmail: {
+    post(req, res) {
+      const emailInput = req.body.emailInput;
+      const validateEmail = (email) => {
+        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+      };
+      if (validateEmail(emailInput)) {
+        res.json({ emailValidated: true });
+      } else {
+        res.json({ emailValidated: false });
+      }
+    },
+  },
+  validatePassword: {
+    post(req, res) {
+      const passwordInput = req.body.passwordInput;
+      // Minimum eight characters, at least one letter and one number.
+      const validatePassword = (password) => {
+        const re = /^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*)$/;
+        return re.test(password);
+      };
+      if (!validatePassword(passwordInput)) {
+        res.json({ passwordValidated: true });
+      } else {
+        res.json({ passwordValidated: false });
+      }
     },
   },
   facebookAuth: {
@@ -27,13 +82,18 @@ module.exports = {
       // Get the user's name using Facebook's Graph API
       request(options)
       .then((response) => {
-        response = JSON.parse(response); //NOTE TO SELF 2: Yes we're idiots
-        console.log('response from graph API: ', response);
+        response = JSON.parse(response);
         res.json({
           facebook_payload: response,
         });
       })
       .catch(err => console.log(err));
+    },
+  },
+  submitUserInfo: {
+    post(req, res) {
+      userUtil.addUser(req.body);
+      res.json({ userSignedUp: true });
     },
   },
   voteNotification: {

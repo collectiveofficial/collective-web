@@ -5,13 +5,26 @@ const Sequelize = require('sequelize');
 const basename = path.basename(module.filename);
 const dotenv = require('dotenv').config();
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.js')[env];
+const config = require('../config/config.js')[env];
 const db = {};
 
 let sequelize;
 
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env.use_env_variable);
+if (env === 'production') {
+// if (config.use_env_variable) {
+  const match = process.env.DATABASE_URL.match(/postgres:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
+  sequelize = new Sequelize(match[5], match[1], match[2], {
+    dialect: 'postgres',
+    protocol: 'postgres',
+    port: match[4],
+    host: match[3],
+    logging: false,
+    dialectOptions: {
+      ssl: true,
+    },
+  });
+  // sequelize = new Sequelize(process.env.DATABASE_URL, {
+  // sequelize = new Sequelize(config.use_env_variable, config);
 } else {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
@@ -29,6 +42,15 @@ Object.keys(db).forEach((modelName) => {
     db[modelName].associate(db);
   }
 });
+
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

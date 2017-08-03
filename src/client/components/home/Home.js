@@ -3,8 +3,6 @@ import {
   Route,
   Link
 } from 'react-router-dom';
-import Header from '../header/Header.js';
-import Footer from '../footer/Footer.js';
 import Modal from 'react-modal';
 import s from './Home.css';
 import Provider from './Provider.js';
@@ -41,7 +39,6 @@ class Home extends React.Component {
   render() {
     return (
       <div>
-        <Header />
         <div className={s.root}>
           <div className={s.container}>
             <div className={s.headcont}>
@@ -76,7 +73,6 @@ class Home extends React.Component {
             ))}
           </div>
         </div>
-        <Footer />
     </div>
     );
   }
