@@ -5,19 +5,16 @@ const Sequelize = require('sequelize');
 const basename = path.basename(module.filename);
 const dotenv = require('dotenv').config();
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.js')[env];
+const config = require('../config/config.js')[env];
 const db = {};
 
 let sequelize;
 
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env.use_env_variable, {
+if (env === 'production') {
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
-    // ssl: true,
     dialectOptions: {
-      ssl: {
-        require: true,
-      },
+      ssl: true,
     },
   });
 } else {
