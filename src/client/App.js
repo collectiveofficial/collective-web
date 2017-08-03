@@ -10,7 +10,6 @@ import Home from './components/home/Home.js';
 import LogIn from './components/authentication/LogIn.js';
 import RegisterForm from './components/authentication/RegisterForm.js';
 import SignUp from './components/authentication/SignUp.js';
-import Payment from './components/authentication/Payment.js';
 import foodwiki from './components/foodwiki/foodwiki.js';
 import community from './components/community/community.js';
 import { ref, firebaseAuth } from './config';
@@ -89,7 +88,6 @@ class App extends Component {
           <Route path={this.state.homePath} component={Home} />
           <Route path="/about" component={About} />
           <Route path="/foodwiki" component={foodwiki} />
-          <Route path="/payment" component={Payment} />
           <Route path="/community" component={community} />
           <Route path="/voting" component={Voting} />
           <Route exact path={this.state.signupPath} component={SignUp} />

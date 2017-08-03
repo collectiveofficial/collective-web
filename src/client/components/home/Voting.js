@@ -88,9 +88,7 @@ onChange(event){
           newVote = newVote + 1;
           this.setState({votes: newVote});
         }
-      } else {
-        alert()
-      }
+      } 
       console.log(this.state.consensus);
       console.log(this.state.vote);
     }
