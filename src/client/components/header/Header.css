@@ -22,7 +22,7 @@
 .brand {
   color: rgba(255, 255, 255, 1);
   text-decoration: none;
-  font-size: 3em; /* ~28px */
+  font-size: 2em; /* ~28px */
   border: 1;
   border-color: inherit;
   align-self: flex-start;
@@ -34,7 +34,7 @@
   // font-family: 'Noe Display Bold', sans-serif;
   // font-family: 'RelayCond', Arial, serif;
   font-weight: bold;
-  font-size: 3em;
+  font-size: 2em;
   text-decoration: none;
 }
 
@@ -52,7 +52,7 @@
   display: inline-block;
   padding: 3px 8px;
   text-decoration: none;
-  font-size: 1.125em; /* ~18px */
+  font-size: 1.25em; /* ~18px */
 }
 
 .sign:active,
@@ -63,11 +63,15 @@
   color: rgba(255, 255, 255, .6);
 }
 
+.link:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
 .sign {
   display: inline-block;
   padding: 3px 8px;
   text-decoration: none;
-  font-size: 1.125em;
+  font-size: 1.25em;
   margin-right: 8px;
   margin-left: 8px;
   border-radius: 3px;
@@ -76,14 +80,13 @@
   text-decoration: none;
 }
 
-.link:hover {
-  color: rgba(255, 255, 255, 1);
-}
+
 
 .highlight {
   margin-right: 8px;
   margin-left: 8px;
   border-radius: 3px;
+  font-size: 1.25em;
   background: rgba(0, 0, 0, .15);
   color: #fff;
   text-decoration: none;
