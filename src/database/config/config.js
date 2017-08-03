@@ -18,12 +18,12 @@ module.exports = {
     dialect: 'postgres',
   },
   production: {
-    // use_env_variable: 'DATABASE_URL',
-    // port: 5432,
-    // dialect: 'postgres',
-    // protocol: 'postgres',
-    // dialectOptions: {
-    //   ssl: true,
-    // },
+    use_env_variable: 'DATABASE_URL',
+    port: 5432,
+    dialect: 'postgres',
+    protocol: 'postgres',
+    dialectOptions: {
+      ssl: true,
+    },
   },
 };
