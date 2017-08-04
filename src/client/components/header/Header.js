@@ -58,15 +58,11 @@ class Head extends Component {
             </Modal>
             <Link className={s.link} to="/foodwiki">FoodWiki</Link>
             <Link className={s.link} to="/community">Community</Link>
-<<<<<<< 9d21cd807ec85b2493964958921e1fdd52823739
             {firebaseAuth().currentUser !== null ?
               <Link className={s.link} to="/login" onClick={this.props.logOut}>Log Out</Link>
               :
               <Link className={s.link} to="/login" onClick={this.props.showUser}>Log In</Link>
             }
-=======
-            <Link className={s.link, s.highlight} to="/login">Log In</Link>
->>>>>>> big old UI changes
             {/* <Link className={s.sign} to="/signup">Sign Up</Link> */}
           </div>
       </div>

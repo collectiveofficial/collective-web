@@ -86,7 +86,6 @@ class App extends Component {
           <Header authenticated={this.state.authenticated} logOut={this.logOut} showUser={this.showUser}/>
           <Route path="/login" component={() => <LogIn authenticated={this.authenticated} />} />
           <Route path={this.state.homePath} component={Home} />
-          <Route path="/about" component={About} />
           <Route path="/foodwiki" component={foodwiki} />
           <Route path="/community" component={community} />
           <Route path="/voting" component={Voting} />
