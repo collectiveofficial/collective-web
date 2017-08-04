@@ -13,7 +13,10 @@ module.exports = function(sequelize, DataTypes) {
     zipCode: DataTypes.INTEGER,
     fullAddress: DataTypes.STRING,
     subscribed: DataTypes.BOOLEAN,
-    userGroupId: DataTypes.INTEGER
+    userGroupId: DataTypes.INTEGER,
+    firebaseUID: DataTypes.STRING,
+    hasUserFinishedSignUp: DataTypes.BOOLEAN,
+    pictureUrl: DataTypes.STRING,
   }, {
     classMethods: {
       associate: function(models) {

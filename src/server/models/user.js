@@ -1,22 +1,57 @@
 const Promise = require('bluebird');
 const models = require('../../database/models/index');
 
-module.exports.addUser = function (user) {
+module.exports.addUserFromFacebookSignUp = function (user) {
   models.User.create({
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
-    phoneNumber: user.phoneNumber,
-    birthday: user.birthday,
-    streetAddress: user.streetAddress,
-    aptSuite: user.aptSuite,
-    city: user.city,
-    state: user.state,
-    zipCode: user.zipCode,
-    fullAddress: user.aptSuite.length > 0 ? `${user.streetAddress}, ${user.aptSuite}, ${user.city}, ${user.state}, ${user.zipCode}`:`${user.streetAddress}, ${user.city}, ${user.state} ${user.zipCode}`,
-    subscribed: false,
-    // userGroupId: user.
-})
+    pictureUrl: user.pictureUrl,
+    firebaseUID: user.uid,
+  })
+  .catch(err => console.log(err));
+};
+
+module.exports.addUserFromEmailSignUp = function (user) {
+  models.User.create({
+    email: user.email,
+    firebaseUID: user.uid,
+  })
+  .catch(err => console.log(err));
+};
+
+// module.exports.addUserFromFacebookSignUp = function (user) {
+//   models.User.create({
+//     firstName: user.firstName,
+//     lastName: user.lastName,
+//     email: user.email,
+//     phoneNumber: user.phoneNumber,
+//     birthday: user.birthday,
+//     streetAddress: user.streetAddress,
+//     aptSuite: user.aptSuite,
+//     city: user.city,
+//     state: user.state,
+//     zipCode: user.zipCode,
+//     fullAddress: user.aptSuite.length > 0 ? `${user.streetAddress}, ${user.aptSuite}, ${user.city}, ${user.state}, ${user.zipCode}`:`${user.streetAddress}, ${user.city}, ${user.state} ${user.zipCode}`,
+//     subscribed: false,
+//     // userGroupId: user.
+// })
+//   .catch(err => console.log(err));
+// };
+
+module.exports.findUser = function (uid, callback) {
+  models.User.findOne({
+    where: {
+      firebaseUID: uid,
+    }
+  })
+  .then((findUserResult) => {
+    let isBasicUser = false;
+    if (findUserResult !== null) {
+      isBasicUser = true;
+    }
+    callback(null, isBasicUser);
+  })
   .catch(err => console.log(err));
 };
 

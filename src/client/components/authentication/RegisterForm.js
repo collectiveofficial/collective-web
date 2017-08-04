@@ -144,7 +144,7 @@ class RegisterForm extends React.Component {
     await console.log('areThereEmptyFields: ', areThereEmptyFields);
     if (areThereEmptyFields === false) {
       await console.log('areThereEmptyFields: ', areThereEmptyFields);
-      const response = await fetch('/auth/submit', {
+      const response = await fetch('/auth/register-form/submit', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',

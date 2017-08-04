@@ -1,6 +1,11 @@
 'use strict';
+var db = require('../models/index');
 module.exports = {
+
   up: function(queryInterface, Sequelize) {
+    return db.sequelize.model('User').sync({ force: true }); // development only: needs to change for production
+  },
+  up_create_table: function(queryInterface, Sequelize) {
     return queryInterface.createTable('Users', {
       id: {
         allowNull: false,

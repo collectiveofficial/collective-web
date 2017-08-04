@@ -105,7 +105,7 @@ class Login extends React.Component {
       console.log('user credentials validated: ', this.state.userCredentialsValidated);
     });
     const idToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
-    const firebaseResponse = await fetch('/auth/basic/home', {
+    const firebaseResponse = await fetch('/auth/signup/facebook/save', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

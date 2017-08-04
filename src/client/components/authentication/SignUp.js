@@ -38,6 +38,10 @@ class SignUp extends React.Component {
   async createNativeUser (email, pw) {
     await this.setState({ hasFirebaseChecked: true });
     return firebaseAuth().createUserWithEmailAndPassword(email, pw)
+    .then((user) => {
+      return user;
+      // console.log('Firebase email-signup user: ', user);
+    })
     .catch((error) => {
       // Handle Errors here.
       const errorCode = error.code;
@@ -81,20 +85,35 @@ class SignUp extends React.Component {
   }
 
   resetErrorStates() {
-    this.setState({ isPasswordValidated: '' });
-    this.setState({ isInvalidEmail: '' });
-    this.setState({ isEmailAlreadyInUse: '' });
+    this.setState({ isPasswordValidated: false });
+    this.setState({ isInvalidEmail: false });
+    this.setState({ isEmailAlreadyInUse: false });
   }
 
   async handleEmailContinue() {
     await this.resetErrorStates();
     await this.validatePassword();
+    let firebaseEmailSignUpUser;
+    let firebaseAccessToken;
     if (this.state.isPasswordValidated) {
-      await this.createNativeUser(this.state.emailInput, this.state.passwordInput);
+      firebaseEmailSignUpUser = await this.createNativeUser(this.state.emailInput, this.state.passwordInput);
+      firebaseAccessToken = firebaseEmailSignUpUser.ie;
     }
     const isValidLogin = !(this.state.isInvalidEmail || this.state.isEmailAlreadyInUse);
+    console.log('FUCKO: ', isValidLogin, this.state.isPasswordValidated)
     if (isValidLogin && this.state.isPasswordValidated) {
-      console.log('this.state.isEmailAlreadyInUse; ', this.state.isEmailAlreadyInUse);
+      const response = await fetch('/auth/signup/email-signup/save', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify({
+          firebaseAccessToken,
+          email: this.state.emailInput,
+        }),
+      });
+      const responseData = await response.json();
       await this.setState({ userWantsEmailSignup: true });
       await this.setState({ userAllowedContinue: true });
     }
@@ -104,6 +123,8 @@ class SignUp extends React.Component {
     const provider = await new firebaseAuth.FacebookAuthProvider();
     await provider.addScope('email, public_profile, user_friends');
     const result = await firebaseAuth().signInWithPopup(provider);
+    await console.log('firebaseAuth result: ', result);
+    const firebaseAccessToken = result.user.ie;
     const token = result.credential.accessToken;
     const response = await fetch('/auth/facebook', {
       method: 'POST',
@@ -116,20 +137,23 @@ class SignUp extends React.Component {
       }),
     });
     const responseData = await response.json();
-    await console.log(responseData);
     await this.setState({ facebookData: responseData.facebook_payload }, () => {
       console.log('this.state.facebookData: ', this.state.facebookData);
     });
     await this.setState({ userAllowedContinue: true });
-    const idToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
-    const firebaseResponse = await fetch('/auth/basic/home', {
+    // const idToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+    const firebaseResponse = await fetch('/auth/signup/facebook/save', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify({
-        idToken,
+        firebaseAccessToken,
+        firstName: this.state.facebookData.first_name,
+        lastName: this.state.facebookData.last_name,
+        email: this.state.facebookData.email,
+        pictureUrl: this.state.facebookData.picture.data.url,
       }),
     });
     const firebaseResponseData = await firebaseResponse.json();

@@ -10,8 +10,8 @@ const firebaseAdminApp = admin.initializeApp({
   credential: admin.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    // privateKey: process.env.FIREBASE_PRIVATE_KEY,
-    privateKey: process.env.NODE_ENV === 'production' ? JSON.parse(process.env.FIREBASE_PRIVATE_KEY) : process.env.FIREBASE_PRIVATE_KEY,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY,
+    // privateKey: process.env.NODE_ENV === 'production' ? JSON.parse(process.env.FIREBASE_PRIVATE_KEY) : process.env.FIREBASE_PRIVATE_KEY,
   }),
   databaseURL: process.env.FIREBASE_DATABASE_URL,
 });
@@ -19,13 +19,44 @@ const firebaseAdminApp = admin.initializeApp({
 console.log(firebaseAdminApp);
 
 module.exports = {
-  authorizeBasicUser: {
+  saveUserOnFacebookSignUp: {
     post(req, res) {
-      admin.auth().verifyIdToken(req.body.idToken)
+      console.log(req.body);
+      admin.auth().verifyIdToken(req.body.firebaseAccessToken)
       .then(function(decodedToken) {
         var uid = decodedToken.uid;
-        res.json({ isLoggedIn: true });
-        // lookup database
+        console.log('firebaseDecodedToken: ', decodedToken);
+        console.log('uid: ', uid);
+        req.body.uid = uid;
+        userUtil.addUserFromFacebookSignUp(req.body);
+        res.json({ saveUserOnFacebookSignUpExecuted: true });
+        // res.json({ isLoggedIn: true });
+        // // lookup database
+        // userUtil.findUser(uid, (err, isBasicUser) => {
+        //   console.log('isBasicUser: ', isBasicUser);
+        // });
+      }).catch(function(error) {
+        // Handle error
+        console.log(error);
+      });
+    },
+  },
+  saveUserOnEmailSignUp: {
+    post(req, res) {
+      console.log(req.body);
+      admin.auth().verifyIdToken(req.body.firebaseAccessToken)
+      .then(function(decodedToken) {
+        var uid = decodedToken.uid;
+        console.log('firebaseDecodedToken: ', decodedToken);
+        console.log('uid: ', uid);
+        req.body.uid = uid;
+        userUtil.addUserFromEmailSignUp(req.body);
+        res.json({ saveUserOnEmailSignUpExecuted: true });
+        // res.json({ isLoggedIn: true });
+        // // lookup database
+        // userUtil.findUser(uid, (err, isBasicUser) => {
+        //   console.log('isBasicUser: ', isBasicUser);
+        // });
       }).catch(function(error) {
         // Handle error
         console.log(error);
@@ -92,7 +123,7 @@ module.exports = {
   },
   submitUserInfo: {
     post(req, res) {
-      userUtil.addUser(req.body);
+      // userUtil.addUser(req.body);
       res.json({ userSignedUp: true });
     },
   },
