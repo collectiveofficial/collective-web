@@ -47,7 +47,6 @@ class Voting extends React.Component {
       ['Avocadoes', false]
     ],
       votes: 6,
-<<<<<<< HEAD
       consensus: {Apples: false,
       Bananas: false,
       Mangos: false,
@@ -59,10 +58,6 @@ class Voting extends React.Component {
       Avocadoes: false
     },
       price: 0
-=======
-      consensus: [],
-      price: 0.
->>>>>>> da866413d3f1fbc5d2e231903b50ef5e8e6a0e1b
     };
     // this.openModal = this.openModal.bind(this);
     // this.afterOpenModal = this.afterOpenModal.bind(this);
@@ -77,7 +72,6 @@ onChange(event){
 
 }
     handleChange(e, { value, checked }) {
-<<<<<<< HEAD
       if(this.state.votes >= 0){
         if(checked) {
           const add = this.state.consensus;
@@ -94,24 +88,11 @@ onChange(event){
           newVote = newVote + 1;
           this.setState({votes: newVote});
         }
-      } 
-      console.log(this.state.consensus);
-      console.log(this.state.vote);
-    }
-
-=======
-      if(checked) {
-        var newArray = this.state.consensus.slice();
-        newArray.push(value);
-        this.setState({consensus: newArray})
-        var newVote = this.state.votes;
-        newVote = newVote - 1;
-        this.setState({vote: newVote});
       }
       console.log(this.state.consensus);
       console.log(this.state.vote);
     }
->>>>>>> da866413d3f1fbc5d2e231903b50ef5e8e6a0e1b
+
     handleDorm(e, { value }) {
       var newPrice = this.state.price;
       newPrice = newPrice + (value * 6);
@@ -150,11 +131,7 @@ onChange(event){
                       ))}
                       </div>
                       </Modal> */}
-<<<<<<< HEAD
                       <h1 className={s.top}>You have {this.state.votes} votes left</h1>
-=======
-                      <h1 className={s.top}>You have <b><h1 className={s.banner}>{this.state.votes}</h1></b> votes left</h1>
->>>>>>> da866413d3f1fbc5d2e231903b50ef5e8e6a0e1b
                       <div className={s.flexcontainer}>
 
                         {this.state.items.map((x) => (
@@ -169,21 +146,14 @@ onChange(event){
                             </Card.Content>
                             <Card.Content extra>
                               <Checkbox toggle
-<<<<<<< HEAD
                                 value={x[0].split(' ').join('')}
                                 onChange={this.handleChange}/>
-=======
-                                value={x[0]}
-                                onClick={this.handleChange}/>
->>>>>>> da866413d3f1fbc5d2e231903b50ef5e8e6a0e1b
+
                             </Card.Content>
                           </Card>
                         </div>
                         ))}
-<<<<<<< HEAD
-=======
                         {/* <Link to="/payment" className={s.butt}><Button>Submit and Pay</Button></Link> */}
->>>>>>> da866413d3f1fbc5d2e231903b50ef5e8e6a0e1b
                         <div className={s.ballot}>
                           <Card>
                             <Card.Content>
