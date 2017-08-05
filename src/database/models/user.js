@@ -17,6 +17,7 @@ module.exports = function(sequelize, DataTypes) {
     firebaseUID: DataTypes.STRING,
     hasUserFinishedSignUp: DataTypes.BOOLEAN,
     pictureUrl: DataTypes.STRING,
+    isFacebookAuth: DataTypes.BOOLEAN,
   }, {
     classMethods: {
       associate: function(models) {

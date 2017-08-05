@@ -162,6 +162,7 @@ class RegisterForm extends React.Component {
           city: this.state.city,
           state: this.state.state,
           zipCode: this.state.zipCode,
+          firebaseAccessToken: this.props.firebaseAccessToken,
         }),
       })
       const responseData = await response.json();

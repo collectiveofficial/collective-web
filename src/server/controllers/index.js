@@ -19,26 +19,50 @@ const firebaseAdminApp = admin.initializeApp({
 console.log(firebaseAdminApp);
 
 module.exports = {
-  saveUserOnFacebookSignUp: {
-    post(req, res) {
-      console.log(req.body);
-      admin.auth().verifyIdToken(req.body.firebaseAccessToken)
-      .then(function(decodedToken) {
-        var uid = decodedToken.uid;
-        console.log('firebaseDecodedToken: ', decodedToken);
-        console.log('uid: ', uid);
-        req.body.uid = uid;
-        userUtil.addUserFromFacebookSignUp(req.body);
-        res.json({ saveUserOnFacebookSignUpExecuted: true });
-        // res.json({ isLoggedIn: true });
-        // // lookup database
-        // userUtil.findUser(uid, (err, isBasicUser) => {
-        //   console.log('isBasicUser: ', isBasicUser);
-        // });
-      }).catch(function(error) {
-        // Handle error
-        console.log(error);
+  checkUserEmail: {
+    async post(req, res) {
+      const email = req.body.email;
+      const doesUserEmailExist = await userUtil.checkIfUserEmailExists(email);
+      const hasUserFinishedSignUp = await userUtil.checkIfEmailUserFinishedSignUp(email);
+      const isUserFacebookAuth = await userUtil.checkIfUserIsFacebookAuth(email);
+      await res.json({
+        isUserFacebookAuth,
+        doesUserEmailExist,
+        hasUserFinishedSignUp,
       });
+    },
+  },
+  saveUserOnFacebookSignUp: {
+    async post(req, res) {
+      console.log(req.body);
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken)
+      let uid = decodedToken.uid;
+      const doesUserExist = await userUtil.checkIfUserExists(uid);
+      req.body.uid = uid;
+      if (doesUserExist) {
+        const hasUserFinishedSignUp = await userUtil.checkIfFacebookUserFinishedSignUp(uid);
+        await console.log('hasUserFinishedSignUp: ', hasUserFinishedSignUp);
+        if (hasUserFinishedSignUp) {
+          await res.json({
+            saveUserOnFacebookSignUpExecuted: false,
+            userAlreadyExists: true,
+            hasUserFinishedSignUp: true,
+          });
+        } else {
+          await res.json({
+            saveUserOnFacebookSignUpExecuted: false,
+            userAlreadyExists: true,
+            hasUserFinishedSignUp: false,
+          });
+        }
+      } else {
+        await userUtil.addUserFromFacebookSignUp(req.body);
+        await res.json({
+          saveUserOnFacebookSignUpExecuted: true,
+          userAlreadyExists: false,
+          hasUserFinishedSignUp: false,
+        });
+      }
     },
   },
   saveUserOnEmailSignUp: {
@@ -52,11 +76,6 @@ module.exports = {
         req.body.uid = uid;
         userUtil.addUserFromEmailSignUp(req.body);
         res.json({ saveUserOnEmailSignUpExecuted: true });
-        // res.json({ isLoggedIn: true });
-        // // lookup database
-        // userUtil.findUser(uid, (err, isBasicUser) => {
-        //   console.log('isBasicUser: ', isBasicUser);
-        // });
       }).catch(function(error) {
         // Handle error
         console.log(error);
@@ -122,9 +141,14 @@ module.exports = {
     },
   },
   submitUserInfo: {
-    post(req, res) {
-      // userUtil.addUser(req.body);
-      res.json({ userSignedUp: true });
+    async post(req, res) {
+      console.log('req.body', req.body);
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken)
+      let uid = decodedToken.uid;
+      const doesUserExist = await userUtil.checkIfUserExists(uid);
+      req.body.uid = uid;
+      await userUtil.saveSubmittedUserInfo(req.body);
+      await res.json({ userSignedUp: true });
     },
   },
   voteNotification: {
