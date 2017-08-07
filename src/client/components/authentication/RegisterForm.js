@@ -151,7 +151,6 @@ class RegisterForm extends React.Component {
           'Content-Type': 'application/json; charset=utf-8'
         },
         body: JSON.stringify({
-          email: this.state.email,
           firstName: this.state.firstName,
           lastName: this.state.lastName,
           school: this.state.school,

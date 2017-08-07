@@ -18,7 +18,7 @@ class SignUp extends React.Component {
     this.state = {
       emailInput: '',
       passwordInput: '',
-      userAllowedContinue: false,
+      routeToRegisterForm: false,
       userWantsEmailSignup: false,
       facebookData: '',
       isPasswordValidated: '',
@@ -158,7 +158,7 @@ class SignUp extends React.Component {
           });
           const responseData = await response.json();
           await this.setState({ userWantsEmailSignup: true });
-          await this.setState({ userAllowedContinue: true });
+          await this.setState({ routeToRegisterForm: true });
         }
       }
     }
@@ -187,7 +187,7 @@ class SignUp extends React.Component {
       console.log('this.state.facebookData: ', this.state.facebookData);
     });
     // const idToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
-    const dbSaveResponse = await fetch('/auth/signup/facebook/save', {
+    const dbSaveResponse = await fetch('/auth/facebook/check', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -209,7 +209,7 @@ class SignUp extends React.Component {
     if (userAlreadyExists && hasUserFinishedSignUp) {
       console.log('authorize user');
     } else if ((userAlreadyExists && !hasUserFinishedSignUp) || saveUserOnFacebookSignUpExecuted) {
-      await this.setState({ userAllowedContinue: true });
+      await this.setState({ routeToRegisterForm: true });
     }
   }
 
@@ -232,8 +232,8 @@ class SignUp extends React.Component {
     return (
       <div>
         <div className={s.root}>
-          <div className={s.container}>
-            {this.state.userAllowedContinue ?
+          <form className={s.container} onSubmit={this.handleEmailContinue}>
+            {this.state.routeToRegisterForm ?
               <RegisterForm
                 userWantsEmailSignup={this.state.userWantsEmailSignup}
                 emailInput={this.state.emailInput}
@@ -284,7 +284,7 @@ class SignUp extends React.Component {
                     /><br />
                   </div>
                 </div>
-                <RaisedButton label="Continue" primary={true} onClick={this.handleEmailContinue} /><br /><br />
+                <RaisedButton label="Continue" type="submit" primary={true} /><br /><br />
                 <div style={styles.or}>OR</div>
                 <button
                   className={s.loginBtn}
@@ -295,7 +295,7 @@ class SignUp extends React.Component {
                 </button>
               </div>
             }
-          </div>
+          </form>
         </div>
       </div>
     );
