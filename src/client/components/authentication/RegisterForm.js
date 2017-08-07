@@ -275,7 +275,7 @@ class RegisterForm extends React.Component {
        <div>
         <RaisedButton label="Submit" primary={true} onClick={this.submitUserInfo} /><br /><br />
         {this.state.userAuthorized ?
-          <Redirect to="/payment"/>
+          <Redirect to="/home"/>
           :
           <div></div>
         }
