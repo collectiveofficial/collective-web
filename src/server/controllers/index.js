@@ -19,6 +19,21 @@ const firebaseAdminApp = admin.initializeApp({
 console.log(firebaseAdminApp);
 
 module.exports = {
+  checkUser: {
+    async post(req, res) {
+      const firebaseAccessToken = req.body.firebaseAccessToken;
+      const hasUserFinishedSignUp = await userUtil.checkIfUserFinishedSignUp(firebaseAccessToken);
+      const decodedToken = await admin.auth().verifyIdToken(firebaseAccessToken);
+      let uid = decodedToken.uid;
+      const doesUserExist = await userUtil.checkIfUserAuthorized(uid);
+      req.body.uid = uid;
+      if (hasUserFinishedSignUp && doesUserExist) {
+        res.json({ userAuthorized: true });
+      } else {
+        res.json({ userAuthorized: false });
+      }
+    },
+  },
   checkUserEmail: {
     async post(req, res) {
       const email = req.body.email;

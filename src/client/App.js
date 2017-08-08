@@ -34,6 +34,7 @@ class App extends Component {
       userWantsEmailSignup: '',
       firebaseAccessToken: '',
       routeToRegisterForm: false,
+      userAuthorized: false,
     };
     this.logOut = this.logOut.bind(this);
     this.showUser = this.showUser.bind(this);
@@ -44,27 +45,46 @@ class App extends Component {
     this.firebaseListener = firebaseAuth().onAuthStateChanged((user) => {
       if (user) { // is signed in
         console.log('Logged in');
+        console.log('user firebaseAccessToken in App.js componentDidMount: ', user.ie);
+        fetch('/auth/check', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8'
+          },
+          body: JSON.stringify({
+            firebaseAccessToken: user.ie,
+          }),
+        })
+        .then((responseData) => {
+          const userAuthorized = responseData.userAuthorized;
+          if (userAuthorized) {
+            this.setState({ userAuthorized });
+          }
+          if (this.state.userAuthorized) {
+            this.setState({ homePath: '/' });
+            this.setState({ signupPath: '/signup' });
+          } else {
+            this.setState({ homePath: '/home' });
+            this.setState({ signupPath: '/' });
+          }
+
+        });
         this.setState({
           authenticated: true,
-          // need another state to check authorization for dynamic routing
           loading: false,
-          // homePath: '/',
-          // signupPath: '/signup',
         }, () => {
           console.log('this.state.loading: ', this.state.loading);
         });
       } else { // isn't signed in
-      this.setState({
-        authenticated: false,
-        loading: false,
-        // homePath: '/home',
-        // signupPath: '/',
-      }, () => {
-        console.log('this.state.loading: ', this.state.loading);
-      });
-    }
-  });
-
+        this.setState({
+          authenticated: false,
+          loading: false,
+        }, () => {
+          console.log('this.state.loading: ', this.state.loading);
+        });
+      }
+    });
   }
 
   componentWillUnmount() {
@@ -74,6 +94,7 @@ class App extends Component {
   async logOut() {
     await nativeLogout();
     await this.setState({ routeToRegisterForm: false });
+    await this.setState({ userAuthorized: false });
     await console.log('User after log out', firebaseAuth().currentUser);
   }
 
@@ -126,6 +147,7 @@ class App extends Component {
     const saveUserOnFacebookSignUpExecuted = facebookCheckResponseData.saveUserOnFacebookSignUpExecuted;
     if (userAlreadyExists && hasUserFinishedSignUp) {
       console.log('authorize user');
+      await this.setState({ userAuthorized: true });
     } else if ((userAlreadyExists && !hasUserFinishedSignUp) || saveUserOnFacebookSignUpExecuted) {
       await this.setState({ routeToRegisterForm: true });
     }
@@ -136,7 +158,16 @@ class App extends Component {
       <MuiThemeProvider>
         <div>
           <Header authenticated={this.state.authenticated} logOut={this.logOut} showUser={this.showUser}/>
-          <Route path="/login" component={() => <LogIn nativeLogin={this.nativeLogin} handleFacebookAuth={this.handleFacebookAuth} facebookData={this.state.facebookData} firebaseAccessToken={this.state.firebaseAccessToken} routeToRegisterForm={this.state.routeToRegisterForm} />} />
+          <Route path="/login" component={() =>
+            (<LogIn
+              nativeLogin={this.nativeLogin}
+              handleFacebookAuth={this.handleFacebookAuth}
+              facebookData={this.state.facebookData}
+              firebaseAccessToken={this.state.firebaseAccessToken}
+              routeToRegisterForm={this.state.routeToRegisterForm}
+              userAuthorized={this.state.userAuthorized}
+            />)}
+          />
           <Route path={this.state.homePath} component={Home} />
           <Route path="/foodwiki" component={foodwiki} />
           <Route path="/terms" component={Terms} />
@@ -145,7 +176,15 @@ class App extends Component {
           <Route path="/community" component={community} />
           <Route path="/voting" component={Voting} />
           <Route path="/register-form" component={() => <RegisterForm authenticated={this.authenticated} firebaseAccessToken={this.state.firebaseAccessToken} userWantsEmailSignup={this.state.userWantsEmailSignup} />} />
-          <Route exact path={this.state.signupPath} component={() => <SignUp handleFacebookAuth={this.handleFacebookAuth} facebookData={this.state.facebookData} firebaseAccessToken={this.state.firebaseAccessToken} routeToRegisterForm={this.state.routeToRegisterForm} />} />
+          <Route exact path={this.state.signupPath} component={() =>
+            (<SignUp
+              handleFacebookAuth={this.handleFacebookAuth}
+              facebookData={this.state.facebookData}
+              firebaseAccessToken={this.state.firebaseAccessToken}
+              routeToRegisterForm={this.state.routeToRegisterForm}
+              userAuthorized={this.state.userAuthorized}
+            />)}
+          />
           <Footer />
         </div>
       </MuiThemeProvider>

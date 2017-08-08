@@ -1,7 +1,7 @@
 'use strict';
 var db = require('../models/index');
-module.exports = {
 
+module.exports = {
   up: function(queryInterface, Sequelize) {
     return db.sequelize.model('User').sync({ force: true }); // development only: needs to change for production
   },

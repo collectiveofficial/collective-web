@@ -5,7 +5,7 @@ module.exports = function(sequelize, DataTypes) {
     lastName: DataTypes.STRING,
     email: DataTypes.STRING,
     phoneNumber: DataTypes.STRING,
-    birthday: DataTypes.STRING,
+    birthday: DataTypes.DATE,
     streetAddress: DataTypes.STRING,
     aptSuite: DataTypes.STRING,
     city: DataTypes.STRING,
@@ -18,6 +18,7 @@ module.exports = function(sequelize, DataTypes) {
     hasUserFinishedSignUp: DataTypes.BOOLEAN,
     pictureUrl: DataTypes.STRING,
     isFacebookAuth: DataTypes.BOOLEAN,
+    cadenceFreq: DataTypes.STRING,
   }, {
     classMethods: {
       associate: function(models) {

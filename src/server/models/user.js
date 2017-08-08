@@ -72,6 +72,42 @@ module.exports.checkIfUserExists = function (uid) {
   .catch(err => console.log(err));
 };
 
+module.exports.checkIfUserAuthorized = function (uid) {
+  return models.User.findOne({
+    where: {
+      firebaseUID: uid,
+      hasUserFinishedSignUp: true,
+    }
+  })
+  .then((checkIfUserFinishedSignUpResult) => {
+    console.log('checkUserResult: ', checkIfUserFinishedSignUpResult);
+    if (checkIfUserFinishedSignUpResult !== null) {
+      return true;
+    } else {
+      return false;
+    }
+  })
+  .catch(err => console.log(err));
+};
+
+module.exports.checkIfUserFinishedSignUp = function (uid) {
+  return models.User.findOne({
+    where: {
+      firebaseUID: uid,
+      hasUserFinishedSignUp: true,
+    }
+  })
+  .then((checkIfUserFinishedSignUpResult) => {
+    console.log('checkUserResult: ', checkIfUserFinishedSignUpResult);
+    if (checkIfUserFinishedSignUpResult !== null) {
+      return true;
+    } else {
+      return false;
+    }
+  })
+  .catch(err => console.log(err));
+};
+
 module.exports.checkIfEmailUserFinishedSignUp = function (email) {
   return models.User.findOne({
     where: {

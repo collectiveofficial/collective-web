@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
   Route,
-  Link
+  Link,
+  Redirect
 } from 'react-router-dom';
 import TextField from 'material-ui/TextField';
 import MailOutline from 'material-ui/svg-icons/communication/mail-outline';
@@ -248,6 +249,11 @@ class SignUp extends React.Component {
                 >
                   Continue with Facebook
                 </button>
+                {/* {this.props.userAuthorized ?
+                  <Redirect to="/home" />
+                  :
+                  <div></div>
+                } */}
               </div>
             }
           </div>

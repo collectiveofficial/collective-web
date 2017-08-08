@@ -181,6 +181,11 @@ class Login extends React.Component {
           </form>
             }
           </div>
+          {this.props.userAuthorized ?
+            <Redirect to="/home" />
+            :
+            <div></div>
+          }
         </div>
       </div>
     );
