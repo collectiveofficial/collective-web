@@ -19,14 +19,14 @@ class Login extends React.Component {
     this.state = {
       emailInput: '',
       passwordInput: '',
-      userCredentialsValidated: false,
       isEmailValidated: '',
       isPasswordValidated: '',
       routeToRegisterForm: false,
       firebaseAccessToken: '',
+      userWantsEmailSignup: false,
     };
     this.handleEmailContinue = this.handleEmailContinue.bind(this);
-    this.handleFBLogin = this.handleFBLogin.bind(this);
+    this.nativeLogin = this.nativeLogin.bind(this);
     this.validateEmail = this.validateEmail.bind(this);
     this.validatePassword = this.validatePassword.bind(this);
   }
@@ -71,11 +71,21 @@ class Login extends React.Component {
     }
   }
 
-  async handleEmailContinue() {
+  async nativeLogin(email, password) {
+    const user = await firebaseAuth().signInWithEmailAndPassword(email, password);
+    await this.setState({ firebaseAccessToken: user.ie });
+    await console.log(this.state.firebaseAccessToken);
+    await this.setState({ userWantsEmailSignup: true });
+    await console.log('this.state.userWantsEmailSignup', this.state.userWantsEmailSignup);
+    return user;
+  }
+
+  async handleEmailContinue(event) {
+    event.preventDefault();
     await this.validateEmail();
     await this.validatePassword();
     if (this.state.isEmailValidated && this.state.isPasswordValidated) {
-      const user = await this.props.nativeLogin(this.state.emailInput, this.state.passwordInput);
+      const user = await this.nativeLogin(this.state.emailInput, this.state.passwordInput);
       // const email = user.email;
       const checkEmailResponse = await fetch('/auth/signup/check-email', {
         method: 'POST',
@@ -89,7 +99,6 @@ class Login extends React.Component {
       });
       const checkEmailResponseData = await checkEmailResponse.json();
       console.log('Login checkEmailResponseData: ', checkEmailResponseData);
-      // if (this.props.unmounted) {
       const doesUserEmailExist = checkEmailResponseData.doesUserEmailExist;
       const hasUserFinishedSignUp = checkEmailResponseData.hasUserFinishedSignUp;
       const isUserFacebookAuth = checkEmailResponseData.isUserFacebookAuth;
@@ -97,108 +106,7 @@ class Login extends React.Component {
       await this.setState({ routeToRegisterForm }, () => {
         console.log('Inside setState, this.state.routeToRegisterForm: ', this.state.routeToRegisterForm);
       });
-      // }
-      // await console.log('routeToRegisterForm: ', routeToRegisterForm);
-      // // if (routeToRegisterForm) {
-      // await this.setState({ routeToRegisterForm }, () => {
-      //   console.log('Inside setState, this.state.routeToRegisterForm: ', this.state.routeToRegisterForm);
-      // });
-      // await console.log('Outside setState, this.state.routeToRegisterForm: ', this.state.routeToRegisterForm);
-      // // }
     }
-  }
-
-  async handleFBLogin() {
-    const provider = await new firebaseAuth.FacebookAuthProvider();
-    await provider.addScope('email, public_profile, user_friends');
-    const result = await firebaseAuth().signInWithPopup(provider);
-    await console.log('firebaseAuth result: ', result);
-    const firebaseAccessToken = result.user.ie;
-    await this.setState({ firebaseAccessToken });
-    const token = result.credential.accessToken;
-    const response = await fetch('/auth/facebook', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8'
-      },
-      body: JSON.stringify({
-        facebook_token: token,
-      }),
-    });
-    const responseData = await response.json();
-    await this.setState({ facebookData: responseData.facebook_payload }, () => {
-      console.log('this.state.facebookData: ', this.state.facebookData);
-    });
-    const loginResponse = await fetch('/auth/facebook/check', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      body: JSON.stringify({
-        firebaseAccessToken,
-        firstName: this.state.facebookData.first_name,
-        lastName: this.state.facebookData.last_name,
-        email: this.state.facebookData.email,
-        pictureUrl: this.state.facebookData.picture.data.url,
-      }),
-    });
-    const loginResponseData = await loginResponse.json();
-    console.log('responseData: ', loginResponseData);
-    const userAlreadyExists = loginResponseData.userAlreadyExists;
-    const hasUserFinishedSignUp = loginResponseData.hasUserFinishedSignUp;
-    const saveUserOnFacebookSignUpExecuted = loginResponseData.saveUserOnFacebookSignUpExecuted;
-    if (userAlreadyExists && hasUserFinishedSignUp) {
-      console.log('authorize user');
-    } else if ((userAlreadyExists && !hasUserFinishedSignUp) || saveUserOnFacebookSignUpExecuted) {
-      // route to register form
-      await this.setState({ routeToRegisterForm: true });
-    }
-    // const provider = await new firebaseAuth.FacebookAuthProvider();
-    // await provider.addScope('email, public_profile, user_friends');
-    // const result = await firebaseAuth().signInWithPopup(provider);
-    // const firebaseAccessToken = result.user.ie;
-    // const authorizeUser = await fetch('/auth/login/facebook', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Accept': 'application/json',
-    //     'Content-Type': 'application/json; charset=utf-8',
-    //   },
-    //   body: JSON.stringify({
-    //     firebaseAccessToken,
-    //   }),
-    // });
-    // const authorizeUserData = await authorizeUser.json();
-    // const doesUserExist = authorizeUserData.doesUserExist;
-    // const hasUserFinishedSignUp = authorizeUserData.hasUserFinishedSignUp;
-    // if (!doesUserExist) {
-    //   console.log('save user data and follow through on signup process');
-    // } else if (doesUserExist && hasUserFinishedSignUp) {
-    //   console.log('authorize user');
-    // } else if (doesUserExist && !hasUserFinishedSignUp) {
-    //   console.log('route to /register-form');
-    // }
-    // const email = result.user.email;
-    // const checkEmailResponse = await fetch('/auth/signup/check-email', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Accept': 'application/json',
-    //     'Content-Type': 'application/json; charset=utf-8',
-    //   },
-    //   body: JSON.stringify({
-    //     email,
-    //   }),
-    // });
-    // const checkEmailResponseData = await checkEmailResponse.json();
-    // const doesUserEmailExist = checkEmailResponseData.doesUserEmailExist;
-    // const hasUserFinishedSignUp = checkEmailResponseData.hasUserFinishedSignUp;
-    // const isUserFacebookAuth = checkEmailResponseData.isUserFacebookAuth;
-    // if (doesUserEmailExist && hasUserFinishedSignUp && isUserFacebookAuth) {
-    //   console.log('authorize user');
-    // } else if ((doesUserEmailExist && !hasUserFinishedSignUp && isUserFacebookAuth) || !doesUserEmailExist) {
-    //   console.log('route to /register-form');
-    // }
   }
 
   render() {
@@ -214,59 +122,65 @@ class Login extends React.Component {
     return (
       <div>
         <div className={s.root}>
-          <form className={s.container} onSubmit={this.handleEmailContinue}>
-            <img
-              src="https://previews.123rf.com/images/arbuzu/arbuzu1410/arbuzu141000209/32592691-Letter-C-eco-leaves-logo-icon-design-template-elements-Vector-color-sign--Stock-Vector.jpg"
-              alt="collective logo"
-              height="30"
-              width="30"
-            />
-            <h2>Log in to see more</h2>
-            <div>
-              <MailOutline />
-              <Popup
-                trigger={<TextField
-                  type="email"
-                  hintText="Email"
-                  style={styles.iconStyles}
-                  onChange={(event) => this.setState({ emailInput: event.target.value })}
+          <div className={s.container}>
+            {this.props.routeToRegisterForm || this.state.routeToRegisterForm ?
+              <RegisterForm
+                userWantsEmailSignup={this.state.userWantsEmailSignup}
+                emailInput={this.state.emailInput}
+                passwordInput={this.state.passwordInput}
+                facebookData={this.props.facebookData}
+                firebaseAccessToken={this.props.firebaseAccessToken.length > 0 ? this.props.firebaseAccessToken : this.state.firebaseAccessToken}
+              />
+              :
+              <form onSubmit={this.handleEmailContinue}>
+                <img
+                  src="https://previews.123rf.com/images/arbuzu/arbuzu1410/arbuzu141000209/32592691-Letter-C-eco-leaves-logo-icon-design-template-elements-Vector-color-sign--Stock-Vector.jpg"
+                  alt="collective logo"
+                  height="30"
+                  width="30"
                 />
-              }
-                content="Hmm...that doesn't look like an email address."
-                open={this.state.isEmailValidated === false}
-                offset={20}
-                position="right center"
-            /><br />
-              <LockOutline />
-              <Popup
-                trigger={<TextField
-                  // ref="password"
-                  type="password"
-                  hintText="Password"
-                  style={styles.iconStyles}
-                  onChange={(event) => this.setState({ passwordInput: event.target.value })}
-                />
-              }
+                <h2>Log in to see more</h2>
+                <div>
+                  <MailOutline />
+                  <Popup
+                    trigger={<TextField
+                      hintText="Email"
+                      style={styles.iconStyles}
+                      onChange={(event) => this.setState({ emailInput: event.target.value })}
+                    />
+                  }
+                  content="Hmm...that doesn't look like an email address."
+                  open={this.state.isEmailValidated === false}
+                  offset={20}
+                  position="right center"
+                /><br />
+                <LockOutline />
+                <Popup
+                  trigger={<TextField
+                    // ref="password"
+                    type="password"
+                    hintText="Password"
+                    style={styles.iconStyles}
+                    onChange={(event) => this.setState({ passwordInput: event.target.value })}
+                  />
+                }
                 content="Your password needs a minimum of 8 characters with at least one uppercasee letter, one lowercase letter and one number."
-                open={(this.state.isPasswordValidated === false && this.state.isEmailValidated === true)}
+                open={this.state.isPasswordValidated === false && this.state.isEmailValidated === true}
                 offset={20}
                 position="right center"
-            /><br />
+              /><br />
             </div>
             <RaisedButton label="Log in" type="submit" primary={true} />
             <div style={styles.or}>OR</div>
             <button
               className={s.loginBtn}
               id="btn-social-login"
-              onClick={this.handleFBLogin}>
+              onClick={this.props.handleFacebookAuth}>
               Login with Facebook
             </button>
-            {/* {this.state.routeToRegisterForm ?
-              <Redirect to='/register-form' />
-              :
-              <div></div>
-            } */}
           </form>
+            }
+          </div>
         </div>
       </div>
     );

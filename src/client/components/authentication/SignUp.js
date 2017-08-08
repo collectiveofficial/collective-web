@@ -20,7 +20,6 @@ class SignUp extends React.Component {
       passwordInput: '',
       routeToRegisterForm: false,
       userWantsEmailSignup: false,
-      facebookData: '',
       isPasswordValidated: '',
       isInvalidEmail: '',
       isWeakPassword: '',
@@ -31,7 +30,6 @@ class SignUp extends React.Component {
       passwordErrorMessage: '',
     };
     this.handleEmailContinue = this.handleEmailContinue.bind(this);
-    this.handleFBSignUp = this.handleFBSignUp.bind(this);
     this.validateEmail = this.validateEmail.bind(this);
     this.validatePassword = this.validatePassword.bind(this);
     this.createNativeUser = this.createNativeUser.bind(this);
@@ -54,6 +52,12 @@ class SignUp extends React.Component {
       } else {
         this.setState({ isWeakPassword: false });
       }
+      // if (errorCode === 'auth/email-already-in-use') {
+      //   this.setState({ isEmailAlreadyInUse: true });
+      //   this.setState({ passwordErrorMessage: 'This email is already in use. Please log in or register with another email.' });
+      // } else {
+      //   this.setState({ isEmailAlreadyInUse: false });
+      // }
       console.log(error);
     });
   }
@@ -164,55 +168,6 @@ class SignUp extends React.Component {
     }
   }
 
-  async handleFBSignUp() {
-    const provider = await new firebaseAuth.FacebookAuthProvider();
-    await provider.addScope('email, public_profile, user_friends');
-    const result = await firebaseAuth().signInWithPopup(provider);
-    await console.log('firebaseAuth result: ', result);
-    const firebaseAccessToken = result.user.ie;
-    await this.setState({ firebaseAccessToken });
-    const token = result.credential.accessToken;
-    const response = await fetch('/auth/facebook', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8'
-      },
-      body: JSON.stringify({
-        facebook_token: token,
-      }),
-    });
-    const responseData = await response.json();
-    await this.setState({ facebookData: responseData.facebook_payload }, () => {
-      console.log('this.state.facebookData: ', this.state.facebookData);
-    });
-    // const idToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
-    const dbSaveResponse = await fetch('/auth/facebook/check', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      body: JSON.stringify({
-        firebaseAccessToken,
-        firstName: this.state.facebookData.first_name,
-        lastName: this.state.facebookData.last_name,
-        email: this.state.facebookData.email,
-        pictureUrl: this.state.facebookData.picture.data.url,
-      }),
-    });
-    const dbSaveResponseData = await dbSaveResponse.json();
-    console.log('responseData: ', dbSaveResponseData);
-    const userAlreadyExists = dbSaveResponseData.userAlreadyExists;
-    const hasUserFinishedSignUp = dbSaveResponseData.hasUserFinishedSignUp;
-    const saveUserOnFacebookSignUpExecuted = dbSaveResponseData.saveUserOnFacebookSignUpExecuted;
-    if (userAlreadyExists && hasUserFinishedSignUp) {
-      console.log('authorize user');
-    } else if ((userAlreadyExists && !hasUserFinishedSignUp) || saveUserOnFacebookSignUpExecuted) {
-      await this.setState({ routeToRegisterForm: true });
-    }
-  }
-
   render() {
     const styles = {
       iconStyles: {
@@ -232,14 +187,14 @@ class SignUp extends React.Component {
     return (
       <div>
         <div className={s.root}>
-          <form className={s.container} onSubmit={this.handleEmailContinue}>
-            {this.state.routeToRegisterForm ?
+          <div className={s.container}>
+            {this.props.routeToRegisterForm || this.state.routeToRegisterForm ?
               <RegisterForm
                 userWantsEmailSignup={this.state.userWantsEmailSignup}
                 emailInput={this.state.emailInput}
                 passwordInput={this.state.passwordInput}
-                facebookData={this.state.facebookData}
-                firebaseAccessToken={this.state.firebaseAccessToken}
+                facebookData={this.props.facebookData}
+                firebaseAccessToken={this.props.firebaseAccessToken.length > 0 ? this.props.firebaseAccessToken : this.state.firebaseAccessToken}
               />
               :
               <div>
@@ -284,18 +239,18 @@ class SignUp extends React.Component {
                     /><br />
                   </div>
                 </div>
-                <RaisedButton label="Continue" type="submit" primary={true} /><br /><br />
+                <RaisedButton label="Continue" primary={true} onClick={this.handleEmailContinue} /><br /><br />
                 <div style={styles.or}>OR</div>
                 <button
                   className={s.loginBtn}
                   id="btn-social-login"
-                  onClick={this.handleFBSignUp}
+                  onClick={this.props.handleFacebookAuth}
                 >
                   Continue with Facebook
                 </button>
               </div>
             }
-          </form>
+          </div>
         </div>
       </div>
     );

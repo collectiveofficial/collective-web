@@ -151,6 +151,39 @@ module.exports = {
       await res.json({ userSignedUp: true });
     },
   },
+  facebookLogin: {
+    async post(req, res) {
+      console.log(req.body);
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken)
+      let uid = decodedToken.uid;
+      const doesUserExist = await userUtil.checkIfUserExists(uid);
+      req.body.uid = uid;
+      if (doesUserExist) {
+        const hasUserFinishedSignUp = await userUtil.checkIfFacebookUserFinishedSignUp(uid);
+        await console.log('hasUserFinishedSignUp: ', hasUserFinishedSignUp);
+        if (hasUserFinishedSignUp) {
+          await res.json({
+            saveUserOnFacebookSignUpExecuted: false,
+            userAlreadyExists: true,
+            hasUserFinishedSignUp: true,
+          });
+        } else {
+          await res.json({
+            saveUserOnFacebookSignUpExecuted: false,
+            userAlreadyExists: true,
+            hasUserFinishedSignUp: false,
+          });
+        }
+      } else {
+        await userUtil.addUserFromFacebookSignUp(req.body);
+        await res.json({
+          saveUserOnFacebookSignUpExecuted: true,
+          userAlreadyExists: false,
+          hasUserFinishedSignUp: false,
+        });
+      }
+    },
+  },
   voteNotification: {
     get(req, res) {
       // date: "26 August 2017 from 9am to Noon",
