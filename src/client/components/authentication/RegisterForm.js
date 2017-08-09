@@ -12,6 +12,7 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import schools from './universities_list.js';
+import { Modal } from 'semantic-ui-react';
 
 injectTapEventPlugin();
 
@@ -273,12 +274,25 @@ class RegisterForm extends React.Component {
          errorText={this.state.isZipCodeEmpty ? 'Zip code is required' : ''}
         /><br />
        <div>
-        <RaisedButton label="Submit" primary={true} onClick={this.submitUserInfo} /><br /><br />
+         <Modal trigger={<div><RaisedButton label="Submit"/><br /><br /></div>}>
+           <Modal.Content>
+             <p>By clicking continue I have read and agreed to Collective's <Link to="terms">terms of use</Link> and <Link to="privacy">privacy policy</Link> as well as Best Food Forward's <Link to="bff">terms of use</Link>, and I agree to not hold any involved individuals or entities liable for anything related to the use, consumption, storage, or purchasing of food within this site.</p>
+           </Modal.Content>
+           <Modal.Actions>
+             <RaisedButton label="Continue" primary={true} onClick={this.submitUserInfo} /><br /><br />
+             {this.state.userAuthorized ?
+               <Redirect to="/home"/>
+               :
+               <div></div>
+             }
+           </Modal.Actions>
+         </Modal>
+        {/* <RaisedButton label="Submit" primary={true} onClick={this.submitUserInfo} /><br /><br />
         {this.state.userAuthorized ?
           <Redirect to="/home"/>
           :
           <div></div>
-        }
+        } */}
       </div>
       </form>
     );

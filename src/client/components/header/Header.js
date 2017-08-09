@@ -29,13 +29,14 @@ class Head extends Component {
                 <Image wrapped size='medium' src='https://scontent-sjc2-1.xx.fbcdn.net/v/t31.0-8/17807302_1001695923264408_1104643144105822755_o.jpg?oh=848e9a20c09ef1a380e51414b70545e0&oe=59EFAC25' />
                 <Modal.Description>
                   <Header>Collective makes healthy food easy</Header>
-                  <p>We believe that the food system is too big, too inefficient and too unsustainable to </p>
-                  <p>to feed people in the way they want. So we help easily connect groups to local</p>
+                  <p>We believe that the food system is too big, too inefficient, and too unsustainable to </p>
+                  <p>feed people in the way they want. So we help to easily connect independent groups to local</p>
                   <p>sources, allowing consumers to empower themselves through high quality, cheap produce.</p>
                   <p></p>
                   <p>By cutting out the middleman and getting back to the community, we can provide</p>
                   <p>farmer's market quality at convenience store price.</p>
-                  <p>You just buy into our $6 or $10 packages, and we give you a box full of amazing food.</p>
+                  <p></p>
+                  <p>You just buy into our $6 or $10 packages, and we help to give you a box full of amazing food.</p>
                 </Modal.Description>
               </Modal.Content>
             </Modal>
@@ -47,11 +48,12 @@ class Head extends Component {
                   <Header>The whole process works in four easy steps</Header>
                   <p>1. You vote and pay for the food you want.</p>
                   <p></p>
-                  <p>2. We compile votes and pool money from your group</p>
+                  <p>2. We compile votes, pool money from your group, and then send everything back</p>
+                  <p>to independent organizers like Best Food Forward.</p>
                   <p></p>
-                  <p>3. We buy the food directly from local sources</p>
+                  <p>3. They buy the food directly from local sources</p>
                   <p></p>
-                  <p>4. And then we bring the bulk food to you, all for around half</p>
+                  <p>4. And then we work togetherto bring the bulk food to you, all for around half</p>
                   <p>the cost of the grocery store</p>
                 </Modal.Description>
               </Modal.Content>

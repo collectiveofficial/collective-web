@@ -68,9 +68,9 @@ class Voting extends React.Component {
     this.handleCook = this.handleCook.bind(this);
     this.onToken = this.onToken.bind(this);
 }
-onChange(event){
+    onChange(event){
 
-}
+    }
     handleChange(e, { value, checked }) {
       if(this.state.votes >= 0){
         if(checked) {
@@ -225,9 +225,8 @@ onChange(event){
                                       <StripeCheckout
                                         name="Best Food Forward/Collective" // the pop-in header title
                                         description="Easy healthy eating" // the pop-in header subtitle
-                                        // image="https://www.vidhub.co/assets/logos/vidhub-icon-2e5c629f64ced5598a56387d4e3d0c7c.png" // the pop-in header image (default none)
                                         ComponentClass="div"
-                                        panelLabel="Give Money" // prepended to the amount in the bottom pay button
+                                        // panelLabel="Give Money" prepended to the amount in the bottom pay button
                                         amount={this.state.price * 100} // cents
                                         currency="USD"
                                         stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
