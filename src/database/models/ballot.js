@@ -8,9 +8,9 @@ module.exports = function(sequelize, DataTypes) {
     elected: DataTypes.BOOLEAN,
     notShippedDesc: DataTypes.STRING,
     notShippedClass: DataTypes.STRING,
-    shipDate: DataTypes.DATE,
-    voteDateBeg: DataTypes.DATE,
-    voteDateEnd: DataTypes.DATE
+    shipDate: DataTypes.STRING,
+    voteDateBeg: DataTypes.STRING,
+    voteDateEnd: DataTypes.STRING
   }, {
     classMethods: {
       associate: function(models) {
