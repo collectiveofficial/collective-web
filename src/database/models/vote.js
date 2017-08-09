@@ -5,7 +5,8 @@ module.exports = function(sequelize, DataTypes) {
     foodID: DataTypes.INTEGER,
     dropoffID: DataTypes.INTEGER,
     voteClass: DataTypes.STRING,
-    ballotID: DataTypes.INTEGER
+    ballotID: DataTypes.INTEGER,
+    isCurrent: DataTypes.BOOLEAN,
   }, {
     classMethods: {
       associate: function(models) {

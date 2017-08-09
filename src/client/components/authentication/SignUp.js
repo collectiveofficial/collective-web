@@ -249,11 +249,11 @@ class SignUp extends React.Component {
                 >
                   Continue with Facebook
                 </button>
-                {/* {this.props.userAuthorized ?
+                {this.props.userAuthorized ?
                   <Redirect to="/home" />
                   :
                   <div></div>
-                } */}
+                }
               </div>
             }
           </div>

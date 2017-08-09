@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
   Route,
-  Link
+  Link,
+  Redirect,
 } from 'react-router-dom';
 import firebase from 'firebase';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -42,11 +43,11 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.firebaseListener = firebaseAuth().onAuthStateChanged((user) => {
+    this.firebaseListener = firebaseAuth().onAuthStateChanged(async (user) => {
       if (user) { // is signed in
-        console.log('Logged in');
-        console.log('user firebaseAccessToken in App.js componentDidMount: ', user.ie);
-        fetch('/auth/check', {
+        await console.log('Logged in');
+        await console.log('user firebaseAccessToken in App.js componentDidMount: ', user.ie);
+        const response = await fetch('/auth/check', {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
@@ -56,30 +57,31 @@ class App extends Component {
             firebaseAccessToken: user.ie,
           }),
         })
-        .then((responseData) => {
-          const userAuthorized = responseData.userAuthorized;
-          if (userAuthorized) {
-            this.setState({ userAuthorized });
-          }
-          if (this.state.userAuthorized) {
-            this.setState({ homePath: '/' });
-            this.setState({ signupPath: '/signup' });
-          } else {
-            this.setState({ homePath: '/home' });
-            this.setState({ signupPath: '/' });
-          }
+        const responseData = await response.json();
+        const userAuthorized = responseData.userAuthorized;
+        console.log('userAuthorized: ', userAuthorized)
+        if (userAuthorized) {
+          await this.setState({ userAuthorized });
+        }
+        if (this.state.userAuthorized) {
+          await this.setState({ homePath: '/' });
+          await this.setState({ signupPath: '/signup' });
+        } else {
+          await this.setState({ homePath: '/home' });
+          await this.setState({ signupPath: '/' });
+        }
 
-        });
-        this.setState({
+        await this.setState({
           authenticated: true,
           loading: false,
         }, () => {
           console.log('this.state.loading: ', this.state.loading);
         });
       } else { // isn't signed in
-        this.setState({
+        await this.setState({
           authenticated: false,
           loading: false,
+          userAuthorized: false,
         }, () => {
           console.log('this.state.loading: ', this.state.loading);
         });
@@ -93,8 +95,8 @@ class App extends Component {
 
   async logOut() {
     await nativeLogout();
-    await this.setState({ routeToRegisterForm: false });
-    await this.setState({ userAuthorized: false });
+    // await this.setState({ routeToRegisterForm: false });
+    // await this.setState({ userAuthorized: false });
     await console.log('User after log out', firebaseAuth().currentUser);
   }
 
@@ -168,7 +170,7 @@ class App extends Component {
               userAuthorized={this.state.userAuthorized}
             />)}
           />
-          <Route path={this.state.homePath} component={Home} />
+          <Route path={this.state.homePath} component={() => <Home userAuthorized={this.state.userAuthorized} />} />
           <Route path="/foodwiki" component={foodwiki} />
           <Route path="/terms" component={Terms} />
           <Route path="/bff" component={BFFTerms} />

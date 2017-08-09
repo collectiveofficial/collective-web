@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
   Route,
-  Link
+  Link,
+  Redirect
 } from 'react-router-dom';
 import { Image, Modal } from 'semantic-ui-react';
 import s from './Home.css';
@@ -43,10 +44,8 @@ class Home extends React.Component {
             <div className={s.headcont}>
               <div>
                 <a href="https://hidden-reef-85880.herokuapp.com/" target="/blank">
-                  <img className={s.head} src='https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/15726586_926945357406132_4915279900008217763_n.jpg?oh=9ecd45f3cf6d31be1f7837c120853bd9&oe=5A046CFF'/>
-                </a>
-              </div>
-              <h1 className={s.banner}>Upcoming Bulk Buys</h1>
+                <img className={s.head} src='https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/15726586_926945357406132_4915279900008217763_n.jpg?oh=9ecd45f3cf6d31be1f7837c120853bd9&oe=5A046CFF'/>
+              </a>
             </div>
             <Card style={{width: "800px", margin: "0 0 30px 0"}}>
               <CardTitle
@@ -75,16 +74,22 @@ class Home extends React.Component {
                   </Modal>
                 </div>
             </Card>
-            {this.state.remainingCalendar.map((x) => (
-              <Card style={{width: "800px", margin: "0 0 30px 0"}}>
-              <CardTitle
-                title={x[0]}
-                subtitle={x[1]}
-               />
+            {this.state.remainingCalendar.map((x, key) => (
+              <Card style={{width: "800px", margin: "0 0 30px 0"}} key={key} >
+                <CardTitle
+                  title={x[0]}
+                  subtitle={x[1]}
+                />
               </Card>
             ))}
           </div>
         </div>
+        {this.props.userAuthorized ?
+          <div></div>
+          :
+          <Redirect to="/login" />
+        }
+      </div>
     </div>
     );
   }

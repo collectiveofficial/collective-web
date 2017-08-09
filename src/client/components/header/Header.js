@@ -65,7 +65,6 @@ class Head extends Component {
               :
               <Link className={s.link, s.highlight} to="/login" onClick={this.props.showUser}>Log In</Link>
             }
-            {/* <Link className={s.sign} to="/signup">Sign Up</Link> */}
           </div>
       </div>
     );
