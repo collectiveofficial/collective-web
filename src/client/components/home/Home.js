@@ -3,9 +3,8 @@ import {
   Route,
   Link
 } from 'react-router-dom';
-import Modal from 'react-modal';
+import { Image, Modal } from 'semantic-ui-react';
 import s from './Home.css';
-import Provider from './Provider.js';
 import Voting from './Voting.js';
 import { Card, CardMedia, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
 import {Button} from 'react-toolbox/lib/button';
@@ -60,7 +59,20 @@ class Home extends React.Component {
                 ></iframe>
                 <div className={s.links}>
                   <Link className={s.link} to="/voting">Vote and Pay</Link>
-                  <Provider provider={this.state.provider}/>
+                  <Modal trigger={<div className={s.link}>Provider info</div>}>
+                    <Modal.Header>{this.state.provider}</Modal.Header>
+                    <Modal.Content image>
+                      <Image wrapped size='medium' src='http://static1.squarespace.com/static/560d50c5e4b0f68fd092a78f/t/577cfee7893fc03a12adcedb/1495464043705/?format=1500w' />
+                      <Modal.Description>
+                        <p>DNO produce is a local food distributor committed to</p>
+                        <p>providing high quality produce to Central Ohio restaurants</p>
+                        <p>and stores. They do what they can to provide Ohio grown</p>
+                        <p>produce and they have been instrumental in providing healthy food</p>
+                        <p>for the Ohio State campus.</p>
+                        <p>For more info, check em out <a href="http://dnoinc.com/" target="/blank">here.</a></p>
+                      </Modal.Description>
+                    </Modal.Content>
+                  </Modal>
                 </div>
             </Card>
             {this.state.remainingCalendar.map((x) => (

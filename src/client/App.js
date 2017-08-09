@@ -17,6 +17,9 @@ import Voting from './components/home/Voting.js';
 import Header from './components/header/Header.js';
 import Footer from './components/footer/Footer.js';
 import { nativeLogout } from './utils/auth.js';
+import Terms from './components/legal/collectiveterms.js';
+import BFFTerms from './components/legal/BFFterms.js';
+import Privacy from './components/legal/privacypolicy.js';
 
 initReactFastclick();
 
@@ -87,6 +90,9 @@ class App extends Component {
           <Route path="/login" component={() => <LogIn authenticated={this.authenticated} />} />
           <Route path={this.state.homePath} component={Home} />
           <Route path="/foodwiki" component={foodwiki} />
+          <Route path="/terms" component={Terms} />
+          <Route path="/bff" component={BFFTerms} />
+          <Route path="/privacy" component={Privacy} />
           <Route path="/community" component={community} />
           <Route path="/voting" component={Voting} />
           <Route exact path={this.state.signupPath} component={SignUp} />
