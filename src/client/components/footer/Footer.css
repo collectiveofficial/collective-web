@@ -9,9 +9,9 @@
 
 
 .root {
-  background: white;
+  background: #228B22;
   font-family: 'Latos', sans-serif;
-  color: #C0C0C0;
+  color: white;
 }
 
 .container {
@@ -21,6 +21,9 @@
   text-align: center;
 }
 
+.link{
+  color: white;
+}
 
 .text,
 .link {
@@ -28,12 +31,6 @@
   font-size: 1em;
 }
 
-.link,
-.link:active,
-.link:visited {
-  color: grey;
-  text-decoration: none;
-}
 
 .link:hover {
   color: grey;
