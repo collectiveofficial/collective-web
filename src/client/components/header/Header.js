@@ -60,10 +60,21 @@ class Head extends Component {
             </Modal>
             <Link className={s.link} to="/foodwiki">FoodWiki</Link>
             <Link className={s.link} to="/community">Community</Link>
-            {firebaseAuth().currentUser !== null ?
-              <Link className={s.link, s.highlight} to="/login" onClick={this.props.logOut}>Log Out</Link>
+            {/* {firebaseAuth().currentUser !== null ? */}
+            {this.props.authenticated ?
+              <button
+                className={s.link, s.highlight}
+                onClick={() => {
+                  this.props.logOut();
+                }}
+              >
+                Log Out
+              </button>
               :
-              <Link className={s.link, s.highlight} to="/login" onClick={this.props.showUser}>Log In</Link>
+              <span>
+                <Link className={s.link, s.highlight} to="/login" onClick={this.props.showUser}>Log In</Link>
+                <Link className={s.link, s.highlight} to="/signup" onClick={this.props.showUser}>Sign Up</Link>
+              </span>
             }
           </div>
       </div>

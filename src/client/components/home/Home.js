@@ -84,11 +84,11 @@ class Home extends React.Component {
             ))}
           </div>
         </div>
-        {this.props.userAuthorized ?
+        {/* {this.props.userAuthorized ?
           <div></div>
           :
           <Redirect to="/login" />
-        }
+        } */}
       </div>
     </div>
     );

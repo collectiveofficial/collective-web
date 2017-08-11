@@ -3,6 +3,7 @@ import {
   Route,
   Link,
   Redirect,
+  Switch,
 } from 'react-router-dom';
 import firebase from 'firebase';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -24,6 +25,28 @@ import Privacy from './components/legal/privacypolicy.js';
 
 initReactFastclick();
 
+const PrivateRoute = ({component: Component, userAuthorized, ...rest}) => {
+  return (
+    <Route
+      {...rest}
+      render={(props) => userAuthorized === true
+        ? <Component {...props} />
+        : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />}
+    />
+  );
+};
+
+const PublicRoute = ({component: Component, userAuthorized, ...rest}) => {
+  return (
+    <Route
+      {...rest}
+      render={(props) => userAuthorized === false
+        ? <Component {...props} />
+        : <Redirect to='/home' />}
+    />
+  );
+};
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -40,6 +63,7 @@ class App extends Component {
     this.logOut = this.logOut.bind(this);
     this.showUser = this.showUser.bind(this);
     this.handleFacebookAuth = this.handleFacebookAuth.bind(this);
+    this.authorizeUser = this.authorizeUser.bind(this);
   }
 
   componentDidMount() {
@@ -63,13 +87,13 @@ class App extends Component {
         if (userAuthorized) {
           await this.setState({ userAuthorized });
         }
-        if (this.state.userAuthorized) {
-          await this.setState({ homePath: '/' });
-          await this.setState({ signupPath: '/signup' });
-        } else {
-          await this.setState({ homePath: '/home' });
-          await this.setState({ signupPath: '/' });
-        }
+        // if (this.state.userAuthorized) {
+        //   await this.setState({ homePath: '/' });
+        //   await this.setState({ signupPath: '/signup' });
+        // } else {
+        //   await this.setState({ homePath: '/home' });
+        //   await this.setState({ signupPath: '/' });
+        // }
 
         await this.setState({
           authenticated: true,
@@ -152,15 +176,65 @@ class App extends Component {
       await this.setState({ userAuthorized: true });
     } else if ((userAlreadyExists && !hasUserFinishedSignUp) || saveUserOnFacebookSignUpExecuted) {
       await this.setState({ routeToRegisterForm: true });
+      // const sendEmailVerification = await result.user.sendEmailVerification();
+      // await console.log('sendEmailVerification successful.');
     }
+  }
+
+  authorizeUser() {
+    this.setState({ userAuthorized: true });
   }
 
   render() {
     return (
       <MuiThemeProvider>
         <div>
-          <Header authenticated={this.state.authenticated} logOut={this.logOut} showUser={this.showUser}/>
-          <Route path="/login" component={() =>
+          <Header authenticated={this.state.authenticated} logOut={this.logOut} showUser={this.showUser} />
+          <Switch>
+            <PublicRoute userAuthorized={this.state.userAuthorized} path='/' exact component={() =>
+              (<SignUp
+                handleFacebookAuth={this.handleFacebookAuth}
+                facebookData={this.state.facebookData}
+                firebaseAccessToken={this.state.firebaseAccessToken}
+                routeToRegisterForm={this.state.routeToRegisterForm}
+                userAuthorized={this.state.userAuthorized}
+              />)}
+            />
+            <PublicRoute userAuthorized={this.state.userAuthorized} path="/login" component={() =>
+              (<LogIn
+                nativeLogin={this.nativeLogin}
+                handleFacebookAuth={this.handleFacebookAuth}
+                facebookData={this.state.facebookData}
+                firebaseAccessToken={this.state.firebaseAccessToken}
+                routeToRegisterForm={this.state.routeToRegisterForm}
+                userAuthorized={this.state.userAuthorized}
+                authorizeUser={this.authorizeUser}
+              />)}
+            />
+            <PrivateRoute userAuthorized={this.state.userAuthorized} path="/home" component={Home} />
+            <PrivateRoute userAuthorized={this.state.userAuthorized} path="/voting" component={Voting} />
+            <PublicRoute userAuthorized={this.state.userAuthorized} path="/foodwiki" component={foodwiki} />
+            <PublicRoute userAuthorized={this.state.userAuthorized} path="/signup" component={() =>
+              (<SignUp
+                handleFacebookAuth={this.handleFacebookAuth}
+                facebookData={this.state.facebookData}
+                firebaseAccessToken={this.state.firebaseAccessToken}
+                routeToRegisterForm={this.state.routeToRegisterForm}
+                userAuthorized={this.state.userAuthorized}
+              />)}
+            />
+            <PublicRoute userAuthorized={this.state.userAuthorized} path="/community" component={community} />
+            <PublicRoute userAuthorized={this.state.userAuthorized} path="/register-form" component={() =>
+              (<RegisterForm
+                authenticated={this.authenticated}
+                firebaseAccessToken={this.state.firebaseAccessToken}
+                authorizeUser={this.authorizeUser}
+                userWantsEmailSignup={this.state.userWantsEmailSignup}
+              />)}
+            />
+            <PublicRoute render={() => <h3>No Match</h3>} />
+          </Switch>
+          {/* <Route path="/login" component={() =>
             (<LogIn
               nativeLogin={this.nativeLogin}
               handleFacebookAuth={this.handleFacebookAuth}
@@ -186,7 +260,7 @@ class App extends Component {
               routeToRegisterForm={this.state.routeToRegisterForm}
               userAuthorized={this.state.userAuthorized}
             />)}
-          />
+          /> */}
           <Footer />
         </div>
       </MuiThemeProvider>

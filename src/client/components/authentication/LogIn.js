@@ -24,11 +24,17 @@ class Login extends React.Component {
       routeToRegisterForm: false,
       firebaseAccessToken: '',
       userWantsEmailSignup: false,
+      wrongPassword: '',
+      userDisabled: '',
+      userNotFound: '',
+      emailErrorMessage: '',
+      passwordErrorMessage: '',
     };
     this.handleEmailContinue = this.handleEmailContinue.bind(this);
     this.nativeLogin = this.nativeLogin.bind(this);
     this.validateEmail = this.validateEmail.bind(this);
     this.validatePassword = this.validatePassword.bind(this);
+    this.resetErrorStates = this.resetErrorStates.bind(this);
   }
 
   async validateEmail() {
@@ -47,8 +53,8 @@ class Login extends React.Component {
     if (responseData.emailValidated) {
       await this.setState({ isEmailValidated: true });
     } else {
-      await console.log('response.emailValidated: ', response.emailValidated);
       await this.setState({ isEmailValidated: false });
+      await this.setState({ emailErrorMessage: 'Hmm...that doesn\'t look like an email address.' });
     }
   }
 
@@ -68,11 +74,30 @@ class Login extends React.Component {
       await this.setState({ isPasswordValidated: true });
     } else {
       await this.setState({ isPasswordValidated: false });
+      await this.setState({ passwordErrorMessage: 'Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number.' });
     }
   }
 
   async nativeLogin(email, password) {
-    const user = await firebaseAuth().signInWithEmailAndPassword(email, password);
+    const user = await firebaseAuth().signInWithEmailAndPassword(email, password)
+    .catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      if (errorCode === 'auth/wrong-password') {
+        this.setState({ wrongPassword: true });
+        this.setState({ passwordErrorMessage: 'Wrong password.' });
+      }
+      if (errorCode === 'auth/user-disabled') {
+        this.setState({ userDisabled: true });
+        this.setState({ emailErrorMessage: 'User disabled.' });
+      }
+      if (errorCode === 'auth/user-not-found') {
+        this.setState({ userNotFound: true });
+        this.setState({ emailErrorMessage: 'User not found.' });
+      }
+      console.log(error);
+    });
     await this.setState({ firebaseAccessToken: user.ie });
     await console.log(this.state.firebaseAccessToken);
     await this.setState({ userWantsEmailSignup: true });
@@ -80,8 +105,17 @@ class Login extends React.Component {
     return user;
   }
 
+  resetErrorStates() {
+    this.setState({ isPasswordValidated: '' });
+    this.setState({ isInvalidEmail: '' });
+    this.setState({ wrongPassword: '' });
+    this.setState({ userDisabled: '' });
+    this.setState({ userNotFound: '' });
+  }
+
   async handleEmailContinue(event) {
     event.preventDefault();
+    await this.resetErrorStates();
     await this.validateEmail();
     await this.validatePassword();
     if (this.state.isEmailValidated && this.state.isPasswordValidated) {
@@ -102,6 +136,9 @@ class Login extends React.Component {
       const doesUserEmailExist = checkEmailResponseData.doesUserEmailExist;
       const hasUserFinishedSignUp = checkEmailResponseData.hasUserFinishedSignUp;
       const isUserFacebookAuth = checkEmailResponseData.isUserFacebookAuth;
+      if (doesUserEmailExist && hasUserFinishedSignUp && !isUserFacebookAuth) {
+        await this.props.authorizeUser();
+      }
       const routeToRegisterForm = doesUserEmailExist && !hasUserFinishedSignUp && !isUserFacebookAuth;
       await this.setState({ routeToRegisterForm }, () => {
         console.log('Inside setState, this.state.routeToRegisterForm: ', this.state.routeToRegisterForm);
@@ -149,8 +186,8 @@ class Login extends React.Component {
                       onChange={(event) => this.setState({ emailInput: event.target.value })}
                     />
                   }
-                  content="Hmm...that doesn't look like an email address."
-                  open={this.state.isEmailValidated === false}
+                  content={this.state.emailErrorMessage}
+                  open={this.state.isEmailValidated === false || this.state.userDisabled === true || this.state.userNotFound === true}
                   offset={20}
                   position="right center"
                 /><br />
@@ -164,8 +201,8 @@ class Login extends React.Component {
                     onChange={(event) => this.setState({ passwordInput: event.target.value })}
                   />
                 }
-                content="Your password needs a minimum of 8 characters with at least one uppercasee letter, one lowercase letter and one number."
-                open={this.state.isPasswordValidated === false && this.state.isEmailValidated === true}
+                content={this.state.passwordErrorMessage}
+                open={(this.state.isPasswordValidated === false || this.state.wrongPassword === true) && (this.state.isEmailValidated === true && this.state.userDisabled !== true && this.state.userNotFound !== true)}
                 offset={20}
                 position="right center"
               /><br />
@@ -181,11 +218,11 @@ class Login extends React.Component {
           </form>
             }
           </div>
-          {this.props.userAuthorized ?
+          {/* {this.props.userAuthorized ?
             <Redirect to="/home" />
             :
             <div></div>
-          }
+          } */}
         </div>
       </div>
     );

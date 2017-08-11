@@ -37,6 +37,11 @@ class SignUp extends React.Component {
     this.resetErrorStates = this.resetErrorStates.bind(this);
   }
 
+  componentWillUnmount() {
+    console.log('Signup is unmounted');
+    console.log('this.state.isPasswordValidated', this.state.isPasswordValidated);
+  }
+
   async createNativeUser (email, pw) {
     await this.setState({ hasFirebaseChecked: true });
     return firebaseAuth().createUserWithEmailAndPassword(email, pw)
@@ -111,6 +116,7 @@ class SignUp extends React.Component {
   }
 
   async handleEmailContinue() {
+    await console.log('handleEmailContinue is executing/executed');
     await this.resetErrorStates();
     await this.validatePassword();
     let firebaseEmailSignUpUser;
@@ -164,6 +170,7 @@ class SignUp extends React.Component {
           const responseData = await response.json();
           await this.setState({ userWantsEmailSignup: true });
           await this.setState({ routeToRegisterForm: true });
+          await console.log(this.state.routeToRegisterForm);
         }
       }
     }
@@ -249,11 +256,11 @@ class SignUp extends React.Component {
                 >
                   Continue with Facebook
                 </button>
-                {this.props.userAuthorized ?
+                {/* {this.props.userAuthorized ?
                   <Redirect to="/home" />
                   :
                   <div></div>
-                }
+                } */}
               </div>
             }
           </div>
