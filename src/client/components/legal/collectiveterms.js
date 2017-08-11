@@ -16,7 +16,7 @@ class terms extends Component {
   render() {
     return (
       <div className={s.container}>
-        <iframe src="https://drive.google.com/file/d/0B72SnxgPvfVAMlVqTGFPYVVlMUU/preview" width="640" height="480"></iframe>
+        <iframe src="https://drive.google.com/file/d/0B72SnxgPvfVAdW5pbUhmVXptY00/preview" width="640" height="480"></iframe>
       </div>
     );
   }
