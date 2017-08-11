@@ -127,7 +127,8 @@ class App extends Component {
     const result = await firebaseAuth().signInWithPopup(provider);
     await console.log('inside handleFacebookAuth');
     await console.log('firebaseAuth result: ', result);
-    const firebaseAccessToken = result.user.ie;
+    // const firebaseAccessToken = result.user.ie;
+    const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
     await this.setState({ firebaseAccessToken });
     const token = result.credential.accessToken;
     const response = await fetch('/auth/facebook', {
@@ -144,7 +145,6 @@ class App extends Component {
     await this.setState({ facebookData: responseData.facebook_payload }, () => {
       console.log('this.state.facebookData: ', this.state.facebookData);
     });
-    // const idToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
     const facebookCheckResponse = await fetch('/auth/facebook/check', {
       method: 'POST',
       headers: {
@@ -152,7 +152,7 @@ class App extends Component {
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify({
-        firebaseAccessToken: firebaseAccessToken,
+        firebaseAccessToken,
         firstName: this.state.facebookData.first_name,
         lastName: this.state.facebookData.last_name,
         email: this.state.facebookData.email,
