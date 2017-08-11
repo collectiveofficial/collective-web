@@ -171,7 +171,7 @@ class Voting extends React.Component {
                                         <Dropdown inline options={numOptions}
                                           onChange={this.handleDorm}
                                           defaultValue={numOptions[0].value}
-                                        /><Modal trigger={<div className={s.mode}>dorm packages</div>}>
+                                        /><Modal trigger={<div className={s.mode}>dorm packages</div>} basic size='small'>
                                           <Modal.Header>Dorm package</Modal.Header>
                                           <Modal.Content image>
                                             <Modal.Description>
@@ -195,7 +195,7 @@ class Voting extends React.Component {
                                         <Dropdown inline options={numOptions}
                                           onChange={this.handleCook}
                                           defaultValue={numOptions[0].value}
-                                        /><Modal trigger={<div className={s.mode}>cooking packages</div>}>
+                                        /><Modal trigger={<div className={s.mode}>cooking packages</div>} basic size='small' >
                                           <Modal.Header>Cooking package</Modal.Header>
                                           <Modal.Content image>
                                             <Modal.Description>

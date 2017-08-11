@@ -98,17 +98,13 @@ img {
   margin-left: 8px;
   border-radius: 3px;
   background: #228B22;
-  color: #fff;
+  color: white;
+  margin-bottom: 8px;
 }
 
-.link,
-.link:active,
-.link:visited {
-  color: rgba(255, 255, 255, .6);
-}
 
 .link:hover {
-  color: rgba(255, 255, 255, 1);
+  color: grey;
 }
 
 .ballot {
@@ -164,6 +160,7 @@ img {
   font-family: 'Lato', sans-serif;
   display: flex;
   justify-content: center;
+  text-decoration: underline;
 }
 
 .flexcontainer {
