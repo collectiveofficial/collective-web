@@ -1,5 +1,6 @@
 .root {
-  background: #228B22;
+  /*background: #228B22; original*/
+  background: white;
   color: #fff;
   font-family: 'Lato', sans-serif;
   display: flex;
@@ -22,19 +23,20 @@
 .brand {
   color: rgba(255, 255, 255, 1);
   text-decoration: none;
-  font-size: 2em; /* ~28px */
+  font-size: 1.75em; /* ~28px */
   border: 1;
   border-color: inherit;
   align-self: flex-start;
 }
 
 .brandTxt {
-  color: rgba(255, 255, 255, 1);
+  /*color: rgba(255, 255, 255, 1);original*/
+  color: #228B22;
   margin-left: 10px;
   // font-family: 'Noe Display Bold', sans-serif;
   // font-family: 'RelayCond', Arial, serif;
   font-weight: bold;
-  font-size: 2em;
+  font-size: 1.75em;
   text-decoration: none;
 }
 
@@ -53,18 +55,19 @@
   padding: 3px 8px;
   text-decoration: none;
   font-size: 1.25em; /* ~18px */
+  color: grey;
 }
 
-.sign:active,
+/*.sign:active,
 .sign:visited,
-.link,
 .link:active,
 .link:visited {
   color: rgba(255, 255, 255, .6);
-}
+}*/
 
 .link:hover {
-  color: rgba(255, 255, 255, 1);
+  /*color: rgba(255, 255, 255, 1);*/
+  color: #228B22;
 }
 
 .sign {
@@ -76,35 +79,30 @@
   margin-left: 8px;
   border-radius: 3px;
   background: rgba(0, 0, 0, .15);
-  color: #fff;
   text-decoration: none;
 }
-
-
 
 .highlight {
   margin-right: 8px;
   margin-left: 8px;
   border-radius: 3px;
   font-size: 1.25em;
-  background: rgba(0, 0, 0, .15);
-  color: #fff;
+  background: #228B22;
+  padding: 3px;
+  color: white;
   text-decoration: none;
 }
 
-.sign:hover,
 .highlight:hover {
-  background: rgba(0, 0, 0, .3);
+  color: grey;
 }
 
 
-.spacer {
-  color: rgba(255, 255, 255, .3);
-}
 .cont {
   display: flex;
   flex-direction: row;
   align-self: flex-end;
+  color: grey;
 }
 
 .bannerTitle {
