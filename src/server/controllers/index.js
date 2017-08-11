@@ -45,7 +45,7 @@ module.exports = {
   saveUserOnFacebookSignUp: {
     async post(req, res) {
       console.log(req.body);
-      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken)
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       const doesUserExist = await userUtil.checkIfUserExists(uid);
       req.body.uid = uid;

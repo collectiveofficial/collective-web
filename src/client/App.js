@@ -152,7 +152,7 @@ class App extends Component {
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify({
-        firebaseAccessToken,
+        firebaseAccessToken: firebaseAccessToken,
         firstName: this.state.facebookData.first_name,
         lastName: this.state.facebookData.last_name,
         email: this.state.facebookData.email,
