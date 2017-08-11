@@ -61,9 +61,9 @@ class Head extends Component {
             <Link className={s.link} to="/foodwiki">FoodWiki</Link>
             <Link className={s.link} to="/community">Community</Link>
             {firebaseAuth().currentUser !== null ?
-              <Link className={s.link} to="/login" onClick={this.props.logOut}>Log Out</Link>
+              <Link className={s.link, s.highlight} to="/login" onClick={this.props.logOut}>Log Out</Link>
               :
-              <Link className={s.link} to="/login" onClick={this.props.showUser}>Log In</Link>
+              <Link className={s.link, s.highlight} to="/login" onClick={this.props.showUser}>Log In</Link>
             }
             {/* <Link className={s.sign} to="/signup">Sign Up</Link> */}
           </div>

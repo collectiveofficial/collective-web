@@ -171,7 +171,7 @@ class SignUp extends React.Component {
                   height="30"
                   width="30"
                 />
-                <h2>Welcome to Collective!</h2>
+                <h2 className={s.head}>Welcome to Collective!</h2>
                 <div>
                   {this.state.isEmailAlreadyInUse === true ?
                     <div>
