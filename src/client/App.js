@@ -87,13 +87,6 @@ class App extends Component {
         if (userAuthorized) {
           await this.setState({ userAuthorized });
         }
-        // if (this.state.userAuthorized) {
-        //   await this.setState({ homePath: '/' });
-        //   await this.setState({ signupPath: '/signup' });
-        // } else {
-        //   await this.setState({ homePath: '/home' });
-        //   await this.setState({ signupPath: '/' });
-        // }
 
         await this.setState({
           authenticated: true,
@@ -234,33 +227,6 @@ class App extends Component {
             />
             <PublicRoute render={() => <h3>No Match</h3>} />
           </Switch>
-          {/* <Route path="/login" component={() =>
-            (<LogIn
-              nativeLogin={this.nativeLogin}
-              handleFacebookAuth={this.handleFacebookAuth}
-              facebookData={this.state.facebookData}
-              firebaseAccessToken={this.state.firebaseAccessToken}
-              routeToRegisterForm={this.state.routeToRegisterForm}
-              userAuthorized={this.state.userAuthorized}
-            />)}
-          />
-          <Route path={this.state.homePath} component={() => <Home userAuthorized={this.state.userAuthorized} />} />
-          <Route path="/foodwiki" component={foodwiki} />
-          <Route path="/terms" component={Terms} />
-          <Route path="/bff" component={BFFTerms} />
-          <Route path="/privacy" component={Privacy} />
-          <Route path="/community" component={community} />
-          <Route path="/voting" component={Voting} />
-          <Route path="/register-form" component={() => <RegisterForm authenticated={this.authenticated} firebaseAccessToken={this.state.firebaseAccessToken} userWantsEmailSignup={this.state.userWantsEmailSignup} />} />
-          <Route exact path={this.state.signupPath} component={() =>
-            (<SignUp
-              handleFacebookAuth={this.handleFacebookAuth}
-              facebookData={this.state.facebookData}
-              firebaseAccessToken={this.state.firebaseAccessToken}
-              routeToRegisterForm={this.state.routeToRegisterForm}
-              userAuthorized={this.state.userAuthorized}
-            />)}
-          /> */}
           <Footer />
         </div>
       </MuiThemeProvider>
