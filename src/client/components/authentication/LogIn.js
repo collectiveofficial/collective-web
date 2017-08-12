@@ -21,9 +21,6 @@ class Login extends React.Component {
       passwordInput: '',
       isEmailValidated: '',
       isPasswordValidated: '',
-      routeToRegisterForm: false,
-      firebaseAccessToken: '',
-      userWantsEmailSignup: false,
       wrongPassword: '',
       userDisabled: '',
       userNotFound: '',
@@ -49,7 +46,6 @@ class Login extends React.Component {
       }),
     });
     const responseData = await response.json();
-    await console.log('responseData: ', responseData);
     if (responseData.emailValidated) {
       await this.setState({ isEmailValidated: true });
     } else {
@@ -98,10 +94,6 @@ class Login extends React.Component {
       }
       console.log(error);
     });
-    await this.setState({ firebaseAccessToken: user.ie }); // TODO
-    await console.log(this.state.firebaseAccessToken);
-    await this.setState({ userWantsEmailSignup: true });
-    await console.log('this.state.userWantsEmailSignup', this.state.userWantsEmailSignup);
     return user;
   }
 
@@ -120,7 +112,6 @@ class Login extends React.Component {
     await this.validatePassword();
     if (this.state.isEmailValidated && this.state.isPasswordValidated) {
       const user = await this.nativeLogin(this.state.emailInput, this.state.passwordInput);
-      // const email = user.email;
       const checkEmailResponse = await fetch('/auth/signup/check-email', {
         method: 'POST',
         headers: {
@@ -140,9 +131,12 @@ class Login extends React.Component {
         await this.props.authorizeUser();
       }
       const routeToRegisterForm = doesUserEmailExist && !hasUserFinishedSignUp && !isUserFacebookAuth;
-      await this.setState({ routeToRegisterForm }, () => {
-        console.log('Inside setState, this.state.routeToRegisterForm: ', this.state.routeToRegisterForm);
-      });
+      if (routeToRegisterForm) {
+        const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+        await this.props.setFirebaseAccessTokenState(firebaseAccessToken);
+        await this.props.setUserWantsEmailSignupState(true);
+      }
+      await this.props.setRouteToRegisterFormState(routeToRegisterForm);
     }
   }
 
@@ -160,14 +154,14 @@ class Login extends React.Component {
       <div>
         <div className={s.root}>
           <div className={s.container}>
-            {this.props.routeToRegisterForm || this.state.routeToRegisterForm ?
+            {this.props.routeToRegisterForm ?
               <RegisterForm
                 authorizeUser={this.props.authorizeUser}
-                userWantsEmailSignup={this.state.userWantsEmailSignup}
+                userWantsEmailSignup={this.props.userWantsEmailSignup}
                 emailInput={this.state.emailInput}
                 passwordInput={this.state.passwordInput}
                 facebookData={this.props.facebookData}
-                firebaseAccessToken={this.props.firebaseAccessToken.length > 0 ? this.props.firebaseAccessToken : this.state.firebaseAccessToken}
+                firebaseAccessToken={this.props.firebaseAccessToken}
               />
               :
               <form onSubmit={this.handleEmailContinue}>
@@ -195,7 +189,6 @@ class Login extends React.Component {
                 <LockOutline />
                 <Popup
                   trigger={<TextField
-                    // ref="password"
                     type="password"
                     hintText="Password"
                     style={styles.iconStyles}
@@ -219,11 +212,6 @@ class Login extends React.Component {
           </form>
             }
           </div>
-          {/* {this.props.userAuthorized ?
-            <Redirect to="/home" />
-            :
-            <div></div>
-          } */}
         </div>
       </div>
     );

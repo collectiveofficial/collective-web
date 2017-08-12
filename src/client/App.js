@@ -229,7 +229,11 @@ class App extends Component {
                 handleFacebookAuth={this.handleFacebookAuth}
                 facebookData={this.state.facebookData}
                 firebaseAccessToken={this.state.firebaseAccessToken}
+                setFirebaseAccessTokenState={this.setFirebaseAccessTokenState}
+                setRouteToRegisterFormState={this.setRouteToRegisterFormState}
+                setUserWantsEmailSignupState={this.setUserWantsEmailSignupState}
                 routeToRegisterForm={this.state.routeToRegisterForm}
+                userWantsEmailSignup={this.state.userWantsEmailSignup}
                 userAuthorized={this.state.userAuthorized}
                 authorizeUser={this.authorizeUser}
               />)}

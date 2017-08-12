@@ -44,6 +44,7 @@ class RegisterForm extends React.Component {
       isZipCodeEmpty: false,
       isSchoolEmpty: false,
       userAuthorized: false,
+      areThereEmptyFields: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -136,13 +137,13 @@ class RegisterForm extends React.Component {
     if (this.state.school.length === 0) {
       await this.setState({ isSchoolEmpty: true });
     }
-    return (this.state.isFirstNameEmpty || this.state.isLastNameEmpty || this.state.isPhoneNumberEmpty || this.state.isBirthdayEmpty ||
-    this.state.isStreetAddressEmpty || this.state.isCityEmpty || this.state.isStateEmpty || this.state.isZipCodeEmpty || this.state.isSchoolEmpty);
+    await this.setState({ areThereEmptyFields: this.state.isFirstNameEmpty || this.state.isLastNameEmpty || this.state.isPhoneNumberEmpty || this.state.isBirthdayEmpty ||
+    this.state.isStreetAddressEmpty || this.state.isCityEmpty || this.state.isStateEmpty || this.state.isZipCodeEmpty || this.state.isSchoolEmpty });
   }
 
   async submitUserInfo() {
-    const areThereEmptyFields = await this.areThereEmptyFields();
-    if (areThereEmptyFields === false) {
+    await this.areThereEmptyFields();
+    if (this.state.areThereEmptyFields === false) {
       const response = await fetch('/auth/register-form/submit', {
         method: 'POST',
         headers: {
@@ -274,25 +275,21 @@ class RegisterForm extends React.Component {
          errorText={this.state.isZipCodeEmpty ? 'Zip code is required' : ''}
         /><br />
        <div>
-         {/* <Modal trigger={<div><RaisedButton label="Submit"/><br /><br /></div>}>
+         <RaisedButton label="Submit" primary={true} onClick={this.areThereEmptyFields} /><br /><br />
+         <Modal open={this.state.areThereEmptyFields === false}>
            <Modal.Content>
              <p>By clicking continue I have read and agreed to Collective's <Link to="terms">terms of use</Link> and <Link to="privacy">privacy policy</Link> as well as Best Food Forward's <Link to="bff">terms of use</Link>, and I agree to not hold any involved individuals or entities liable for anything related to the use, consumption, storage, or purchasing of food within this site.</p>
            </Modal.Content>
            <Modal.Actions>
+             <RaisedButton label="Cancel" secondary={true} onClick={() => { this.setState({ areThereEmptyFields: '' }); }} />
              <RaisedButton label="Continue" primary={true} onClick={this.submitUserInfo} /><br /><br />
              {this.state.userAuthorized ?
-               <Redirect to="/home"/>
+               <Redirect to="/home" />
                :
                <div></div>
              }
            </Modal.Actions>
-         </Modal> */}
-        <RaisedButton label="Submit" primary={true} onClick={this.submitUserInfo} /><br /><br />
-        {this.props.userAuthorized ?
-          <Redirect to="/home"/>
-          :
-          <div></div>
-        }
+         </Modal>
       </div>
       </form>
     );
