@@ -27,7 +27,16 @@ Pears: "http://www.canned-fresh.com/live/media/2012/02/pears2.jpg",
 Potatoes: "https://upload.wikimedia.org/wikipedia/commons/a/ab/Patates.jpg",
 Kiwis: "http://cdn.thealternativedaily.com/wp-content/uploads/2013/11/kiwi.jpg",
 Oranges: "http://grapplergourmet.com/wp-content/uploads/2015/03/piles.jpg",
-Avocadoes: "http://jenknoedl.com/wp-content/uploads/2015/11/20150115-avocados-brown-1.jpg"
+Avocadoes: "http://jenknoedl.com/wp-content/uploads/2015/11/20150115-avocados-brown-1.jpg",
+GrannySmithApples: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Granny_smith.jpg/220px-Granny_smith.jpg",
+GoldenDeliciousApples: "https://sc01.alicdn.com/kf/UT88x55XFFaXXagOFbXL/Golden-Delicious-Apples-Best-Quality-and-best.jpg",
+PinkLadyApples: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQafjY4RXhQCk40caqUGSRtmzkK0hu_RQQ_zR1v3nWAkRSvvSgTsA",
+RedGrapes: "https://blackmoonejuice.com/wp-content/uploads/2014/05/grapes.jpg",
+WhiteGrapes: "http://world-food-and-wine.com/image-files/white-grapes.jpg",
+Carrots: "https://edge.alluremedia.com.au/uploads/businessinsider/2015/12/baby-carrots.jpg",
+Spinach: "http://healthyrise.com/wp-content/uploads/2016/07/Spinach.jpg",
+RedPeppers: "http://www.ibizeneco.com/communities/1/004/013/082/201/images/4621089873.jpg",
+GreenPeppers: "http://palmaworld.com/wp-content/uploads/2017/01/green-pepper.jpg"
 }
 
 class Voting extends React.Component {
@@ -36,26 +45,36 @@ class Voting extends React.Component {
       this.state = {
       modalIsOpen: false,
       condition: false,
-      items: [['Apples', false],
-      ['Bananas', false],
-      ['Mangos', false],
-      ['Sweet Potatoes', false],
-      ['Pears', false],
+      items: [['Sweet Potatoes', false],
       ['Potatoes', false],
       ['Kiwis', false],
       ['Oranges', false],
-      ['Avocadoes', false]
+      ['Granny Smith Apples', false],
+      ['Golden Delicious Apples', false],
+      ['Pink Lady Apples', false],
+      ['Bananas', false],
+      ['Red Grapes', false],
+      ['White Grapes', false],
+      ['Carrots', false],
+      ['Spinach', false],
+      ['Red Peppers', false],
+      ['Green Peppers', false]
     ],
       votes: 6,
-      consensus: {Apples: false,
-      Bananas: false,
-      Mangos: false,
-      SweetPotatoes: false,
-      Pears: false,
+      consensus: {SweetPotatoes: false,
       Potatoes: false,
       Kiwis: false,
       Oranges: false,
-      Avocadoes: false
+      GrannySmithApples: false,
+      GoldenDeliciousApples: false,
+      PinkLadyApples: false,
+      Bananas: false,
+      RedGrapes: false,
+      WhiteGrapes: false,
+      Carrots: false,
+      Spinach: false,
+      RedPeppers: false,
+      GreenPeppers: false
     },
       price: 0
     };
