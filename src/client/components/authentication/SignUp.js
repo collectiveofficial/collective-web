@@ -19,13 +19,10 @@ class SignUp extends React.Component {
     this.state = {
       emailInput: '',
       passwordInput: '',
-      routeToRegisterForm: false,
-      userWantsEmailSignup: false,
       isPasswordValidated: '',
       isInvalidEmail: '',
       isWeakPassword: '',
       isEmailAlreadyInUse: '',
-      firebaseAccessToken: '',
       isExistingUserFBAuth: false,
       emailErrorMessage: '',
       passwordErrorMessage: '',
@@ -151,8 +148,8 @@ class SignUp extends React.Component {
         // go through logic
         if (this.state.isPasswordValidated) {
           firebaseEmailSignUpUser = await this.createNativeUser(this.state.emailInput, this.state.passwordInput);
-          firebaseAccessToken = firebaseEmailSignUpUser.ie;
-          await this.setState({ firebaseAccessToken });
+          firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+          await this.props.setFirebaseAccessTokenState(firebaseAccessToken);
         }
         const isValidLogin = !(this.state.isInvalidEmail || this.state.isEmailAlreadyInUse);
         if (isValidLogin && this.state.isPasswordValidated) {
@@ -168,9 +165,8 @@ class SignUp extends React.Component {
             }),
           });
           const responseData = await response.json();
-          await this.setState({ userWantsEmailSignup: true });
-          await this.setState({ routeToRegisterForm: true });
-          await console.log(this.state.routeToRegisterForm);
+          await this.props.setUserWantsEmailSignupState(true);
+          await this.props.setRouteToRegisterFormState(true);
         }
       }
     }
@@ -196,13 +192,15 @@ class SignUp extends React.Component {
       <div>
         <div className={s.root}>
           <div className={s.container}>
-            {this.props.routeToRegisterForm || this.state.routeToRegisterForm ?
+            {this.props.routeToRegisterForm ?
               <RegisterForm
-                userWantsEmailSignup={this.state.userWantsEmailSignup}
+                authorizeUser={this.props.authorizeUser}
+                userWantsEmailSignup={this.props.userWantsEmailSignup}
                 emailInput={this.state.emailInput}
                 passwordInput={this.state.passwordInput}
                 facebookData={this.props.facebookData}
-                firebaseAccessToken={this.props.firebaseAccessToken.length > 0 ? this.props.firebaseAccessToken : this.state.firebaseAccessToken}
+                firebaseAccessToken={this.props.firebaseAccessToken}
+                userAuthorized={this.props.userAuthorized}
               />
               :
               <div>

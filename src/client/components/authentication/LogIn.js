@@ -98,7 +98,7 @@ class Login extends React.Component {
       }
       console.log(error);
     });
-    await this.setState({ firebaseAccessToken: user.ie });
+    await this.setState({ firebaseAccessToken: user.ie }); // TODO
     await console.log(this.state.firebaseAccessToken);
     await this.setState({ userWantsEmailSignup: true });
     await console.log('this.state.userWantsEmailSignup', this.state.userWantsEmailSignup);
@@ -162,6 +162,7 @@ class Login extends React.Component {
           <div className={s.container}>
             {this.props.routeToRegisterForm || this.state.routeToRegisterForm ?
               <RegisterForm
+                authorizeUser={this.props.authorizeUser}
                 userWantsEmailSignup={this.state.userWantsEmailSignup}
                 emailInput={this.state.emailInput}
                 passwordInput={this.state.passwordInput}

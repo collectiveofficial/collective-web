@@ -142,9 +142,7 @@ class RegisterForm extends React.Component {
 
   async submitUserInfo() {
     const areThereEmptyFields = await this.areThereEmptyFields();
-    await console.log('areThereEmptyFields: ', areThereEmptyFields);
     if (areThereEmptyFields === false) {
-      await console.log('areThereEmptyFields: ', areThereEmptyFields);
       const response = await fetch('/auth/register-form/submit', {
         method: 'POST',
         headers: {
@@ -166,7 +164,7 @@ class RegisterForm extends React.Component {
         }),
       })
       const responseData = await response.json();
-      await this.setState({ userAuthorized: true });
+      // await this.setState({ userAuthorized: true });
       await this.props.authorizeUser();
     }
   }
@@ -276,7 +274,7 @@ class RegisterForm extends React.Component {
          errorText={this.state.isZipCodeEmpty ? 'Zip code is required' : ''}
         /><br />
        <div>
-         <Modal trigger={<div><RaisedButton label="Submit"/><br /><br /></div>}>
+         {/* <Modal trigger={<div><RaisedButton label="Submit"/><br /><br /></div>}>
            <Modal.Content>
              <p>By clicking continue I have read and agreed to Collective's <Link to="terms">terms of use</Link> and <Link to="privacy">privacy policy</Link> as well as Best Food Forward's <Link to="bff">terms of use</Link>, and I agree to not hold any involved individuals or entities liable for anything related to the use, consumption, storage, or purchasing of food within this site.</p>
            </Modal.Content>
@@ -288,13 +286,13 @@ class RegisterForm extends React.Component {
                <div></div>
              }
            </Modal.Actions>
-         </Modal>
-        {/* <RaisedButton label="Submit" primary={true} onClick={this.submitUserInfo} /><br /><br />
-        {this.state.userAuthorized ?
+         </Modal> */}
+        <RaisedButton label="Submit" primary={true} onClick={this.submitUserInfo} /><br /><br />
+        {this.props.userAuthorized ?
           <Redirect to="/home"/>
           :
           <div></div>
-        } */}
+        }
       </div>
       </form>
     );

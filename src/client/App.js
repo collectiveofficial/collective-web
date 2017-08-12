@@ -40,6 +40,15 @@ const PublicRoute = ({component: Component, userAuthorized, ...rest}) => {
   return (
     <Route
       {...rest}
+      render={(props) => <Component {...props} />}
+    />
+  );
+};
+
+const DenyAuthorizedRoute = ({component: Component, userAuthorized, ...rest}) => {
+  return (
+    <Route
+      {...rest}
       render={(props) => userAuthorized === false
         ? <Component {...props} />
         : <Redirect to='/home' />}
@@ -64,13 +73,17 @@ class App extends Component {
     this.showUser = this.showUser.bind(this);
     this.handleFacebookAuth = this.handleFacebookAuth.bind(this);
     this.authorizeUser = this.authorizeUser.bind(this);
+    this.setRouteToRegisterFormState = this.setRouteToRegisterFormState.bind(this);
+    this.setUserWantsEmailSignupState = this.setUserWantsEmailSignupState.bind(this);
+    this.setFirebaseAccessTokenState = this.setFirebaseAccessTokenState.bind(this);
   }
 
   componentDidMount() {
     this.firebaseListener = firebaseAuth().onAuthStateChanged(async (user) => {
       if (user) { // is signed in
         await console.log('Logged in');
-        await console.log('user firebaseAccessToken in App.js componentDidMount: ', user.ie);
+        const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+        // await console.log('user firebaseAccessToken in App.js componentDidMount: ', user.ie);
         const response = await fetch('/auth/check', {
           method: 'POST',
           headers: {
@@ -78,7 +91,7 @@ class App extends Component {
             'Content-Type': 'application/json; charset=utf-8'
           },
           body: JSON.stringify({
-            firebaseAccessToken: user.ie,
+            firebaseAccessToken,
           }),
         })
         const responseData = await response.json();
@@ -112,13 +125,25 @@ class App extends Component {
 
   async logOut() {
     await nativeLogout();
-    // await this.setState({ routeToRegisterForm: false });
+    await this.setState({ routeToRegisterForm: false });
     // await this.setState({ userAuthorized: false });
     await console.log('User after log out', firebaseAuth().currentUser);
   }
 
   async showUser() {
     await console.log(await firebaseAuth().currentUser);
+  }
+
+  async setRouteToRegisterFormState(boolean) {
+    this.setState({ routeToRegisterForm: boolean });
+  }
+
+  async setUserWantsEmailSignupState(boolean) {
+    this.setState({ userWantsEmailSignup: boolean });
+  }
+
+  async setFirebaseAccessTokenState(accessToken) {
+    this.setState({ firebaseAccessToken: accessToken });
   }
 
   async handleFacebookAuth() {
@@ -168,7 +193,7 @@ class App extends Component {
       console.log('authorize user');
       await this.setState({ userAuthorized: true });
     } else if ((userAlreadyExists && !hasUserFinishedSignUp) || saveUserOnFacebookSignUpExecuted) {
-      await this.setState({ routeToRegisterForm: true });
+      await this.setRouteToRegisterFormState(true);
       // const sendEmailVerification = await result.user.sendEmailVerification();
       // await console.log('sendEmailVerification successful.');
     }
@@ -184,16 +209,21 @@ class App extends Component {
         <div>
           <Header authenticated={this.state.authenticated} logOut={this.logOut} showUser={this.showUser} />
           <Switch>
-            <PublicRoute userAuthorized={this.state.userAuthorized} path='/' exact component={() =>
+            <DenyAuthorizedRoute userAuthorized={this.state.userAuthorized} path='/' exact component={() =>
               (<SignUp
                 handleFacebookAuth={this.handleFacebookAuth}
                 facebookData={this.state.facebookData}
                 firebaseAccessToken={this.state.firebaseAccessToken}
+                setFirebaseAccessTokenState={this.setFirebaseAccessTokenState}
                 routeToRegisterForm={this.state.routeToRegisterForm}
+                userWantsEmailSignup={this.state.userWantsEmailSignup}
+                setRouteToRegisterFormState={this.setRouteToRegisterFormState}
+                setUserWantsEmailSignupState={this.setUserWantsEmailSignupState}
                 userAuthorized={this.state.userAuthorized}
+                authorizeUser={this.authorizeUser}
               />)}
             />
-            <PublicRoute userAuthorized={this.state.userAuthorized} path="/login" component={() =>
+            <DenyAuthorizedRoute userAuthorized={this.state.userAuthorized} path="/login" component={() =>
               (<LogIn
                 nativeLogin={this.nativeLogin}
                 handleFacebookAuth={this.handleFacebookAuth}
@@ -207,17 +237,21 @@ class App extends Component {
             <PrivateRoute userAuthorized={this.state.userAuthorized} path="/home" component={Home} />
             <PrivateRoute userAuthorized={this.state.userAuthorized} path="/voting" component={Voting} />
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/foodwiki" component={foodwiki} />
-            <PublicRoute userAuthorized={this.state.userAuthorized} path="/signup" component={() =>
+            <DenyAuthorizedRoute userAuthorized={this.state.userAuthorized} path="/signup" component={() =>
               (<SignUp
                 handleFacebookAuth={this.handleFacebookAuth}
                 facebookData={this.state.facebookData}
                 firebaseAccessToken={this.state.firebaseAccessToken}
+                setFirebaseAccessTokenState={this.setFirebaseAccessTokenState}
                 routeToRegisterForm={this.state.routeToRegisterForm}
+                userWantsEmailSignup={this.state.userWantsEmailSignup}
+                setRouteToRegisterFormState={this.setRouteToRegisterFormState}
+                setUserWantsEmailSignupState={this.setUserWantsEmailSignupState}
                 userAuthorized={this.state.userAuthorized}
               />)}
             />
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/community" component={community} />
-            <PublicRoute userAuthorized={this.state.userAuthorized} path="/register-form" component={() =>
+            <DenyAuthorizedRoute userAuthorized={this.state.userAuthorized} path="/register-form" component={() =>
               (<RegisterForm
                 authenticated={this.authenticated}
                 firebaseAccessToken={this.state.firebaseAccessToken}
@@ -225,6 +259,9 @@ class App extends Component {
                 userWantsEmailSignup={this.state.userWantsEmailSignup}
               />)}
             />
+            <PublicRoute userAuthorized={this.state.userAuthorized} path="/terms" component={Terms} />
+            <PublicRoute userAuthorized={this.state.userAuthorized} path="/bff" component={BFFTerms} />
+            <PublicRoute userAuthorized={this.state.userAuthorized} path="/privacy" component={Privacy} />
             <PublicRoute render={() => <h3>No Match</h3>} />
           </Switch>
           <Footer />
