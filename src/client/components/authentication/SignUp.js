@@ -245,8 +245,8 @@ class SignUp extends React.Component {
                     /><br />
                   </div>
                 </div>
+                <br />
                 <RaisedButton label="Continue" primary={true} onClick={this.handleEmailContinue} /><br /><br />
-                <div style={styles.or}>OR</div>
                 <button
                   className={s.loginBtn}
                   id="btn-social-login"

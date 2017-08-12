@@ -40,6 +40,11 @@
   text-decoration: none;
 }
 
+.brand:hover,
+.brandTxt:hover {
+  color: grey;
+}
+
 .nav {
   float: right;
   margin-top: 6px;
