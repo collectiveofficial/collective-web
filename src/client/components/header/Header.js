@@ -20,7 +20,7 @@ class Head extends Component {
       <div className={s.root}>
           <Link className={s.brand} to="/">
             {/* <img src={require('./logo-small.png')} width="38" height="38" alt="React" /> */}
-            <span className={s.brandTxt}>Collective</span>
+            <span className={s.brandTxt}>COLLECTIVE</span>
           </Link>
           <div className={s.cont}>
             <Modal trigger={<div className={s.link}>About</div>}>
