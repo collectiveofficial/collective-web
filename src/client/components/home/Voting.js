@@ -86,10 +86,7 @@ class Voting extends React.Component {
     this.handleDorm = this.handleDorm.bind(this);
     this.handleCook = this.handleCook.bind(this);
     this.onToken = this.onToken.bind(this);
-}
-    onChange(event){
 
-    }
     handleChange(e, { value, checked }) {
       if(this.state.votes >= 0){
         if(checked) {
