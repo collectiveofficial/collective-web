@@ -1,8 +1,9 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
   var Vote = sequelize.define('Vote', {
-    userID: DataTypes.INTEGER,
+    firebaseUID: DataTypes.STRING,
     foodID: DataTypes.INTEGER,
+    foodName: DataTypes.STRING,
     dropoffID: DataTypes.INTEGER,
     voteClass: DataTypes.STRING,
     ballotID: DataTypes.INTEGER,

@@ -1,12 +1,13 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
   var Dropoff = sequelize.define('Dropoff', {
-    date: DataTypes.STRING,
+    intendedShipDate: DataTypes.DATEONLY,
+    intendedPickupTimeStart: DataTypes.DATE,
+    intendedPickupTimeEnd: DataTypes.DATE,
     groupID: DataTypes.INTEGER,
-    ballotID: DataTypes.INTEGER,
-    shipDate: DataTypes.STRING,
-    voteDateBeg: DataTypes.STRING,
-    voteDateEnd: DataTypes.STRING,
+    shipDate: DataTypes.DATEONLY,
+    voteDateTimeBeg: DataTypes.DATE,
+    voteDateTimeEnd: DataTypes.DATE,
     pricePerDormPackage: DataTypes.DECIMAL,
     pricePerCookingPackage: DataTypes.DECIMAL,
     totalDormPackagesOrdered: DataTypes.INTEGER,

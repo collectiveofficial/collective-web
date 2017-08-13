@@ -165,7 +165,6 @@ class RegisterForm extends React.Component {
         }),
       })
       const responseData = await response.json();
-      // await this.setState({ userAuthorized: true });
       await this.props.authorizeUser();
     }
   }

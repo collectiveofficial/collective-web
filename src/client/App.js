@@ -6,6 +6,7 @@ import {
   Switch,
 } from 'react-router-dom';
 import firebase from 'firebase';
+import queryString from 'query-string';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import initReactFastclick from 'react-fastclick';
 import Home from './components/home/Home.js';
@@ -68,6 +69,7 @@ class App extends Component {
       firebaseAccessToken: '',
       routeToRegisterForm: false,
       userAuthorized: false,
+      defaultBallots: '',
     };
     this.logOut = this.logOut.bind(this);
     this.showUser = this.showUser.bind(this);
@@ -191,7 +193,7 @@ class App extends Component {
     const saveUserOnFacebookSignUpExecuted = facebookCheckResponseData.saveUserOnFacebookSignUpExecuted;
     if (userAlreadyExists && hasUserFinishedSignUp) {
       console.log('authorize user');
-      await this.setState({ userAuthorized: true });
+      await this.authorizeUser();
     } else if ((userAlreadyExists && !hasUserFinishedSignUp) || saveUserOnFacebookSignUpExecuted) {
       await this.setRouteToRegisterFormState(true);
       // const sendEmailVerification = await result.user.sendEmailVerification();
@@ -199,8 +201,13 @@ class App extends Component {
     }
   }
 
-  authorizeUser() {
-    this.setState({ userAuthorized: true });
+  async authorizeUser() {
+    await this.setState({ userAuthorized: true });
+    // TODO: Change hardcoded dropoff to dynamic
+    const dropoff = { dropoffID: 1 };
+    const defaultBallots = await fetch(`/ballot/get-default/?${queryString.stringify(dropoff)}`);
+    const defaultBallotsResults = await defaultBallots.json();
+    await this.setState({ defaultBallots: defaultBallotsResults.ballots });
   }
 
   render() {
@@ -239,7 +246,10 @@ class App extends Component {
               />)}
             />
             <PrivateRoute userAuthorized={this.state.userAuthorized} path="/home" component={Home} />
-            <PrivateRoute userAuthorized={this.state.userAuthorized} path="/voting" component={Voting} />
+            <PrivateRoute userAuthorized={this.state.userAuthorized} path="/voting" component={() =>
+              (<Voting
+                defaultBallots={this.state.defaultBallots}
+              />)} />
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/foodwiki" component={foodwiki} />
             <DenyAuthorizedRoute userAuthorized={this.state.userAuthorized} path="/signup" component={() =>
               (<SignUp
@@ -252,6 +262,7 @@ class App extends Component {
                 setRouteToRegisterFormState={this.setRouteToRegisterFormState}
                 setUserWantsEmailSignupState={this.setUserWantsEmailSignupState}
                 userAuthorized={this.state.userAuthorized}
+                authorizeUser={this.authorizeUser}
               />)}
             />
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/community" component={community} />

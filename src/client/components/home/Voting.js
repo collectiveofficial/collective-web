@@ -90,23 +90,18 @@ class Voting extends React.Component {
     this.onToken = this.onToken.bind(this);
   }
 
+  componentDidMount() {
+    console.log('-------> this.props.defaultBallots: ', this.props.defaultBallots);
+  }
+
   handleChange(e, { value, checked }) {
     if (this.state.votes >= 0) {
-      if (checked) {
-        const add = this.state.consensus;
-        add[value] = true;
-        this.setState({ consensus: add });
-        var newVote = this.state.votes;
-        newVote = newVote - 1;
-        this.setState({ votes: newVote });
-      } else {
-        const del = this.state.consensus;
-        del[value] = false;
-        this.setState({ consensus: del });
-        var newVote = this.state.votes;
-        newVote = newVote + 1;
-        this.setState({ votes: newVote });
-      }
+      const add = this.state.consensus;
+      add[value] = checked;
+      this.setState({ consensus: add });
+      var newVote = this.state.votes;
+      checked ? newVote-- : newVote++;
+      this.setState({ votes: newVote });
     }
     console.log(this.state.consensus);
     console.log(this.state.vote);
@@ -138,6 +133,24 @@ class Voting extends React.Component {
       });
     });
   }
+
+  // "firebaseAccessToken":"fwnropeiwnp32n42p3pnfwe",
+	// "foodObj": {
+	// 	"Sweet Potatoes": false,
+  //       "Potatoes": false,
+  //       "Kiwis": false,
+  //       "Oranges": false,
+  //       "Granny Smith Apples": false,
+  //       "Golden Delicious Apples": false,
+  //       "Pink Lady Apples": false,
+  //       "Bananas": false,
+  //       "Red Grapes": false,
+  //       "White Grapes": false,
+  //       "Carrots": false,
+  //       "Spinach": false,
+  //       "Red Peppers": false,
+  //       "Green Peppers": false
+	// }
 
   render() {
     return (
