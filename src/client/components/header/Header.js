@@ -24,7 +24,7 @@ class Head extends Component {
           </Link>
           <div className={s.cont}>
             {/* <Modal trigger={<div className={s.link}>About</div>}>
-              <Modal.Header>About Us</Modal.Header>
+              <Modal.Header>About Us</sModal.Header>
               <Modal.Content image>
                 <Image wrapped size='medium' src='https://scontent-sjc2-1.xx.fbcdn.net/v/t31.0-8/17807302_1001695923264408_1104643144105822755_o.jpg?oh=848e9a20c09ef1a380e51414b70545e0&oe=59EFAC25' />
                 <Modal.Description>
