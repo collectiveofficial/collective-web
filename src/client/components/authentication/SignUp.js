@@ -149,6 +149,8 @@ class SignUp extends React.Component {
         // go through logic
         if (this.state.isPasswordValidated) {
           firebaseEmailSignUpUser = await this.createNativeUser(this.state.emailInput, this.state.passwordInput);
+          const sendEmailVerification = await firebaseEmailSignUpUser.sendEmailVerification();
+          await console.log('sendEmailVerification successful.');
         }
         const isValidLogin = !(this.state.isInvalidEmail || this.state.isEmailAlreadyInUse);
         if (isValidLogin && this.state.isPasswordValidated) {

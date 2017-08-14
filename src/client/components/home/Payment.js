@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import {
   Route,
-  Link
+  Link,
+  Redirect,
 } from 'react-router-dom';
 import s from './Home.css';
 import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
 import RaisedButton from 'material-ui/RaisedButton';
+import { ref, firebaseAuth } from '../../config';
 
 const numOptions = [
   {text: "0", value: "0"},
@@ -28,8 +30,9 @@ class Payment extends React.Component {
       paymentErrorMessage: '',
       dorm: 0,
       cook: 0,
+      hasPaymentCompleted: false,
+      votesSaved: false,
     };
-
     this.handleDorm = this.handleDorm.bind(this);
     this.handleCook = this.handleCook.bind(this);
     this.onToken = this.onToken.bind(this);
@@ -38,48 +41,82 @@ class Payment extends React.Component {
 
   handleDorm(e, { value }) {
     this.setState({ dorm: value });
-    var newPrice = this.state.price;
+    let newPrice = this.state.price;
     newPrice = ((value * 6) + (this.state.cook * 10));
-    this.setState({ price: newPrice});
+    this.setState({ price: newPrice });
   }
+
   handleCook(e, { value }) {
     this.setState({ cook: value });
-    var newPrice = this.state.price;
+    let newPrice = this.state.price;
     newPrice = ((this.state.dorm * 6) + (value * 10));
     this.setState({ price: newPrice });
   }
 
-  // handleDorm(e, { value }) {
-  //   var newPrice = this.state.price;
-  //   newPrice = newPrice + (value * 6);
-  //   this.setState({ price: newPrice });
-  // }
-  //
-  // handleCook(e, { value }) {
-  //   var newPrice = this.state.price;
-  //   newPrice = newPrice + (value * 10);
-  //   this.setState({ price: newPrice });
-  // }
+  async submitInitialVotes() {
+    const foodObj = {};
+    for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
+      foodObj[this.props.ballotsAndVotes[i].name] = this.props.ballotsAndVotes[i].isCurrent;
+    }
+    // save votes to DB and allow to continue to payment
+    const response = await fetch('/vote/save', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        firebaseAccessToken: this.props.firebaseAccessToken,
+        foodObj,
+      }),
+    });
+    const responseData = await response.json();
+    if (responseData.votesSaved) {
+      this.setState({ votesSaved: true });
+    } else {
+      this.setState({ votesSaved: false });
+    }
+  }
 
   async handlePayment() {
     await this.setState({ paymentErrorMessage: '' });
     if (this.state.price === 0) {
       await this.setState({ paymentErrorMessage: 'Please specify an amount for the packages.' });
     }
-    if (this.state.price > 0) {
-      // let modal open
-    }
   }
 
-  onToken(token) {
-    fetch('/save-stripe-token', {
+  async onToken(token) {
+    await this.setState({ hasPaymentCompleted: false });
+    const email = await firebaseAuth().currentUser.email;
+    console.log('--------> email: ', email);
+    const submitPaymentResult = await fetch('/confirm-payment', {
       method: 'POST',
-      body: JSON.stringify(token),
-    }).then(response => {
-      response.json().then(data => {
-        alert(`We are in business, ${data.email}`);
-      });
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        firebaseAccessToken: this.props.firebaseAccessToken,
+        token,
+        price: this.state.price,
+        email,
+        dormPackagesOrdered: this.state.dorm,
+        cookingPackagesOrdered: this.state.cook,
+      }),
     });
+    const submitPaymentResultData = await submitPaymentResult.json();
+    if (submitPaymentResultData.paymentCompleted) {
+      await this.submitInitialVotes();
+      if (this.state.votesSaved) {
+        alert(`Thank you for voting! Your votes are now recorded. Your receipt has been sent to ${submitPaymentResultData.emailSentTo}`);
+        await this.setState({ hasPaymentCompleted: true });
+      } else {
+        alert('Voting failed. Please contact Collective to resolve this issue. We appreciate your patience.');
+      }
+    } else {
+      alert('Payment failed. Please contact Collective to resolve this issue. We appreciate your patience.');
+      await this.setState({ hasPaymentCompleted: false });
+    }
   }
 
 
@@ -94,7 +131,6 @@ class Payment extends React.Component {
     return (
       <div>
         <div className={s.cont}>
-          {/* <Link to="/payment" className={s.butt}><Button>Submit and Pay</Button></Link> */}
           <div className={s.ballot}>
             <Card>
               <Card.Content>
@@ -155,13 +191,31 @@ class Payment extends React.Component {
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
-                        Total = ${this.state.price} + $.50 transaction cost
+                        Subtotal ${this.state.price}
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
-                  <br />
-
-
+                  <Feed.Event>
+                    <Feed.Content>
+                      <Feed.Summary>
+                        Processing Fee ${Math.round(this.state.price * 0.05 * 100) / 100}
+                      </Feed.Summary>
+                    </Feed.Content>
+                  </Feed.Event>
+                  <Feed.Event>
+                    <Feed.Content>
+                      <Feed.Summary>
+                        Transaction Fee $0.5
+                      </Feed.Summary>
+                    </Feed.Content>
+                  </Feed.Event>
+                  <Feed.Event>
+                    <Feed.Content>
+                      <Feed.Summary>
+                        Total ${Math.round((this.state.price + 0.5 + (this.state.price * 0.05)) * 100) / 100}
+                      </Feed.Summary>
+                    </Feed.Content>
+                  </Feed.Event>
                   <Popup
                     trigger={<Feed.Event onClick={this.handlePayment}>
                       <Feed.Content>
@@ -175,7 +229,7 @@ class Payment extends React.Component {
                                     // panelLabel="Give Money" prepended to the amount in the bottom pay button
                                     amount={this.state.price * 100 + 50} // cents
                                     currency="USD"
-                                    stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
+                                    stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
                                     email="bestfoodforward@osu.edu"
                                     // Note: Enabling either address option will give the user the ability to
                                     // fill out both. Addresses are sent as a second parameter in the token callback.
@@ -214,6 +268,11 @@ class Payment extends React.Component {
             </Card>
           </div>
         </div>
+        {this.state.hasPaymentCompleted ?
+          <Redirect to="/home" />
+          :
+          <div></div>
+        }
       </div>
     )
   }

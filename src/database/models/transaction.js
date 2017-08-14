@@ -2,7 +2,6 @@
 module.exports = function(sequelize, DataTypes) {
   var Transaction = sequelize.define('Transaction', {
     userID: DataTypes.INTEGER,
-    ballotID: DataTypes.INTEGER,
     hasVoted: DataTypes.BOOLEAN,
     hasPaid: DataTypes.BOOLEAN,
     dropoffID: DataTypes.INTEGER,

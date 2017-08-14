@@ -45,7 +45,7 @@ DATABASE_USERNAME=YOUR_MAC_USER_NAME
 DATABASE_PASS=your_new_password
 DATABASE_NAME=collective
 ```
-6. Learn how Sequelize works [here](http://mherman.org/blog/2015/10/22/node-postgres-sequelize/#.WXRGp9PytYh)
+6. Learn how Sequelize works [here](https://mherman.org/blog/2015/10/22/node-postgres-sequelize/#.WXRGp9PytYh)
 
 Other useful commands:
 Inside psql:

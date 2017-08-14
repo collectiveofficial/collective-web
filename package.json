@@ -74,6 +74,7 @@
     "semantic-ui-react": "^0.71.2",
     "sequelize": "^3.30.4",
     "sequelize-cli": "^2.7.0",
+    "stripe": "^4.24.0",
     "style-loader": "^0.18.2",
     "twilio": "^3.6.1",
     "webpack": "^2.6.1"
