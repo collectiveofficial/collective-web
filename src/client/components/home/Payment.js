@@ -38,11 +38,15 @@ class Payment extends React.Component {
 
   handleDorm(e, { value }) {
     this.setState({ dorm: value });
-    this.setState({ price: ((this.state.dorm * 6) + (this.state.cook * 10)) });
+    var newPrice = this.state.price;
+    newPrice = ((value * 6) + (this.state.cook * 10));
+    this.setState({ price: newPrice});
   }
   handleCook(e, { value }) {
     this.setState({ cook: value });
-    this.setState({ price: ((this.state.dorm * 6) + (this.state.cook * 10)) });
+    var newPrice = this.state.price;
+    newPrice = ((this.state.dorm * 6) + (value * 10));
+    this.setState({ price: newPrice });
   }
 
   // handleDorm(e, { value }) {
@@ -78,12 +82,14 @@ class Payment extends React.Component {
     });
   }
 
+
   render() {
     const styles = {
       stripe: {
         visibility: 'hidden',
       },
     };
+
 
     return (
       <div>
@@ -149,7 +155,7 @@ class Payment extends React.Component {
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
-                        Total = ${this.state.price}
+                        Total = ${this.state.price} + $.50 transaction cost
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
@@ -160,41 +166,40 @@ class Payment extends React.Component {
                     trigger={<Feed.Event onClick={this.handlePayment}>
                       <Feed.Content>
                         <Feed.Summary>
-                          <RaisedButton label="Pay With Card" primary={true} onClick={this.handlePayment} >
-                            {this.state.price > 0 ?
-                              <StripeCheckout
-                                // style={styles.stripe}
-                                name="Best Food Forward/Collective" // the pop-in header title
-                                description="Easy healthy eating" // the pop-in header subtitle
-                                ComponentClass="div"
-                                // panelLabel="Give Money" prepended to the amount in the bottom pay button
-                                amount={this.state.price * 100} // cents
-                                currency="USD"
-                                stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
-                                email="bestfoodforward@osu.edu"
-                                // Note: Enabling either address option will give the user the ability to
-                                // fill out both. Addresses are sent as a second parameter in the token callback.
-                                shippingAddress
-                                billingAddress={false}
-                                // Note: enabling both zipCode checks and billing or shipping address will
-                                // cause zipCheck to be pulled from billing address (set to shipping if none provided).
-                                zipCode={false}
-                                allowRememberMe // "Remember Me" option (default true)
-                                token={this.onToken} // submit callback
-                                opened={this.onOpened} // called when the checkout popin is opened (no IE6/7)
-                                closed={this.onClosed} // called when the checkout popin is closed (no IE6/7)
-                                // Note: `reconfigureOnUpdate` should be set to true IFF, for some reason
-                                // you are using multiple stripe keys
-                                reconfigureOnUpdate={false}
-                                // Note: you can change the event to `onTouchTap`, `onClick`, `onTouchStart`
-                                // useful if you're using React-Tap-Event-Plugin
-                                triggerEvent="onTouchTap"
-                                >
-                                </StripeCheckout>
-                              :
-                              <div>Pay with Card</div>
-                            }
-                          </RaisedButton>
+                              {this.state.price > 0 ? (
+                                <StripeCheckout
+                                    // style={styles.stripe}
+                                    name="Best Food Forward/Collective" // the pop-in header title
+                                    description="Easy healthy eating" // the pop-in header subtitle
+                                    ComponentClass="div"
+                                    // panelLabel="Give Money" prepended to the amount in the bottom pay button
+                                    amount={this.state.price * 100 + 50} // cents
+                                    currency="USD"
+                                    stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
+                                    email="bestfoodforward@osu.edu"
+                                    // Note: Enabling either address option will give the user the ability to
+                                    // fill out both. Addresses are sent as a second parameter in the token callback.
+                                    shippingAddress
+                                    billingAddress={false}
+                                    // Note: enabling both zipCode checks and billing or shipping address will
+                                    // cause zipCheck to be pulled from billing address (set to shipping if none provided).
+                                    zipCode={false}
+                                    allowRememberMe // "Remember Me" option (default true)
+                                    token={this.onToken} // submit callback
+                                    opened={this.onOpened} // called when the checkout popin is opened (no IE6/7)
+                                    closed={this.onClosed} // called when the checkout popin is closed (no IE6/7)
+                                    // Note: `reconfigureOnUpdate` should be set to true IFF, for some reason
+                                    // you are using multiple stripe keys
+                                    reconfigureOnUpdate={false}
+                                    // Note: you can change the event to `onTouchTap`, `onClick`, `onTouchStart`
+                                    // useful if you're using React-Tap-Event-Plugin
+                                    triggerEvent="onTouchTap"
+                                    >
+                                    </StripeCheckout>
+                              ) : (
+                                <RaisedButton label="Pay With Card" primary={true} onClick={this.handlePayment} >
+                                </RaisedButton>
+                              )}
                         </Feed.Summary>
                       </Feed.Content>
                     </Feed.Event>
