@@ -17,3 +17,19 @@ module.exports.savePaymentInfo = async (requestBody, dropoffID) => {
     revenueAfterStripe: requestBody.totalDollarAmount - (requestBody.totalDollarAmount - ((requestBody.totalDollarAmount * 0.029) + 0.3)),
   });
 };
+
+module.exports.checkTransaction = async (requestBody) => {
+  const userID = await userUtil.findUserID(requestBody.uid);
+  const checkTransactionResult = await models.Transaction.findOne({
+    where: {
+      userID,
+      dropoffID: requestBody.dropoffID,
+      hasPaid: true,
+    },
+  });
+  if (checkTransactionResult !== null) {
+    return { hasUserPaid: true };
+  } else {
+    return { hasUserPaid: false };
+  }
+};

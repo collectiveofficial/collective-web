@@ -250,35 +250,6 @@ module.exports = {
       }
     },
   },
-  confirmPayment: {
-    async post(req, res) {
-      console.log(req.body);
-      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
-      let uid = decodedToken.uid;
-      req.body.uid = uid;
-      // TODO: dynamic dropoffID
-      const dropoffID = 1;
-      const pctFeePerPackage = await dropoffUtil.findPctFeePerPackageForDrop(dropoffID);
-      req.body.pctFeePerPackage = pctFeePerPackage;
-      const totalDollarAmount = req.body.price + 0.5 + (req.body.price * req.body.pctFeePerPackage);
-      req.body.totalDollarAmount = totalDollarAmount;
-      let charge = await stripe.charges.create({
-        amount: totalDollarAmount * 100,
-        currency: 'usd',
-        card: req.body.token.id,
-        description: req.body.email,
-        receipt_email: req.body.email, // will only send in production
-      }, async (err, charge) => {
-        if (err) {
-          // console.log(JSON.stringify(err, null, 2));
-          console.log(err);
-        } else {
-          await transactionUtil.savePaymentInfo(req.body, dropoffID);
-          await res.json({ paymentCompleted: true, emailSentTo: req.body.email });
-        }
-      });
-    },
-  },
   facebookAuth: {
     post(req, res) {
       console.log('token from server', req.body.facebook_token);
@@ -376,6 +347,44 @@ module.exports = {
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.updateVotes(req.body);
       res.json({ votesSaved: true });
+    },
+  },
+  confirmPayment: {
+    async post(req, res) {
+      console.log(req.body);
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+      let uid = decodedToken.uid;
+      req.body.uid = uid;
+      // TODO: dynamic dropoffID
+      const dropoffID = 1;
+      const pctFeePerPackage = await dropoffUtil.findPctFeePerPackageForDrop(dropoffID);
+      req.body.pctFeePerPackage = pctFeePerPackage;
+      const totalDollarAmount = req.body.price + 0.5 + (req.body.price * req.body.pctFeePerPackage);
+      req.body.totalDollarAmount = totalDollarAmount;
+      let charge = await stripe.charges.create({
+        amount: totalDollarAmount * 100,
+        currency: 'usd',
+        card: req.body.token.id,
+        description: req.body.email,
+        receipt_email: req.body.email, // will only send in production
+      }, async (err, charge) => {
+        if (err) {
+          // console.log(JSON.stringify(err, null, 2));
+          console.log(err);
+        } else {
+          await transactionUtil.savePaymentInfo(req.body, dropoffID);
+          await res.json({ paymentCompleted: true, emailSentTo: req.body.email });
+        }
+      });
+    },
+  },
+  checkTransaction: {
+    async post(req, res) {
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+      let uid = decodedToken.uid;
+      req.body.uid = uid;
+      const checkTransactionResult = await transactionUtil.checkTransaction(req.body);
+      res.json(checkTransactionResult);
     },
   },
   voteNotification: {

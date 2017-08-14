@@ -153,13 +153,31 @@ class Payment extends React.Component {
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
-                        Total = ${this.state.price} + $.50 transaction cost
+                        Subtotal ${this.state.price}
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
-                  <br />
-
-
+                  <Feed.Event>
+                    <Feed.Content>
+                      <Feed.Summary>
+                        Processing Fee ${this.state.price * 0.05}
+                      </Feed.Summary>
+                    </Feed.Content>
+                  </Feed.Event>
+                  <Feed.Event>
+                    <Feed.Content>
+                      <Feed.Summary>
+                        Transaction Fee $0.5
+                      </Feed.Summary>
+                    </Feed.Content>
+                  </Feed.Event>
+                  <Feed.Event>
+                    <Feed.Content>
+                      <Feed.Summary>
+                        Total ${this.state.price + 0.5 + (this.state.price * 0.05)}
+                      </Feed.Summary>
+                    </Feed.Content>
+                  </Feed.Event>
                   <Popup
                     trigger={<Feed.Event onClick={this.handlePayment}>
                       <Feed.Content>

@@ -17,6 +17,7 @@ router.post('/auth/signup/email-signup/save', controller.saveUserOnEmailSignUp.p
 router.post('/vote-ballot/get-ballot-votes', controller.getBallotUserVotes.post);
 router.post('/vote/save', controller.saveVotes.post);
 router.post('/vote/update', controller.updateVotes.post);
+router.post('/transaction/check', controller.checkTransaction.post);
 router.post('/confirm-payment', controller.confirmPayment.post);
 
 module.exports = router;

@@ -17,13 +17,15 @@ class Voting extends React.Component {
       price: 0,
       voteErrorMessage: '',
       allowContinueToPayment: '',
+      hasUserPaid: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleContinueToPayment = this.handleContinueToPayment.bind(this);
+    this.handleSubmitUpdateVotes = this.handleSubmitUpdateVotes.bind(this);
   }
 
-  componentWillMount() {
+  async componentWillMount() {
     if (this.props.ballotsAndVotes.length > 0) {
       let votes = 6;
       for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
@@ -31,7 +33,20 @@ class Voting extends React.Component {
           votes--;
         }
       }
-      this.setState({ votes });
+      await this.setState({ votes });
+      const checkIfUserHasPaidResult = await fetch('/transaction/check', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify({
+          firebaseAccessToken: this.props.firebaseAccessToken,
+          dropoffID: 1, //TODO: implement dynamic dropoffID
+        }),
+      });
+      const checkIfUserHasPaidResultData = await checkIfUserHasPaidResult.json();
+      this.setState({ hasUserPaid: checkIfUserHasPaidResultData.hasUserPaid });
     }
   }
 
@@ -41,15 +56,12 @@ class Voting extends React.Component {
       return;
     }
     const newBallotsAndVotes = this.props.ballotsAndVotes;
-    console.log('-----> checked: ', checked);
     for (let i = 0; i < newBallotsAndVotes.length; i++) {
       if (newBallotsAndVotes[i].name === value) {
         newBallotsAndVotes[i].isCurrent = checked;
       }
     }
-    console.log('old this.props.ballotsAndVotes: ', this.props.ballotsAndVotes);
     this.props.updateBallotsAndVotes(newBallotsAndVotes);
-    console.log('new this.props.ballotsAndVotes: ', this.props.ballotsAndVotes);
     let newVote = this.state.votes;
     checked ? newVote-- : newVote++;
     this.setState({ votes: newVote });
@@ -58,7 +70,6 @@ class Voting extends React.Component {
   async handleContinueToPayment() {
     await this.setState({ voteErrorMessage: '' });
     await this.setState({ allowContinueToPayment: '' });
-    console.log('-------> handleContinueToPayment was triggered');
     if (this.state.votes !== 0) {
       await this.setState({ voteErrorMessage: 'Remember to use all your votes! You can change them later.' });
       this.setState({ allowContinueToPayment: false });
@@ -86,6 +97,33 @@ class Voting extends React.Component {
       } else {
         this.setState({ allowContinueToPayment: false });
       }
+    }
+  }
+
+  async handleSubmitUpdateVotes() {
+    await this.setState({ voteErrorMessage: '' });
+    await this.setState({ allowContinueToPayment: '' });
+    if (this.state.votes !== 0) {
+      await this.setState({ voteErrorMessage: 'Remember to use all your votes! You can change them later.' });
+    }
+    if (this.state.votes === 0) {
+      const foodObj = {};
+      for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
+        foodObj[this.props.ballotsAndVotes[i].name] = this.props.ballotsAndVotes[i].isCurrent;
+      }
+      // save votes to DB and allow to continue to payment
+      const response = await fetch('/vote/update', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify({
+          firebaseAccessToken: this.props.firebaseAccessToken,
+          foodObj,
+        }),
+      });
+      const responseData = await response.json();
     }
   }
 
@@ -117,19 +155,35 @@ class Voting extends React.Component {
                   </Card>
                 </div>
               ))}
-              <Popup
-                trigger={
-                  <RaisedButton
-                    label="Continue to Payment"
-                    primary={true}
-                    onClick={this.handleContinueToPayment}
-                  />
-                }
-                content={this.state.voteErrorMessage}
-                open={this.state.allowContinueToPayment === false}
-                offset={5}
-                position="bottom left"
-              />
+              {this.state.hasUserPaid ?
+                <Popup
+                  trigger={
+                    <RaisedButton
+                      label="Update Votes"
+                      primary={true}
+                      onClick={this.handleSubmitUpdateVotes}
+                    />
+                  }
+                  content={this.state.voteErrorMessage}
+                  open={this.state.allowContinueToPayment === false}
+                  offset={5}
+                  position="bottom left"
+                />
+                :
+                <Popup
+                  trigger={
+                    <RaisedButton
+                      label="Continue to Payment"
+                      primary={true}
+                      onClick={this.handleContinueToPayment}
+                    />
+                  }
+                  content={this.state.voteErrorMessage}
+                  open={this.state.allowContinueToPayment === false}
+                  offset={5}
+                  position="bottom left"
+                />
+              }
             </div>
           </div>
         }
