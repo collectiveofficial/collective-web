@@ -202,7 +202,7 @@ class Login extends React.Component {
               /><br />
             </div>
             <RaisedButton label="Log in" type="submit" primary={true} />
-            <div style={styles.or}>OR</div>
+            <br /> <br />
             <button
               className={s.loginBtn}
               id="btn-social-login"
