@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
   Route,
-  Link
+  Link,
+  Redirect
 } from 'react-router-dom';
 import TextField from 'material-ui/TextField';
 import MailOutline from 'material-ui/svg-icons/communication/mail-outline';
@@ -12,7 +13,6 @@ import { Icon, Popup, List, Image } from 'semantic-ui-react';
 import s from './Register.css';
 import RegisterForm from './RegisterForm.js';
 import { ref, firebaseAuth } from '../../config';
-import { createNativeUser } from '../../utils/auth.js';
 
 class SignUp extends React.Component {
   constructor(props) {
@@ -20,45 +20,70 @@ class SignUp extends React.Component {
     this.state = {
       emailInput: '',
       passwordInput: '',
-      userAllowedContinue: false,
       isPasswordValidated: '',
-      userWantsEmailSignup: false,
-      facebookData: '',
       isInvalidEmail: '',
       isWeakPassword: '',
       isEmailAlreadyInUse: '',
+      isExistingUserFBAuth: false,
+      emailErrorMessage: '',
+      passwordErrorMessage: '',
     };
     this.handleEmailContinue = this.handleEmailContinue.bind(this);
-    this.handleFBSignUp = this.handleFBSignUp.bind(this);
+    this.validateEmail = this.validateEmail.bind(this);
     this.validatePassword = this.validatePassword.bind(this);
     this.createNativeUser = this.createNativeUser.bind(this);
     this.resetErrorStates = this.resetErrorStates.bind(this);
   }
 
+  componentWillUnmount() {
+    console.log('Signup is unmounted');
+    console.log('this.state.isPasswordValidated', this.state.isPasswordValidated);
+  }
+
   async createNativeUser (email, pw) {
     await this.setState({ hasFirebaseChecked: true });
     return firebaseAuth().createUserWithEmailAndPassword(email, pw)
+    .then((user) => {
+      return user;
+    })
     .catch((error) => {
       // Handle Errors here.
       const errorCode = error.code;
       const errorMessage = error.message;
-      if (errorCode === 'auth/invalid-email') {
-        this.setState({ isInvalidEmail: true });
-      } else {
-        this.setState({ isInvalidEmail: false });
-      }
-      if (errorCode === 'auth/email-already-in-use') {
-        this.setState({ isEmailAlreadyInUse: true });
-      } else {
-        this.setState({ isEmailAlreadyInUse: false });
-      }
       if (errorCode === 'auth/weak-password') {
         this.setState({ isWeakPassword: true });
+        this.setState({ passwordErrorMessage: 'The password is too weak.' });
       } else {
         this.setState({ isWeakPassword: false });
       }
+      // if (errorCode === 'auth/email-already-in-use') {
+      //   this.setState({ isEmailAlreadyInUse: true });
+      //   this.setState({ passwordErrorMessage: 'This email is already in use. Please log in or register with another email.' });
+      // } else {
+      //   this.setState({ isEmailAlreadyInUse: false });
+      // }
       console.log(error);
     });
+  }
+
+  async validateEmail() {
+    const response = await fetch('/auth/email', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: JSON.stringify({
+        emailInput: this.state.emailInput,
+      }),
+    })
+    const responseData = await response.json();
+    if (responseData.emailValidated) {
+      await this.setState({ isInvalidEmail: false });
+    } else {
+      await this.setState({ emailErrorMessage: 'Hmm...that doesn\'t look like an email address.' });
+      await this.setState({ isInvalidEmail: true });
+    }
   }
 
   async validatePassword() {
@@ -77,63 +102,75 @@ class SignUp extends React.Component {
       await this.setState({ isPasswordValidated: true });
     } else {
       await this.setState({ isPasswordValidated: false });
+      await this.setState({ passwordErrorMessage: 'Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number.' });
     }
   }
 
   resetErrorStates() {
-    this.setState({ isPasswordValidated: '' });
-    this.setState({ isInvalidEmail: '' });
-    this.setState({ isEmailAlreadyInUse: '' });
+    this.setState({ isPasswordValidated: false });
+    this.setState({ isInvalidEmail: false });
+    this.setState({ isEmailAlreadyInUse: false });
+    this.setState({ isExistingUserFBAuth: false });
   }
 
   async handleEmailContinue() {
+    await console.log('handleEmailContinue is executing/executed');
     await this.resetErrorStates();
     await this.validatePassword();
-    if (this.state.isPasswordValidated) {
-      await this.createNativeUser(this.state.emailInput, this.state.passwordInput);
+    let firebaseEmailSignUpUser;
+    let firebaseAccessToken;
+    await this.validateEmail();
+    if (!this.state.isInvalidEmail) {
+      // declare variable that sends post request of email to server
+      const checkEmailResponse = await fetch('/auth/signup/check-email', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify({
+          email: this.state.emailInput,
+        }),
+      });
+      const checkEmailResponseData = await checkEmailResponse.json();
+      const doesUserEmailExist = checkEmailResponseData.doesUserEmailExist;
+      const hasUserFinishedSignUp = checkEmailResponseData.hasUserFinishedSignUp;
+      const isUserFacebookAuth = checkEmailResponseData.isUserFacebookAuth;
+      // if email exists and hasUserFinishedSignUp is false
+      if (doesUserEmailExist && !hasUserFinishedSignUp && !isUserFacebookAuth) {
+        // tell user to login because email exists
+        await this.setState({ isEmailAlreadyInUse: true });
+        await this.setState({ emailErrorMessage: 'This email is already in use. Please log in or register with another email.' });
+        // else if email doesn't exist
+      } else if (doesUserEmailExist && isUserFacebookAuth) {
+        await this.setState({ isExistingUserFBAuth: true });
+        await this.setState({ emailErrorMessage: 'This email is associated with a Facebook account. Please continue with Facebook.' });
+      } else if (!doesUserEmailExist) {
+        // go through logic
+        if (this.state.isPasswordValidated) {
+          firebaseEmailSignUpUser = await this.createNativeUser(this.state.emailInput, this.state.passwordInput);
+        }
+        const isValidLogin = !(this.state.isInvalidEmail || this.state.isEmailAlreadyInUse);
+        if (isValidLogin && this.state.isPasswordValidated) {
+          firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+          await this.props.setFirebaseAccessTokenState(firebaseAccessToken);
+          const response = await fetch('/auth/signup/email-signup/save', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json; charset=utf-8',
+            },
+            body: JSON.stringify({
+              firebaseAccessToken,
+              email: this.state.emailInput,
+            }),
+          });
+          const responseData = await response.json();
+          await this.props.setUserWantsEmailSignupState(true);
+          await this.props.setRouteToRegisterFormState(true);
+        }
+      }
     }
-    const isValidLogin = !(this.state.isInvalidEmail || this.state.isEmailAlreadyInUse);
-    if (isValidLogin && this.state.isPasswordValidated) {
-      console.log('this.state.isEmailAlreadyInUse; ', this.state.isEmailAlreadyInUse);
-      await this.setState({ userWantsEmailSignup: true });
-      await this.setState({ userAllowedContinue: true });
-    }
-  }
-
-  async handleFBSignUp() {
-    const provider = await new firebaseAuth.FacebookAuthProvider();
-    await provider.addScope('email, public_profile, user_friends');
-    const result = await firebaseAuth().signInWithPopup(provider);
-    const token = result.credential.accessToken;
-    const response = await fetch('/auth/facebook', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8'
-      },
-      body: JSON.stringify({
-        facebook_token: token,
-      }),
-    });
-    const responseData = await response.json();
-    await console.log(responseData);
-    await this.setState({ facebookData: responseData.facebook_payload }, () => {
-      console.log('this.state.facebookData: ', this.state.facebookData);
-    });
-    await this.setState({ userAllowedContinue: true });
-    const idToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
-    const firebaseResponse = await fetch('/auth/basic/home', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      body: JSON.stringify({
-        idToken,
-      }),
-    });
-    const firebaseResponseData = await firebaseResponse.json();
-    console.log('responseData: ', firebaseResponseData);
   }
 
   render() {
@@ -156,12 +193,15 @@ class SignUp extends React.Component {
       <div>
         <div className={s.root}>
           <div className={s.container}>
-            {this.state.userAllowedContinue ?
+            {this.props.routeToRegisterForm ?
               <RegisterForm
-                userWantsEmailSignup={this.state.userWantsEmailSignup}
+                authorizeUser={this.props.authorizeUser}
+                userWantsEmailSignup={this.props.userWantsEmailSignup}
                 emailInput={this.state.emailInput}
                 passwordInput={this.state.passwordInput}
-                facebookData={this.state.facebookData}
+                facebookData={this.props.facebookData}
+                firebaseAccessToken={this.props.firebaseAccessToken}
+                userAuthorized={this.props.userAuthorized}
               />
               :
               <div>
@@ -173,88 +213,53 @@ class SignUp extends React.Component {
                 />
                 <h2 className={s.head}>Welcome to Collective</h2>
                 <div>
-                  {this.state.isEmailAlreadyInUse === true ?
-                    <div>
+                  <div>
                     <MailOutline />
                     <Popup
                       trigger={<TextField
                         type="email"
                         hintText="Email"
                         style={styles.iconStyles}
-                        onChange={(event) => this.setState({ emailInput: event.target.value }, () => {console.log(this.state.emailInput)})}
+                        onChange={(event) => this.setState({ emailInput: event.target.value })}
                       />
                     }
-                    content="This email is already in use"
-                    open={this.state.isEmailAlreadyInUse === true}
+                    content={this.state.emailErrorMessage}
+                    open={this.state.isEmailAlreadyInUse || this.state.isExistingUserFBAuth || this.state.isInvalidEmail}
                     offset={20}
                     position="right center"
                     /><br />
-                    </div>
-                    :
-                    <div>
-                    <MailOutline />
+                  </div>
+                  <div>
+                    <LockOutline />
                     <Popup
-                      trigger={
-                        <TextField
-                          type="email"
-                          hintText="Email"
-                          style={styles.iconStyles}
-                          onChange={(event) => this.setState({ emailInput: event.target.value }, () => {console.log(this.state.emailInput)})}
-                        />
-                    }
-                      content="Hmm...that doesn't look like an email address."
-                      open={this.state.isInvalidEmail === true}
-                      offset={20}
-                      position="right center"
-                    /><br />
-                  </div>
-                  }
-                  {this.state.isWeakPassword ?
-                    <div>
-                      <LockOutline />
-                      <Popup
-                        trigger={<TextField
-                          type="password"
-                          hintText="Create New Password"
-                          style={styles.iconStyles}
-                          onChange={(event) => this.setState({ passwordInput: event.target.value })}
-                        />
-                        }
-                        content="The password is too weak."
-                        open={(this.state.isWeakPassword === true && this.state.isInvalidEmail === false && this.state.isEmailAlreadyInUse === false)}
-                        offset={20}
-                        position="right center"
-                      /><br />
-                    </div>
-                    :
-                    <div>
-                      <LockOutline />
-                      <Popup
-                        trigger={<TextField
-                          type="password"
-                          hintText="Create New Password"
-                          style={styles.iconStyles}
-                          onChange={(event) => this.setState({ passwordInput: event.target.value })}
-                        />
+                      trigger={<TextField
+                        type="password"
+                        hintText="Create New Password"
+                        style={styles.iconStyles}
+                        onChange={(event) => this.setState({ passwordInput: event.target.value })}
+                      />
                       }
-                      content="Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number."
-                      open={(this.state.isPasswordValidated === false)}
-                      // open={(this.state.isPasswordValidated === false && this.state.isInvalidEmail === false && this.state.isEmailAlreadyInUse === false)}
+                      content={this.state.passwordErrorMessage}
+                      open={(this.state.isWeakPassword || this.state.isPasswordValidated === false) && this.state.isInvalidEmail === false && this.state.isEmailAlreadyInUse === false && this.state.isExistingUserFBAuth === false}
                       offset={20}
                       position="right center"
                     /><br />
                   </div>
-                  }
                 </div>
                 <br />
                 <RaisedButton label="Continue" primary={true} onClick={this.handleEmailContinue} /><br /><br />
                 <button
                   className={s.loginBtn}
                   id="btn-social-login"
-                  onClick={this.handleFBSignUp}
-                  >
-                    Continue with Facebook
-                  </button>
+                  onClick={this.props.handleFacebookAuth}
+                >
+                  Continue with Facebook
+                </button>
+                {/* {this.props.userAuthorized ?
+                  <Redirect to="/home" />
+                  :
+                  <div></div>
+                } */}
               </div>
             }
           </div>

@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import {
   Route,
-  Link
+  Link,
+  Redirect,
 } from 'react-router-dom';
 import TextField from 'material-ui/TextField';
 import MailOutline from 'material-ui/svg-icons/communication/mail-outline';
 import LockOutline from 'material-ui/svg-icons/action/lock-outline';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Icon, Popup } from 'semantic-ui-react';
+import RegisterForm from './RegisterForm.js';
 import { ref, firebaseAuth } from '../../config'
 import s from './Login.css';
 
@@ -17,14 +19,19 @@ class Login extends React.Component {
     this.state = {
       emailInput: '',
       passwordInput: '',
-      userCredentialsValidated: false,
       isEmailValidated: '',
       isPasswordValidated: '',
+      wrongPassword: '',
+      userDisabled: '',
+      userNotFound: '',
+      emailErrorMessage: '',
+      passwordErrorMessage: '',
     };
     this.handleEmailContinue = this.handleEmailContinue.bind(this);
-    this.handleFBLogin = this.handleFBLogin.bind(this);
+    this.nativeLogin = this.nativeLogin.bind(this);
     this.validateEmail = this.validateEmail.bind(this);
     this.validatePassword = this.validatePassword.bind(this);
+    this.resetErrorStates = this.resetErrorStates.bind(this);
   }
 
   async validateEmail() {
@@ -39,12 +46,11 @@ class Login extends React.Component {
       }),
     });
     const responseData = await response.json();
-    await console.log('responseData: ', responseData);
     if (responseData.emailValidated) {
       await this.setState({ isEmailValidated: true });
     } else {
-      await console.log('response.emailValidated: ', response.emailValidated);
       await this.setState({ isEmailValidated: false });
+      await this.setState({ emailErrorMessage: 'Hmm...that doesn\'t look like an email address.' });
     }
   }
 
@@ -64,60 +70,74 @@ class Login extends React.Component {
       await this.setState({ isPasswordValidated: true });
     } else {
       await this.setState({ isPasswordValidated: false });
+      await this.setState({ passwordErrorMessage: 'Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number.' });
     }
   }
 
-  async handleEmailContinue() {
+  async nativeLogin(email, password) {
+    const user = await firebaseAuth().signInWithEmailAndPassword(email, password)
+    .catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      if (errorCode === 'auth/wrong-password') {
+        this.setState({ wrongPassword: true });
+        this.setState({ passwordErrorMessage: 'Wrong password.' });
+      }
+      if (errorCode === 'auth/user-disabled') {
+        this.setState({ userDisabled: true });
+        this.setState({ emailErrorMessage: 'User disabled.' });
+      }
+      if (errorCode === 'auth/user-not-found') {
+        this.setState({ userNotFound: true });
+        this.setState({ emailErrorMessage: 'User not found.' });
+      }
+      console.log(error);
+    });
+    return user;
+  }
+
+  resetErrorStates() {
+    this.setState({ isPasswordValidated: '' });
+    this.setState({ isInvalidEmail: '' });
+    this.setState({ wrongPassword: '' });
+    this.setState({ userDisabled: '' });
+    this.setState({ userNotFound: '' });
+  }
+
+  async handleEmailContinue(event) {
+    event.preventDefault();
+    await this.resetErrorStates();
     await this.validateEmail();
     await this.validatePassword();
     if (this.state.isEmailValidated && this.state.isPasswordValidated) {
-      await this.setState({ userCredentialsValidated: true }, () => {
-        console.log('user credentials validated: ', this.state.userCredentialsValidated);
+      const user = await this.nativeLogin(this.state.emailInput, this.state.passwordInput);
+      const checkEmailResponse = await fetch('/auth/signup/check-email', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify({
+          email: this.state.emailInput,
+        }),
       });
+      const checkEmailResponseData = await checkEmailResponse.json();
+      console.log('Login checkEmailResponseData: ', checkEmailResponseData);
+      const doesUserEmailExist = checkEmailResponseData.doesUserEmailExist;
+      const hasUserFinishedSignUp = checkEmailResponseData.hasUserFinishedSignUp;
+      const isUserFacebookAuth = checkEmailResponseData.isUserFacebookAuth;
+      if (doesUserEmailExist && hasUserFinishedSignUp && !isUserFacebookAuth) {
+        await this.props.authorizeUser();
+      }
+      const routeToRegisterForm = doesUserEmailExist && !hasUserFinishedSignUp && !isUserFacebookAuth;
+      if (routeToRegisterForm) {
+        const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+        await this.props.setFirebaseAccessTokenState(firebaseAccessToken);
+        await this.props.setUserWantsEmailSignupState(true);
+      }
+      await this.props.setRouteToRegisterFormState(routeToRegisterForm);
     }
-  }
-
-  async handleFBLogin() {
-    const provider = await new firebaseAuth.FacebookAuthProvider();
-    await provider.addScope('email, public_profile, user_friends');
-    const result = await firebaseAuth().signInWithPopup(provider);
-    const token = result.credential.accessToken;
-    // const user = result.user;
-    // await this.setState({ email: user.email });
-    // await this.setState({ photoURL: user.photoURL });
-    const response = await fetch('/auth/facebook', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8'
-      },
-      body: JSON.stringify({
-        facebook_token: token,
-      }),
-    });
-    const responseData = await response.json();
-    await console.log(responseData);
-    // Need user authorization
-    await this.setState({ facebookData: responseData.facebook_payload }, () => {
-      console.log('this.state.facebookData: ', this.state.facebookData);
-    });
-    await this.setState({ userCredentialsValidated: true }, () => {
-      console.log('user credentials validated: ', this.state.userCredentialsValidated);
-    });
-    const idToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
-    const firebaseResponse = await fetch('/auth/basic/home', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8'
-      },
-      body: JSON.stringify({
-        idToken
-      }),
-    })
-    const firebaseResponseData = await firebaseResponse.json();
-    console.log('responseData: ', firebaseResponseData);
-    // await this.logIn();
   }
 
   render() {
@@ -132,62 +152,68 @@ class Login extends React.Component {
     };
     return (
       <div>
-        {this.props.authenticated ?
-          <div></div>
-          :
-          <div className={s.root}>
-            <div className={s.container}>
-              <img
-                src="https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/20770387_10203435278718905_5967924942940849831_n.jpg?oh=db3ccb9562c5b3b2744d2418fcbc8cd2&oe=5A34AF97"
-                alt="collective logo"
-                height="30"
-                width="30"
+        <div className={s.root}>
+          <div className={s.container}>
+            {this.props.routeToRegisterForm ?
+              <RegisterForm
+                authorizeUser={this.props.authorizeUser}
+                userWantsEmailSignup={this.props.userWantsEmailSignup}
+                emailInput={this.state.emailInput}
+                passwordInput={this.state.passwordInput}
+                facebookData={this.props.facebookData}
+                firebaseAccessToken={this.props.firebaseAccessToken}
               />
-              <h2>Log in to see more</h2>
-              <div>
-                <MailOutline />
+              :
+              <form onSubmit={this.handleEmailContinue}>
+                <img
+                  src="https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/20770387_10203435278718905_5967924942940849831_n.jpg?oh=db3ccb9562c5b3b2744d2418fcbc8cd2&oe=5A34AF97"
+                  alt="collective logo"
+                  height="30"
+                  width="30"
+                />
+                <h2>Log in to see more</h2>
+                <div>
+                  <MailOutline />
+                  <Popup
+                    trigger={<TextField
+                      hintText="Email"
+                      style={styles.iconStyles}
+                      onChange={(event) => this.setState({ emailInput: event.target.value })}
+                    />
+                  }
+                  content={this.state.emailErrorMessage}
+                  open={this.state.isEmailValidated === false || this.state.userDisabled === true || this.state.userNotFound === true}
+                  offset={20}
+                  position="right center"
+                /><br />
+                <LockOutline />
                 <Popup
                   trigger={<TextField
-                    type="email"
-                    hintText="Email"
+                    type="password"
+                    hintText="Password"
                     style={styles.iconStyles}
-                    onChange={(event) => this.setState({ emailInput: event.target.value })}
+                    onChange={(event) => this.setState({ passwordInput: event.target.value })}
                   />
                 }
-                content="Hmm...that doesn't look like an email address."
-                open={this.state.isEmailValidated === false}
+                content={this.state.passwordErrorMessage}
+                open={(this.state.isPasswordValidated === false || this.state.wrongPassword === true) && (this.state.isEmailValidated === true && this.state.userDisabled !== true && this.state.userNotFound !== true)}
                 offset={20}
                 position="right center"
               /><br />
-              <LockOutline />
-              <Popup
-                trigger={<TextField
-                  // ref="password"
-                  type="password"
-                  hintText="Password"
-                  style={styles.iconStyles}
-                  onChange={(event) => this.setState({ passwordInput: event.target.value })}
-                />
-              }
-              content="Your password needs a minimum of 8 characters with at least one uppercasee letter, one lowercase letter and one number."
-              open={(this.state.isPasswordValidated === false && this.state.isEmailValidated === true)}
-              offset={20}
-              position="right center"
-            /><br />
+            </div>
+            <RaisedButton label="Log in" type="submit" primary={true} />
+            <div style={styles.or}>OR</div>
+            <button
+              className={s.loginBtn}
+              id="btn-social-login"
+              onClick={this.props.handleFacebookAuth}>
+              Login with Facebook
+            </button>
+          </form>
+            }
           </div>
-          <RaisedButton label="Log in" primary={true} onClick={this.handleEmailContinue} />
-          {/* <LoginForm /> */}
-          <div style={styles.or}>OR</div>
-          <button
-            className={s.loginBtn}
-            id="btn-social-login"
-            onClick={this.handleFBLogin}>
-            Login with Facebook
-          </button>
         </div>
       </div>
-        }
-    </div>
     );
   }
 }

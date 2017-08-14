@@ -18,7 +18,7 @@ class Head extends Component {
   render() {
     return (
       <div className={s.root}>
-          <Link className={s.brand} to="/home">
+          <Link className={s.brand} to="/">
             {/* <img src={require('./logo-small.png')} width="38" height="38" alt="React" /> */}
             <span className={s.brandTxt}>COLLECTIVE</span>
           </Link>
@@ -61,12 +61,22 @@ class Head extends Component {
             <Link className={s.link} to="/about">About</Link>
             <Link className={s.link} to="/foodwiki">FoodWiki</Link>
             <Link className={s.link} to="/community">Community</Link>
-            {firebaseAuth().currentUser !== null ?
-              <Link className={s.link, s.highlight} to="/login" onClick={this.props.logOut}>Log Out</Link>
+            {/* {firebaseAuth().currentUser !== null ? */}
+            {this.props.authenticated ?
+              <button
+                className={s.link, s.highlight}
+                onClick={() => {
+                  this.props.logOut();
+                }}
+              >
+                Log Out
+              </button>
               :
-              <Link className={s.link, s.highlight} to="/login" onClick={this.props.showUser}>Log In</Link>
+              <span>
+                <Link className={s.link, s.highlight} to="/login" onClick={this.props.showUser}>Log In</Link>
+                <Link className={s.link, s.highlight} to="/signup" onClick={this.props.showUser}>Sign Up</Link>
+              </span>
             }
-            {/* <Link className={s.sign} to="/signup">Sign Up</Link> */}
           </div>
       </div>
     );

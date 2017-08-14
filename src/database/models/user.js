@@ -5,7 +5,7 @@ module.exports = function(sequelize, DataTypes) {
     lastName: DataTypes.STRING,
     email: DataTypes.STRING,
     phoneNumber: DataTypes.STRING,
-    birthday: DataTypes.STRING,
+    birthday: DataTypes.DATEONLY,
     streetAddress: DataTypes.STRING,
     aptSuite: DataTypes.STRING,
     city: DataTypes.STRING,
@@ -13,7 +13,12 @@ module.exports = function(sequelize, DataTypes) {
     zipCode: DataTypes.INTEGER,
     fullAddress: DataTypes.STRING,
     subscribed: DataTypes.BOOLEAN,
-    userGroupId: DataTypes.INTEGER
+    userGroupId: DataTypes.INTEGER,
+    firebaseUID: DataTypes.STRING,
+    hasUserFinishedSignUp: DataTypes.BOOLEAN,
+    pictureUrl: DataTypes.STRING,
+    isFacebookAuth: DataTypes.BOOLEAN,
+    cadenceFreq: DataTypes.STRING,
   }, {
     classMethods: {
       associate: function(models) {
