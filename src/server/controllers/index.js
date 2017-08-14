@@ -362,7 +362,7 @@ module.exports = {
       const totalDollarAmount = req.body.price + 0.5 + (req.body.price * req.body.pctFeePerPackage);
       req.body.totalDollarAmount = totalDollarAmount;
       let charge = await stripe.charges.create({
-        amount: totalDollarAmount * 100,
+        amount: Math.round(totalDollarAmount * 100),
         currency: 'usd',
         card: req.body.token.id,
         description: req.body.email,

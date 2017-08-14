@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
   Route,
-  Link
+  Link,
+  Redirect,
 } from 'react-router-dom';
 import s from './Home.css';
 import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
@@ -29,6 +30,7 @@ class Payment extends React.Component {
       paymentErrorMessage: '',
       dorm: 0,
       cook: 0,
+      hasPaymentCompleted: false,
     };
     this.handleDorm = this.handleDorm.bind(this);
     this.handleCook = this.handleCook.bind(this);
@@ -76,9 +78,8 @@ class Payment extends React.Component {
       }),
     });
     const submitPaymentResultData = await submitPaymentResult.json();
-    if (submitPaymentResultData.paymentCompleted) {
-      alert(`Your receipt has been sent to ${submitPaymentResultData.emailSentTo}`);
-    }
+    await this.setState({ hasPaymentCompleted: submitPaymentResultData.paymentCompleted });
+    alert(`Your receipt has been sent to ${submitPaymentResultData.emailSentTo}`);
   }
 
 
@@ -160,7 +161,7 @@ class Payment extends React.Component {
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
-                        Processing Fee ${this.state.price * 0.05}
+                        Processing Fee ${Math.round(this.state.price * 0.05 * 100) / 100}
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
@@ -174,7 +175,7 @@ class Payment extends React.Component {
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
-                        Total ${this.state.price + 0.5 + (this.state.price * 0.05)}
+                        Total ${Math.round((this.state.price + 0.5 + (this.state.price * 0.05)) * 100) / 100}
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
@@ -230,6 +231,11 @@ class Payment extends React.Component {
             </Card>
           </div>
         </div>
+        {this.state.hasPaymentCompleted ?
+          <Redirect to="/home" />
+          :
+          <div></div>
+        }
       </div>
     )
   }

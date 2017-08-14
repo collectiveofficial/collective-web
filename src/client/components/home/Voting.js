@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
   Route,
-  Link
+  Link,
+  Redirect,
 } from 'react-router-dom';
 import s from './Home.css';
 import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
@@ -18,6 +19,7 @@ class Voting extends React.Component {
       voteErrorMessage: '',
       allowContinueToPayment: '',
       hasUserPaid: false,
+      votesHaveFinishedUpdating: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -124,6 +126,8 @@ class Voting extends React.Component {
         }),
       });
       const responseData = await response.json();
+      alert('Your votes have been updated.');
+      await this.setState({ votesHaveFinishedUpdating: responseData.votesSaved });
     }
   }
 
@@ -187,8 +191,13 @@ class Voting extends React.Component {
             </div>
           </div>
         }
+        {this.state.votesHaveFinishedUpdating ?
+          <Redirect to="/home" />
+          :
+          <div></div>
+        }
       </div>
-    )
+    );
   }
 }
 
