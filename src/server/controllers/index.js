@@ -111,33 +111,36 @@ const firstDropFoodItems = [{
   imageUrl: 'http://palmaworld.com/wp-content/uploads/2017/01/green-pepper.jpg',
 }];
 
-const initializeFirstDropoff = async () => {
-  // initialize dropoff
-  const doesFirstDropoffExist = await dropoffUtil.doesFirstDropoffExist();
-  // if dropoff at id 1 does not exist
-  if (!doesFirstDropoffExist) {
-    await dropoffUtil.populateDropoff(firstDropoff);
-  }
+const initializeData = async () => {
+  const initializeFirstDropoff = async () => {
+    // initialize dropoff
+    const doesFirstDropoffExist = await dropoffUtil.doesFirstDropoffExist();
+    // if dropoff at id 1 does not exist
+    if (!doesFirstDropoffExist) {
+      await dropoffUtil.populateDropoff(firstDropoff);
+    }
+  };
+
+  const initializeFirstDropFoodItems = async () => {
+    const doesFoodItemExist = await foodUtil.doesFoodItemExist();
+    if (!doesFoodItemExist) {
+      await foodUtil.populateFoodItems(firstDropFoodItems);
+    }
+  };
+
+  const initializeFirstDropBallots = async () => {
+    const doesBallotExist = await ballotUtil.doesBallotExist();
+    if (!doesBallotExist) {
+      // populate ballots first drop's food items for first dropoff
+      await ballotUtil.populateBallots(1, voteDateTimeBeg, voteDateTimeEnd);
+    }
+  };
+  await initializeFirstDropoff();
+  await initializeFirstDropFoodItems();
+  await initializeFirstDropBallots();
 };
 
-const initializeFirstDropFoodItems = async () => {
-  const doesFoodItemExist = await foodUtil.doesFoodItemExist();
-  if (!doesFoodItemExist) {
-    await foodUtil.populateFoodItems(firstDropFoodItems);
-  }
-};
-
-const initializeFirstDropBallots = async () => {
-  const doesBallotExist = await ballotUtil.doesBallotExist();
-  if (!doesBallotExist) {
-    // populate ballots first drop's food items for first dropoff
-    await ballotUtil.populateBallots(1, voteDateTimeBeg, voteDateTimeEnd);
-  }
-};
-
-initializeFirstDropoff();
-initializeFirstDropFoodItems();
-initializeFirstDropBallots();
+initializeData();
 
 console.log(firebaseAdminApp);
 
