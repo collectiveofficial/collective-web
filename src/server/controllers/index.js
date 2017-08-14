@@ -64,11 +64,11 @@ const firstDropFoodItems = [{
 },
 {
   name: 'Kiwis',
-  imageUrl: 'http://cdn.thealternativedaily.com/wp-content/uploads/2013/11/kiwi.jpg',
+  imageUrl: 'https://cdn.thealternativedaily.com/wp-content/uploads/2013/11/kiwi.jpg',
 },
 {
   name: 'Oranges',
-  imageUrl: 'http://grapplergourmet.com/wp-content/uploads/2015/03/piles.jpg',
+  imageUrl: 'https://grapplergourmet.com/wp-content/uploads/2015/03/piles.jpg',
 },
 {
   name: 'Granny Smith Apples',
@@ -92,7 +92,7 @@ const firstDropFoodItems = [{
 },
 {
   name: 'White Grapes',
-  imageUrl: 'http://world-food-and-wine.com/image-files/white-grapes.jpg',
+  imageUrl: 'https://world-food-and-wine.com/image-files/white-grapes.jpg',
 },
 {
   name: 'Carrots',
@@ -100,15 +100,15 @@ const firstDropFoodItems = [{
 },
 {
   name: 'Spinach',
-  imageUrl: 'http://healthyrise.com/wp-content/uploads/2016/07/Spinach.jpg',
+  imageUrl: 'https://healthyrise.com/wp-content/uploads/2016/07/Spinach.jpg',
 },
 {
   name: 'Red Peppers',
-  imageUrl: 'http://www.ibizeneco.com/communities/1/004/013/082/201/images/4621089873.jpg',
+  imageUrl: 'https://www.ibizeneco.com/communities/1/004/013/082/201/images/4621089873.jpg',
 },
 {
   name: 'Green Peppers',
-  imageUrl: 'http://palmaworld.com/wp-content/uploads/2017/01/green-pepper.jpg',
+  imageUrl: 'https://palmaworld.com/wp-content/uploads/2017/01/green-pepper.jpg',
 }];
 
 const initializeData = async () => {
