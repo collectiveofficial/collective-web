@@ -20,11 +20,11 @@ class Head extends Component {
       <div className={s.root}>
           <Link className={s.brand} to="/">
             {/* <img src={require('./logo-small.png')} width="38" height="38" alt="React" /> */}
-            <span className={s.brandTxt}>Collective</span>
+            <span className={s.brandTxt}>COLLECTIVE</span>
           </Link>
           <div className={s.cont}>
-            <Modal trigger={<div className={s.link}>About</div>}>
-              <Modal.Header>About Us</Modal.Header>
+            {/* <Modal trigger={<div className={s.link}>About</div>}>
+              <Modal.Header>About Us</sModal.Header>
               <Modal.Content image>
                 <Image wrapped size='medium' src='https://scontent-sjc2-1.xx.fbcdn.net/v/t31.0-8/17807302_1001695923264408_1104643144105822755_o.jpg?oh=848e9a20c09ef1a380e51414b70545e0&oe=59EFAC25' />
                 <Modal.Description>
@@ -39,8 +39,8 @@ class Head extends Component {
                   <p>You just buy into our $6 or $10 packages, and we help to give you a box full of amazing food.</p>
                 </Modal.Description>
               </Modal.Content>
-            </Modal>
-            <Modal trigger={<div className={s.link}>How it works</div>}>
+            </Modal> */}
+            {/* <Modal trigger={<div className={s.link}>How it works</div>}>
               <Modal.Header>How it works</Modal.Header>
               <Modal.Content image>
                 <Image wrapped size='medium' src='https://scontent-sjc2-1.xx.fbcdn.net/v/t31.0-8/20543885_10203394818707430_3468504837222731456_o.jpg?oh=9da059cb55b752e2440478a2df39293a&oe=5A2E7096' />
@@ -57,15 +57,26 @@ class Head extends Component {
                   <p>the cost of the grocery store</p>
                 </Modal.Description>
               </Modal.Content>
-            </Modal>
+            </Modal> */}
+            <Link className={s.link} to="/about">About</Link>
             <Link className={s.link} to="/foodwiki">FoodWiki</Link>
             <Link className={s.link} to="/community">Community</Link>
-            {firebaseAuth().currentUser !== null ?
-              <Link className={s.link, s.highlight} to="/login" onClick={this.props.logOut}>Log Out</Link>
+            {/* {firebaseAuth().currentUser !== null ? */}
+            {this.props.authenticated ?
+              <button
+                className={s.link, s.highlight}
+                onClick={() => {
+                  this.props.logOut();
+                }}
+              >
+                Log Out
+              </button>
               :
-              <Link className={s.link, s.highlight} to="/login" onClick={this.props.showUser}>Log In</Link>
+              <span>
+                <Link className={s.link, s.highlight} to="/login" onClick={this.props.showUser}>Log In</Link>
+                <Link className={s.link, s.highlight} to="/signup" onClick={this.props.showUser}>Sign Up</Link>
+              </span>
             }
-            {/* <Link className={s.sign} to="/signup">Sign Up</Link> */}
           </div>
       </div>
     );

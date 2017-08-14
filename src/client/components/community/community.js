@@ -17,7 +17,6 @@ class community extends Component {
       <div>
         <div className={s.root}>
           <div className={s.container}>
-            <h1 className={s.banner}>Community</h1>
             <div className={s.card}>
               Thanks for coming to our community page. Here we will give you a chance to connect with other bulk buyers: sharing recipes, organizing meetups, and setting up events built around food. We will keep you updated as we improve the site and make this the section that you want it to be.
             </div>

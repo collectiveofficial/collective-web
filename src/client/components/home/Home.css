@@ -98,17 +98,14 @@ img {
   margin-left: 8px;
   border-radius: 3px;
   background: #228B22;
-  color: #fff;
+  color: white;
+  margin-bottom: 8px;
 }
 
-.link,
-.link:active,
-.link:visited {
-  color: rgba(255, 255, 255, .6);
-}
 
 .link:hover {
-  color: rgba(255, 255, 255, 1);
+  color: white;
+  text-decoration: underline;
 }
 
 .ballot {
@@ -164,6 +161,7 @@ img {
   font-family: 'Lato', sans-serif;
   display: flex;
   justify-content: center;
+  text-decoration: underline;
 }
 
 .flexcontainer {
@@ -192,7 +190,7 @@ img {
   padding-right: 20px;
   display: flex;
   justify-content: center;
-  background-image: url("https://scontent-sjc2-1.xx.fbcdn.net/v/t31.0-8/16722816_967218253378842_633864775433504773_o.jpg?oh=5146d613341e96a1b888e8c9157691f3&oe=59F6E8B3");
+  background-image: url("https://scontent-lax3-2.xx.fbcdn.net/v/t31.0-8/17880057_1005883869512280_2672757500595292705_o.jpg?oh=d896a7760c7feae53fd6dac05e9403db&oe=59F61E1A");
   background-size: cover;
   flex: 1;
 }

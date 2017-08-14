@@ -1,6 +1,9 @@
 {
   "name": "collective-web",
   "version": "1.0.0",
+  "engines": {
+    "node": "7.10.0"
+  },
   "description": "Collective",
   "main": "index.js",
   "scripts": {
@@ -47,12 +50,14 @@
     "firebaseui": "^2.3.0",
     "jquery": "^3.2.1",
     "material-ui": "^0.18.7",
+    "moment-timezone": "^0.5.13",
     "mysql": "^2.14.0",
     "node-sass": "^4.5.3",
     "nodemon": "^1.11.0",
     "pg": "^6.4.1",
     "pg-hstore": "^2.3.2",
     "react": "^15.5.4",
+    "react-cookie": "^2.0.8",
     "react-dom": "^15.5.4",
     "react-fastclick": "^3.0.2",
     "react-modal": "^1.9.7",

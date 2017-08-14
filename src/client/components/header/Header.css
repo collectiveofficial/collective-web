@@ -40,6 +40,11 @@
   text-decoration: none;
 }
 
+.brand:hover,
+.brandTxt:hover {
+  text-decoration: underline;
+}
+
 .nav {
   float: right;
   margin-top: 6px;
@@ -58,16 +63,10 @@
   color: grey;
 }
 
-/*.sign:active,
-.sign:visited,
-.link:active,
-.link:visited {
-  color: rgba(255, 255, 255, .6);
-}*/
-
 .link:hover {
   /*color: rgba(255, 255, 255, 1);*/
-  color: #228B22;
+  text-decoration: underline;
+  color: grey;
 }
 
 .sign {
@@ -94,7 +93,8 @@
 }
 
 .highlight:hover {
-  color: grey;
+  text-decoration: underline;
+  color: white;
 }
 
 
