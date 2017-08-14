@@ -31,6 +31,7 @@ class Payment extends React.Component {
       dorm: 0,
       cook: 0,
       hasPaymentCompleted: false,
+      votesSaved: false,
     };
     this.handleDorm = this.handleDorm.bind(this);
     this.handleCook = this.handleCook.bind(this);
@@ -52,6 +53,31 @@ class Payment extends React.Component {
     this.setState({ price: newPrice });
   }
 
+  async submitInitialVotes() {
+    const foodObj = {};
+    for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
+      foodObj[this.props.ballotsAndVotes[i].name] = this.props.ballotsAndVotes[i].isCurrent;
+    }
+    // save votes to DB and allow to continue to payment
+    const response = await fetch('/vote/save', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        firebaseAccessToken: this.props.firebaseAccessToken,
+        foodObj,
+      }),
+    });
+    const responseData = await response.json();
+    if (responseData.votesSaved) {
+      this.setState({ votesSaved: true });
+    } else {
+      this.setState({ votesSaved: false });
+    }
+  }
+
   async handlePayment() {
     await this.setState({ paymentErrorMessage: '' });
     if (this.state.price === 0) {
@@ -60,6 +86,7 @@ class Payment extends React.Component {
   }
 
   async onToken(token) {
+    await this.setState({ hasPaymentCompleted: false });
     const email = await firebaseAuth().currentUser.email;
     console.log('--------> email: ', email);
     const submitPaymentResult = await fetch('/confirm-payment', {
@@ -78,8 +105,18 @@ class Payment extends React.Component {
       }),
     });
     const submitPaymentResultData = await submitPaymentResult.json();
-    await this.setState({ hasPaymentCompleted: submitPaymentResultData.paymentCompleted });
-    alert(`Your receipt has been sent to ${submitPaymentResultData.emailSentTo}`);
+    if (submitPaymentResultData.paymentCompleted) {
+      await this.submitInitialVotes();
+      if (this.state.votesSaved) {
+        alert(`Thank you for voting! Your votes are now recorded. Your receipt has been sent to ${submitPaymentResultData.emailSentTo}`);
+        await this.setState({ hasPaymentCompleted: true });
+      } else {
+        alert('Voting failed. Please contact Collective to resolve this issue. We appreciate your patience.');
+      }
+    } else {
+      alert('Payment failed. Please contact Collective to resolve this issue. We appreciate your patience.');
+      await this.setState({ hasPaymentCompleted: false });
+    }
   }
 
 
@@ -192,7 +229,7 @@ class Payment extends React.Component {
                                     // panelLabel="Give Money" prepended to the amount in the bottom pay button
                                     amount={this.state.price * 100 + 50} // cents
                                     currency="USD"
-                                    stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
+                                    stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
                                     email="bestfoodforward@osu.edu"
                                     // Note: Enabling either address option will give the user the ability to
                                     // fill out both. Addresses are sent as a second parameter in the token callback.

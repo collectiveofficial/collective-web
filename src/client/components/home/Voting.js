@@ -77,28 +77,7 @@ class Voting extends React.Component {
       this.setState({ allowContinueToPayment: false });
     }
     if (this.state.votes === 0) {
-      const foodObj = {};
-      for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
-        foodObj[this.props.ballotsAndVotes[i].name] = this.props.ballotsAndVotes[i].isCurrent;
-      }
-      // save votes to DB and allow to continue to payment
-      const response = await fetch('/vote/save', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json; charset=utf-8',
-        },
-        body: JSON.stringify({
-          firebaseAccessToken: this.props.firebaseAccessToken,
-          foodObj,
-        }),
-      });
-      const responseData = await response.json();
-      if (responseData.votesSaved) {
-        this.setState({ allowContinueToPayment: true });
-      } else {
-        this.setState({ allowContinueToPayment: false });
-      }
+      this.setState({ allowContinueToPayment: true });
     }
   }
 
@@ -138,7 +117,7 @@ class Voting extends React.Component {
     return (
       <div>
         {this.state.allowContinueToPayment ?
-          <Payment firebaseAccessToken={this.props.firebaseAccessToken} />
+          <Payment firebaseAccessToken={this.props.firebaseAccessToken} ballotsAndVotes={this.props.ballotsAndVotes}/>
           :
           <div className={s.cont}>
             <h1 className={s.top}>You have {this.state.votes} votes left</h1>
