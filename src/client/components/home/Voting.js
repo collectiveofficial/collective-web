@@ -6,6 +6,50 @@ import {
 import s from './Home.css';
 import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
+import axios from 'axios';
+
+// const successPayment = data => {
+//   alert('Payment Successful');
+// };
+//
+// const errorPayment = data => {
+//   alert('Payment Error');
+// };
+//
+// onToken = (amount, description) => token =>
+//   axios.post("https://checkout.stripe.com/checkout.js",
+//     {
+//       description,
+//       source: token.id,
+//       currency: 'USD',
+//       amount: fromEuroToCent(amount)
+//     })
+//     .then(successPayment)
+//     .catch(errorPayment);
+//
+//   <StripeCheckout
+//     name={name}
+//     description={description}
+//     token={onToken(amount, description)}
+//   />
+//   <StripeCheckout
+//     name="Best Food Forward/Collective"
+//     description="Easy healthy eating"
+//     ComponentClass="div"
+//     amount={this.state.price * 100 + 50}
+//     currency="USD"
+//     stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
+//     email="bestfoodforward@osu.edu"
+//     shippingAddress
+//     billingAddress={false}
+//     zipCode={false}
+//     allowRememberMe
+//     token={this.onToken}
+//     opened={this.onOpened}
+//     closed={this.onClosed}
+//     reconfigureOnUpdate={false}
+//     triggerEvent="onTouchTap"
+//     >
 
 
 const numOptions = [
@@ -125,6 +169,7 @@ class Voting extends React.Component {
     handleClick() {
       this.setState({condition: !this.state.condition});
     };
+
     onToken(token) {
       fetch('/save-stripe-token', {
         method: 'POST',
@@ -233,7 +278,7 @@ class Voting extends React.Component {
                                 <Feed.Event>
                                   <Feed.Content>
                                     <Feed.Summary>
-                                      Total = ${this.state.price}
+                                      Total = ${this.state.price} + $.50 transaction fee
                                     </Feed.Summary>
                                   </Feed.Content>
                                 </Feed.Event>
@@ -246,7 +291,7 @@ class Voting extends React.Component {
                                         description="Easy healthy eating" // the pop-in header subtitle
                                         ComponentClass="div"
                                         // panelLabel="Give Money" prepended to the amount in the bottom pay button
-                                        amount={this.state.price * 100} // cents
+                                        amount={this.state.price * 100 + 50} // cents
                                         currency="USD"
                                         stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
                                         email="bestfoodforward@osu.edu"
