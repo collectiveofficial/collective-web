@@ -64,11 +64,11 @@ const firstDropFoodItems = [{
 },
 {
   name: 'Kiwis',
-  imageUrl: 'https://cdn.thealternativedaily.com/wp-content/uploads/2013/11/kiwi.jpg',
+  imageUrl: 'http://cdn.thealternativedaily.com/wp-content/uploads/2013/11/kiwi.jpg',
 },
 {
   name: 'Oranges',
-  imageUrl: 'https://grapplergourmet.com/wp-content/uploads/2015/03/piles.jpg',
+  imageUrl: 'http://grapplergourmet.com/wp-content/uploads/2015/03/piles.jpg',
 },
 {
   name: 'Granny Smith Apples',
@@ -96,19 +96,19 @@ const firstDropFoodItems = [{
 },
 {
   name: 'Carrots',
-  imageUrl: 'https://edge.alluremedia.com.au/uploads/businessinsider/2015/12/baby-carrots.jpg',
+  imageUrl: 'http://edge.alluremedia.com.au/uploads/businessinsider/2015/12/baby-carrots.jpg',
 },
 {
   name: 'Spinach',
-  imageUrl: 'https://healthyrise.com/wp-content/uploads/2016/07/Spinach.jpg',
+  imageUrl: 'http://healthyrise.com/wp-content/uploads/2016/07/Spinach.jpg',
 },
 {
   name: 'Red Peppers',
-  imageUrl: 'https://www.ibizeneco.com/communities/1/004/013/082/201/images/4621089873.jpg',
+  imageUrl: 'http://www.ibizeneco.com/communities/1/004/013/082/201/images/4621089873.jpg',
 },
 {
   name: 'Green Peppers',
-  imageUrl: 'https://palmaworld.com/wp-content/uploads/2017/01/green-pepper.jpg',
+  imageUrl: 'http://palmaworld.com/wp-content/uploads/2017/01/green-pepper.jpg',
 }];
 
 const initializeData = async () => {
