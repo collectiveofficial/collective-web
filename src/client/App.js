@@ -77,6 +77,7 @@ class App extends Component {
     this.setRouteToRegisterFormState = this.setRouteToRegisterFormState.bind(this);
     this.setUserWantsEmailSignupState = this.setUserWantsEmailSignupState.bind(this);
     this.setFirebaseAccessTokenState = this.setFirebaseAccessTokenState.bind(this);
+    this.updateBallotsAndVotes = this.updateBallotsAndVotes.bind(this);
   }
 
   componentDidMount() {
@@ -84,6 +85,7 @@ class App extends Component {
       if (user) { // is signed in
         await console.log('Logged in');
         const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+        await this.setState({ firebaseAccessToken });
         // await console.log('user firebaseAccessToken in App.js componentDidMount: ', user.ie);
         const response = await fetch('/auth/check', {
           method: 'POST',
@@ -99,7 +101,7 @@ class App extends Component {
         const userAuthorized = responseData.userAuthorized;
         console.log('userAuthorized: ', userAuthorized)
         if (userAuthorized) {
-          await this.setState({ userAuthorized });
+          this.authorizeUser();
         }
 
         await this.setState({
@@ -216,6 +218,11 @@ class App extends Component {
     })
     const initialDataLoadResults = await initialDataLoad.json();
     await this.setState({ ballotsAndVotes: initialDataLoadResults.ballotsAndVotes });
+    await console.log('-------> this.state.ballotsAndVotes: ', this.state.ballotsAndVotes);
+  }
+
+  updateBallotsAndVotes(newBallotsAndVotes) {
+    this.setState({ ballotsAndVotes: newBallotsAndVotes });
   }
 
   render() {
@@ -257,6 +264,8 @@ class App extends Component {
             <PrivateRoute userAuthorized={this.state.userAuthorized} path="/voting" component={() =>
               (<Voting
                 ballotsAndVotes={this.state.ballotsAndVotes}
+                updateBallotsAndVotes={this.updateBallotsAndVotes}
+                firebaseAccessToken={this.state.firebaseAccessToken}
               />)} />
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/foodwiki" component={foodwiki} />
             <DenyAuthorizedRoute userAuthorized={this.state.userAuthorized} path="/signup" component={() =>

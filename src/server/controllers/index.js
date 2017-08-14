@@ -315,7 +315,6 @@ module.exports = {
         // send back votes data
       // else
         // initialize votes at 0
-      console.log('---------> req.body.firebaseAccessToken: ', req.body.firebaseAccessToken);
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;

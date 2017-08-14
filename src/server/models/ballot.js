@@ -97,7 +97,7 @@ module.exports.getBallotUserVotes = async (requestBody) => {
     const ballotsVotes = {};
     ballotsVotes.name = ballot.name;
     ballotsVotes.imageUrl = ballot.imageUrl;
-    ballotsVotes.isCurrent = userVotes[ballot.name];
+    ballotsVotes.isCurrent = JSON.stringify(userVotes) === JSON.stringify({}) ? false : userVotes[ballot.name];
     return ballotsVotes;
   });
 
