@@ -7,6 +7,7 @@ import s from './Home.css';
 import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
 import RaisedButton from 'material-ui/RaisedButton';
+import { ref, firebaseAuth } from '../../config';
 
 const numOptions = [
   {text: "0", value: "0"},
@@ -29,7 +30,6 @@ class Payment extends React.Component {
       dorm: 0,
       cook: 0,
     };
-
     this.handleDorm = this.handleDorm.bind(this);
     this.handleCook = this.handleCook.bind(this);
     this.onToken = this.onToken.bind(this);
@@ -38,44 +38,45 @@ class Payment extends React.Component {
 
   handleDorm(e, { value }) {
     this.setState({ dorm: value });
-    this.setState({ price: ((this.state.dorm * 6) + (this.state.cook * 10)) });
-  }
-  handleCook(e, { value }) {
-    this.setState({ cook: value });
-    this.setState({ price: ((this.state.dorm * 6) + (this.state.cook * 10)) });
+    let newPrice = this.state.price;
+    newPrice = ((value * 6) + (this.state.cook * 10));
+    this.setState({ price: newPrice });
   }
 
-  // handleDorm(e, { value }) {
-  //   var newPrice = this.state.price;
-  //   newPrice = newPrice + (value * 6);
-  //   this.setState({ price: newPrice });
-  // }
-  //
-  // handleCook(e, { value }) {
-  //   var newPrice = this.state.price;
-  //   newPrice = newPrice + (value * 10);
-  //   this.setState({ price: newPrice });
-  // }
+  handleCook(e, { value }) {
+    this.setState({ cook: value });
+    let newPrice = this.state.price;
+    newPrice = ((this.state.dorm * 6) + (value * 10));
+    this.setState({ price: newPrice });
+  }
 
   async handlePayment() {
     await this.setState({ paymentErrorMessage: '' });
     if (this.state.price === 0) {
       await this.setState({ paymentErrorMessage: 'Please specify an amount for the packages.' });
     }
-    if (this.state.price > 0) {
-      // let modal open
-    }
   }
 
-  onToken(token) {
-    fetch('/save-stripe-token', {
+  async onToken(token) {
+    const email = await firebaseAuth().currentUser.email;
+    console.log('--------> email: ', email);
+    const submitPaymentResult = await fetch('/confirm-payment', {
       method: 'POST',
-      body: JSON.stringify(token),
-    }).then(response => {
-      response.json().then(data => {
-        alert(`We are in business, ${data.email}`);
-      });
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        firebaseAccessToken: this.props.firebaseAccessToken,
+        token,
+        price: (this.state.price + 0.5) * 100,
+        email,
+      }),
     });
+    const submitPaymentResultData = await submitPaymentResult.json();
+    if (submitPaymentResultData.paymentCompleted) {
+      alert(`Your receipt has been sent to ${submitPaymentResultData.emailSentTo}`);
+    }
   }
 
   render() {
@@ -88,7 +89,6 @@ class Payment extends React.Component {
     return (
       <div>
         <div className={s.cont}>
-          {/* <Link to="/payment" className={s.butt}><Button>Submit and Pay</Button></Link> */}
           <div className={s.ballot}>
             <Card>
               <Card.Content>

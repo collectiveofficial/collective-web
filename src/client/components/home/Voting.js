@@ -16,7 +16,7 @@ class Voting extends React.Component {
       votes: 6,
       price: 0,
       voteErrorMessage: '',
-      allowContinueToPayment: false,
+      allowContinueToPayment: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -57,9 +57,11 @@ class Voting extends React.Component {
 
   async handleContinueToPayment() {
     await this.setState({ voteErrorMessage: '' });
+    await this.setState({ allowContinueToPayment: '' });
     console.log('-------> handleContinueToPayment was triggered');
     if (this.state.votes !== 0) {
       await this.setState({ voteErrorMessage: 'Remember to use all your votes! You can change them later.' });
+      this.setState({ allowContinueToPayment: false });
     }
     if (this.state.votes === 0) {
       const foodObj = {};
@@ -81,6 +83,8 @@ class Voting extends React.Component {
       const responseData = await response.json();
       if (responseData.votesSaved) {
         this.setState({ allowContinueToPayment: true });
+      } else {
+        this.setState({ allowContinueToPayment: false });
       }
     }
   }
@@ -89,7 +93,7 @@ class Voting extends React.Component {
     return (
       <div>
         {this.state.allowContinueToPayment ?
-          <Payment />
+          <Payment firebaseAccessToken={this.props.firebaseAccessToken} />
           :
           <div className={s.cont}>
             <h1 className={s.top}>You have {this.state.votes} votes left</h1>
@@ -113,7 +117,19 @@ class Voting extends React.Component {
                   </Card>
                 </div>
               ))}
-              <RaisedButton label="Pay With Card" primary={true} onClick={this.handleContinueToPayment} />
+              <Popup
+                trigger={
+                  <RaisedButton
+                    label="Continue to Payment"
+                    primary={true}
+                    onClick={this.handleContinueToPayment}
+                  />
+                }
+                content={this.state.voteErrorMessage}
+                open={this.state.allowContinueToPayment === false}
+                offset={5}
+                position="bottom left"
+              />
             </div>
           </div>
         }

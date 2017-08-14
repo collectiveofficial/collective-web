@@ -8,8 +8,19 @@ const dropoffUtil = require('../models/dropoff');
 const foodUtil = require('../models/food');
 const ballotUtil = require('../models/ballot');
 const voteUtil = require('../models/vote');
+const paymentUtil = require('../models/payment');
 const admin = require('firebase-admin');
 const moment = require('moment-timezone');
+const configureStripe = require('stripe');
+let STRIPE_SECRET_KEY;
+
+if (process.env.NODE_ENV === 'production') {
+  STRIPE_SECRET_KEY = process.env.sk_test_MY_SECRET_KEY;
+} else {
+  STRIPE_SECRET_KEY = process.env.sk_test_MY_SECRET_KEY;
+}
+
+const stripe = configureStripe(STRIPE_SECRET_KEY);
 
 const firebaseAdminApp = admin.initializeApp({
   credential: admin.credential.cert({
@@ -239,6 +250,34 @@ module.exports = {
       }
     },
   },
+  confirmPayment: {
+    async post(req, res) {
+      console.log(req.body);
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+      let uid = decodedToken.uid;
+      req.body.uid = uid;
+      // TODO: dynamic dropoffID
+      const dropoffID = 1;
+      const pctFeePerPackage = dropoffUtil.findPctFeePerPackageForDrop(dropoffID);
+      req.body.pctFeePerPackage = pctFeePerPackage;
+      const totalDollarAmount = req.body.price + 0.5 + (req.body.price * req.body.pctFeePerPackage);
+      req.body.totalDollarAmount = totalDollarAmount;
+      let charge = await stripe.charges.create({
+        amount: totalDollarAmount * 100,
+        currency: 'usd',
+        card: req.body.token.id,
+        description: req.body.email,
+      }, async (err, charge) => {
+        if (err) {
+          // console.log(JSON.stringify(err, null, 2));
+          console.log(err);
+        } else {
+          await paymentUtil.savePaymentInfo(req.body, dropoffID);
+          await res.json({ paymentCompleted: true, emailSentTo: req.body.email });
+        }
+      });
+    },
+  },
   facebookAuth: {
     post(req, res) {
       console.log('token from server', req.body.facebook_token);
@@ -308,13 +347,6 @@ module.exports = {
   },
   getBallotUserVotes: {
     async post(req, res) {
-      // grab data from ballot table
-      // use uid to find user id
-      // use id to see if there's votes
-      // if there are votes
-        // send back votes data
-      // else
-        // initialize votes at 0
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;
