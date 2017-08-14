@@ -80,9 +80,7 @@ class Voting extends React.Component {
       },
       price: 0,
     };
-    // this.openModal = this.openModal.bind(this);
-    // this.afterOpenModal = this.afterOpenModal.bind(this);
-    // this.closeModal = this.closeModal.bind(this);
+
     this.handleClick = this.handleClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleDorm = this.handleDorm.bind(this);
@@ -91,7 +89,7 @@ class Voting extends React.Component {
   }
 
   componentDidMount() {
-    console.log('-------> this.props.defaultBallots: ', this.props.defaultBallots);
+    console.log('-------> this.props.ballotsAndVotes: ', this.props.ballotsAndVotes);
   }
 
   handleChange(e, { value, checked }) {
@@ -134,23 +132,25 @@ class Voting extends React.Component {
     });
   }
 
-  // "firebaseAccessToken":"fwnropeiwnp32n42p3pnfwe",
-	// "foodObj": {
-	// 	"Sweet Potatoes": false,
-  //       "Potatoes": false,
-  //       "Kiwis": false,
-  //       "Oranges": false,
-  //       "Granny Smith Apples": false,
-  //       "Golden Delicious Apples": false,
-  //       "Pink Lady Apples": false,
-  //       "Bananas": false,
-  //       "Red Grapes": false,
-  //       "White Grapes": false,
-  //       "Carrots": false,
-  //       "Spinach": false,
-  //       "Red Peppers": false,
-  //       "Green Peppers": false
-	// }
+//   {
+//     "firebaseAccessToken":"fwnropeiwnp32n42p3pnfwe",
+//   	"foodObj": {
+//   		"Sweet Potatoes": false,
+//           "Potatoes": false,
+//           "Kiwis": false,
+//           "Oranges": false,
+//           "Granny Smith Apples": false,
+//           "Golden Delicious Apples": false,
+//           "Pink Lady Apples": false,
+//           "Bananas": false,
+//           "Red Grapes": false,
+//           "White Grapes": false,
+//           "Carrots": false,
+//           "Spinach": false,
+//           "Red Peppers": false,
+//           "Green Peppers": false
+//   	}
+// }
 
   render() {
     return (

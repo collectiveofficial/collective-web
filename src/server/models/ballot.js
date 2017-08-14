@@ -1,5 +1,7 @@
 const models = require('../../database/models/index');
+const userUtil = require('./user');
 const foodUtil = require('./food');
+const voteUtil = require('./vote');
 
 module.exports.doesBallotExist = () => {
   return models.Ballot.findOne({
@@ -72,12 +74,32 @@ module.exports.changeVoteCount = async (isChosen, foodID, dropoffID) => {
   });
 };
 
-module.exports.getDefaultBallots = async (dropoffID) => {
-  const getDefaultBallotsResult = await models.Ballot.findAll({
+module.exports.getBallotUserVotes = async (requestBody) => {
+  const ballots = [];
+  const getBallotUserVotesResult = await models.Ballot.findAll({
     where: {
-      dropoffID,
+      dropoffID: requestBody.dropoffID,
     },
   });
-  console.log('------------> getDefaultBallotsResult: ', getDefaultBallotsResult);
-  return getDefaultBallotsResult;
+
+  for (let i = 0; i < getBallotUserVotesResult.length; i++) {
+    const foodItem = {
+      name: getBallotUserVotesResult[i].foodName,
+      imageUrl: getBallotUserVotesResult[i].imageUrl,
+    };
+    ballots.push(foodItem);
+  }
+
+  const userID = await userUtil.findUserID(requestBody.uid);
+  const userVotes = await voteUtil.findVotesByUser(userID);
+
+  const ballotsAndVotes = await ballots.map((ballot) => {
+    const ballotsVotes = {};
+    ballotsVotes.name = ballot.name;
+    ballotsVotes.imageUrl = ballot.imageUrl;
+    ballotsVotes.isCurrent = userVotes[ballot.name];
+    return ballotsVotes;
+  });
+
+  return ballotsAndVotes;
 };

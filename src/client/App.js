@@ -6,7 +6,6 @@ import {
   Switch,
 } from 'react-router-dom';
 import firebase from 'firebase';
-import queryString from 'query-string';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import initReactFastclick from 'react-fastclick';
 import Home from './components/home/Home.js';
@@ -69,7 +68,7 @@ class App extends Component {
       firebaseAccessToken: '',
       routeToRegisterForm: false,
       userAuthorized: false,
-      defaultBallots: '',
+      ballotsAndVotes: '',
     };
     this.logOut = this.logOut.bind(this);
     this.showUser = this.showUser.bind(this);
@@ -204,10 +203,20 @@ class App extends Component {
   async authorizeUser() {
     await this.setState({ userAuthorized: true });
     // TODO: Change hardcoded dropoff to dynamic
-    const dropoff = { dropoffID: 1 };
-    const defaultBallots = await fetch(`/ballot/get-default/?${queryString.stringify(dropoff)}`);
-    const defaultBallotsResults = await defaultBallots.json();
-    await this.setState({ defaultBallots: defaultBallotsResults.ballots });
+    const ballotsAndVotes = await fetch('/vote-ballot/get-ballot-votes', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        firebaseAccessToken: this.state.firebaseAccessToken,
+        dropoffID: 1,
+      }),
+    })
+    const ballotsAndVotesResults = await ballotsAndVotes.json();
+    console.log('------> ballotsAndVotesResults: ', ballotsAndVotesResults);
+    await this.setState({ ballotsAndVotes: ballotsAndVotesResults.ballotsAndVotes });
   }
 
   render() {
@@ -248,7 +257,7 @@ class App extends Component {
             <PrivateRoute userAuthorized={this.state.userAuthorized} path="/home" component={Home} />
             <PrivateRoute userAuthorized={this.state.userAuthorized} path="/voting" component={() =>
               (<Voting
-                defaultBallots={this.state.defaultBallots}
+                ballotsAndVotes={this.state.ballotsAndVotes}
               />)} />
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/foodwiki" component={foodwiki} />
             <DenyAuthorizedRoute userAuthorized={this.state.userAuthorized} path="/signup" component={() =>

@@ -306,26 +306,31 @@ module.exports = {
       }
     },
   },
-  getDefaultBallots: {
-    async get(req, res) {
-      const ballotDBresults = await ballotUtil.getDefaultBallots(req.query.dropoffID);
-      const ballots = [];
-      for (let i = 0; i < ballotDBresults.length; i++) {
-        const foodItem = {
-          name: ballotDBresults[i].foodName,
-          imageUrl: ballotDBresults[i].imageUrl,
-        };
-        ballots.push(foodItem);
-      }
-      await res.json({ ballots });
+  getBallotUserVotes: {
+    async post(req, res) {
+      // grab data from ballot table
+      // use uid to find user id
+      // use id to see if there's votes
+      // if there are votes
+        // send back votes data
+      // else
+        // initialize votes at 0
+      console.log('---------> req.body.firebaseAccessToken: ', req.body.firebaseAccessToken);
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+      let uid = decodedToken.uid;
+      req.body.uid = uid;
+      const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
+      const responseObject = {
+        ballotsAndVotes,
+      };
+      await res.json(responseObject);
     },
   },
   saveVotes: {
     async post(req, res) {
-      // const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
-      // let uid = decodedToken.uid;
-      // req.body.uid = uid;
-      req.body.uid = req.body.firebaseAccessToken;
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+      let uid = decodedToken.uid;
+      req.body.uid = uid;
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.saveVotes(req.body);
       res.json({ votesSaved: true });
@@ -333,10 +338,9 @@ module.exports = {
   },
   updateVotes: {
     async post(req, res) {
-      // const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
-      // let uid = decodedToken.uid;
-      // req.body.uid = uid;
-      req.body.uid = req.body.firebaseAccessToken;
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+      let uid = decodedToken.uid;
+      req.body.uid = uid;
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.updateVotes(req.body);
       res.json({ votesSaved: true });
