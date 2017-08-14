@@ -138,7 +138,7 @@ class Login extends React.Component {
           <div className={s.root}>
             <div className={s.container}>
               <img
-                src="https://previews.123rf.com/images/arbuzu/arbuzu1410/arbuzu141000209/32592691-Letter-C-eco-leaves-logo-icon-design-template-elements-Vector-color-sign--Stock-Vector.jpg"
+                src="https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/20770387_10203435278718905_5967924942940849831_n.jpg?oh=db3ccb9562c5b3b2744d2418fcbc8cd2&oe=5A34AF97"
                 alt="collective logo"
                 height="30"
                 width="30"
