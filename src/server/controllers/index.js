@@ -15,7 +15,7 @@ const configureStripe = require('stripe');
 let STRIPE_SECRET_KEY;
 
 if (process.env.NODE_ENV === 'production') {
-  STRIPE_SECRET_KEY = process.env.sk_test_MY_SECRET_KEY;
+  STRIPE_SECRET_KEY = process.env.sk_live_MY_SECRET_KEY;
 } else {
   STRIPE_SECRET_KEY = process.env.sk_test_MY_SECRET_KEY;
 }
