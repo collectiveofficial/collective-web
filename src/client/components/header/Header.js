@@ -63,14 +63,14 @@ class Head extends Component {
             <Link className={s.link} to="/community">Community</Link>
             {/* {firebaseAuth().currentUser !== null ? */}
             {this.props.authenticated ?
-              <button
+              <div
                 className={s.link, s.highlight}
                 onClick={() => {
                   this.props.logOut();
                 }}
               >
                 Log Out
-              </button>
+              </div>
               :
               <span>
                 <Link className={s.link, s.highlight} to="/login" onClick={this.props.showUser}>Log In</Link>
