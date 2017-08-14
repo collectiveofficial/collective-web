@@ -19,7 +19,7 @@ class Voting extends React.Component {
       voteErrorMessage: '',
       allowContinueToPayment: '',
       hasUserPaid: false,
-      votesHaveFinishedUpdating: false,
+      votesHaveFinishedUpdating: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -105,6 +105,7 @@ class Voting extends React.Component {
   async handleSubmitUpdateVotes() {
     await this.setState({ voteErrorMessage: '' });
     await this.setState({ allowContinueToPayment: '' });
+    await this.setState({ votesHaveFinishedUpdating: '' });
     if (this.state.votes !== 0) {
       await this.setState({ voteErrorMessage: 'Remember to use all your votes! You can change them later.' });
     }
@@ -128,6 +129,8 @@ class Voting extends React.Component {
       const responseData = await response.json();
       alert('Your votes have been updated.');
       await this.setState({ votesHaveFinishedUpdating: responseData.votesSaved });
+    } else {
+      this.setState({ votesHaveFinishedUpdating: false });
     }
   }
 
@@ -169,7 +172,7 @@ class Voting extends React.Component {
                     />
                   }
                   content={this.state.voteErrorMessage}
-                  open={this.state.allowContinueToPayment === false}
+                  open={this.state.votesHaveFinishedUpdating === false}
                   offset={5}
                   position="bottom left"
                 />
