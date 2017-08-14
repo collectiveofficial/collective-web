@@ -26,6 +26,8 @@ class Payment extends React.Component {
       modalIsOpen: false,
       price: 0,
       paymentErrorMessage: '',
+      dorm: 0,
+      cook: 0,
     };
 
     this.handleDorm = this.handleDorm.bind(this);
@@ -34,18 +36,26 @@ class Payment extends React.Component {
     this.handlePayment = this.handlePayment.bind(this);
   }
 
-
   handleDorm(e, { value }) {
-    var newPrice = this.state.price;
-    newPrice = newPrice + (value * 6);
-    this.setState({ price: newPrice });
+    this.setState({ dorm: value });
+    this.setState({ price: ((this.state.dorm * 6) + (this.state.cook * 10)) });
+  }
+  handleCook(e, { value }) {
+    this.setState({ cook: value });
+    this.setState({ price: ((this.state.dorm * 6) + (this.state.cook * 10)) });
   }
 
-  handleCook(e, { value }) {
-    var newPrice = this.state.price;
-    newPrice = newPrice + (value * 10);
-    this.setState({ price: newPrice });
-  }
+  // handleDorm(e, { value }) {
+  //   var newPrice = this.state.price;
+  //   newPrice = newPrice + (value * 6);
+  //   this.setState({ price: newPrice });
+  // }
+  //
+  // handleCook(e, { value }) {
+  //   var newPrice = this.state.price;
+  //   newPrice = newPrice + (value * 10);
+  //   this.setState({ price: newPrice });
+  // }
 
   async handlePayment() {
     await this.setState({ paymentErrorMessage: '' });

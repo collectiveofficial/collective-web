@@ -296,6 +296,9 @@ class App extends Component {
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/terms" component={Terms} />
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/bff" component={BFFTerms} />
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/privacy" component={Privacy} />
+            <PublicRoute userAuthorized={this.state.userAuthorized} path="/about" component={about} />
+            <PublicRoute userAuthorized={this.state.userAuthorized} path="/foodwiki" component={foodwiki} />
+            <PublicRoute userAuthorized={this.state.userAuthorized} path="/community" component={community} />
             <PublicRoute render={() => <h3>No Match</h3>} />
           </Switch>
           <Footer />
