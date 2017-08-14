@@ -3,7 +3,7 @@
   padding-right: 20px;
   display: flex;
   justify-content: center;
-  background-image: url("https://scontent-lax3-2.xx.fbcdn.net/v/t31.0-8/16836148_967219183378749_6214123780522592225_o.jpg?oh=b436dd404a8ef16ee559236f0769a0c5&oe=59FD45A7");
+  background-image: url("https://scontent.fsnc1-3.fna.fbcdn.net/v/t1.0-9/16298880_950827551684579_5488654430611976935_n.jpg?oh=b51ce550513cb7fdcd5ea46c4dfd758e&oe=5A30878F");
   background-size: cover;
   flex: 1;
 }
@@ -28,10 +28,11 @@
   border-bottom: 1px solid #e6e6e6;
   padding: 5px;
   width: 1000px;
-  color: darkgrey;
+  color: black;
   padding-bottom: 8px;
   padding-top: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 60px;
+  margin-top: 60px;
   background-color: white;
   display:'flex';
   align-items: 'center';
