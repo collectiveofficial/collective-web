@@ -203,7 +203,7 @@ class App extends Component {
   async authorizeUser() {
     await this.setState({ userAuthorized: true });
     // TODO: Change hardcoded dropoff to dynamic
-    const ballotsAndVotes = await fetch('/vote-ballot/get-ballot-votes', {
+    const initialDataLoad = await fetch('/vote-ballot/get-ballot-votes', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -214,9 +214,8 @@ class App extends Component {
         dropoffID: 1,
       }),
     })
-    const ballotsAndVotesResults = await ballotsAndVotes.json();
-    console.log('------> ballotsAndVotesResults: ', ballotsAndVotesResults);
-    await this.setState({ ballotsAndVotes: ballotsAndVotesResults.ballotsAndVotes });
+    const initialDataLoadResults = await initialDataLoad.json();
+    await this.setState({ ballotsAndVotes: initialDataLoadResults.ballotsAndVotes });
   }
 
   render() {
