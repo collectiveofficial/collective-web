@@ -63,14 +63,14 @@ class Home extends React.Component {
                   <Modal trigger={<div className={s.link}>Provider info</div>}>
                     <Modal.Header>{this.state.provider}</Modal.Header>
                     <Modal.Content image>
-                      <Image wrapped size='medium' src='http://static1.squarespace.com/static/560d50c5e4b0f68fd092a78f/t/577cfee7893fc03a12adcedb/1495464043705/?format=1500w' />
+                      <Image wrapped size='medium' src='https://static1.squarespace.com/static/560d50c5e4b0f68fd092a78f/t/577cfee7893fc03a12adcedb/1495464043705/?format=1500w' />
                       <Modal.Description>
                         <p>DNO produce is a local food distributor committed to</p>
                         <p>providing high quality produce to Central Ohio restaurants</p>
                         <p>and stores. They do what they can to provide Ohio grown</p>
                         <p>produce and they have been instrumental in providing healthy food</p>
                         <p>for the Ohio State campus.</p>
-                        <p>For more info, check em out <a href="http://dnoinc.com/" target="/blank">here.</a></p>
+                        <p>For more info, check em out <a href="https://dnoinc.com/" target="/blank">here.</a></p>
                       </Modal.Description>
                     </Modal.Content>
                   </Modal>
