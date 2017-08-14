@@ -29,6 +29,9 @@
     },
     "FIREBASE_DATABASE_URL": {
       "required": true
+    },
+    "sk_live_MY_SECRET_KEY": {
+      "required": true
     }
   },
   "formation": {

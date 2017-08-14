@@ -35,3 +35,13 @@ module.exports.populateDropoff = (user) => {
   })
   .catch(err => console.log(err));
 };
+
+module.exports.findPctFeePerPackageForDrop = async (dropoffID) => {
+  const findDropoffByIDResult = await models.Dropoff.findOne({
+    where: {
+      id: dropoffID,
+    },
+  });
+  const pctFeePerPackage = findDropoffByIDResult.dataValues.pctFeePerPackage;
+  return pctFeePerPackage;
+};

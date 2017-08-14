@@ -8,8 +8,19 @@ const dropoffUtil = require('../models/dropoff');
 const foodUtil = require('../models/food');
 const ballotUtil = require('../models/ballot');
 const voteUtil = require('../models/vote');
+const transactionUtil = require('../models/transaction');
 const admin = require('firebase-admin');
 const moment = require('moment-timezone');
+const configureStripe = require('stripe');
+let STRIPE_SECRET_KEY;
+
+if (process.env.NODE_ENV === 'production') {
+  STRIPE_SECRET_KEY = process.env.sk_live_MY_SECRET_KEY;
+} else {
+  STRIPE_SECRET_KEY = process.env.sk_test_MY_SECRET_KEY;
+}
+
+const stripe = configureStripe(STRIPE_SECRET_KEY);
 
 const firebaseAdminApp = admin.initializeApp({
   credential: admin.credential.cert({
@@ -81,11 +92,11 @@ const firstDropFoodItems = [{
 },
 {
   name: 'White Grapes',
-  imageUrl: 'http://world-food-and-wine.com/image-files/white-grapes.jpg',
+  imageUrl: 'https://world-food-and-wine.com/image-files/white-grapes.jpg',
 },
 {
   name: 'Carrots',
-  imageUrl: 'https://edge.alluremedia.com.au/uploads/businessinsider/2015/12/baby-carrots.jpg',
+  imageUrl: 'http://edge.alluremedia.com.au/uploads/businessinsider/2015/12/baby-carrots.jpg',
 },
 {
   name: 'Spinach',
@@ -100,33 +111,36 @@ const firstDropFoodItems = [{
   imageUrl: 'http://palmaworld.com/wp-content/uploads/2017/01/green-pepper.jpg',
 }];
 
-const initializeFirstDropoff = async () => {
-  // initialize dropoff
-  const doesFirstDropoffExist = await dropoffUtil.doesFirstDropoffExist();
-  // if dropoff at id 1 does not exist
-  if (!doesFirstDropoffExist) {
-    await dropoffUtil.populateDropoff(firstDropoff);
-  }
+const initializeData = async () => {
+  const initializeFirstDropoff = async () => {
+    // initialize dropoff
+    const doesFirstDropoffExist = await dropoffUtil.doesFirstDropoffExist();
+    // if dropoff at id 1 does not exist
+    if (!doesFirstDropoffExist) {
+      await dropoffUtil.populateDropoff(firstDropoff);
+    }
+  };
+
+  const initializeFirstDropFoodItems = async () => {
+    const doesFoodItemExist = await foodUtil.doesFoodItemExist();
+    if (!doesFoodItemExist) {
+      await foodUtil.populateFoodItems(firstDropFoodItems);
+    }
+  };
+
+  const initializeFirstDropBallots = async () => {
+    const doesBallotExist = await ballotUtil.doesBallotExist();
+    if (!doesBallotExist) {
+      // populate ballots first drop's food items for first dropoff
+      await ballotUtil.populateBallots(1, voteDateTimeBeg, voteDateTimeEnd);
+    }
+  };
+  await initializeFirstDropoff();
+  await initializeFirstDropFoodItems();
+  await initializeFirstDropBallots();
 };
 
-const initializeFirstDropFoodItems = async () => {
-  const doesFoodItemExist = await foodUtil.doesFoodItemExist();
-  if (!doesFoodItemExist) {
-    await foodUtil.populateFoodItems(firstDropFoodItems);
-  }
-};
-
-const initializeFirstDropBallots = async () => {
-  const doesBallotExist = await ballotUtil.doesBallotExist();
-  if (!doesBallotExist) {
-    // populate ballots first drop's food items for first dropoff
-    await ballotUtil.populateBallots(1, voteDateTimeBeg, voteDateTimeEnd);
-  }
-};
-
-initializeFirstDropoff();
-initializeFirstDropFoodItems();
-initializeFirstDropBallots();
+initializeData();
 
 console.log(firebaseAdminApp);
 
@@ -308,13 +322,6 @@ module.exports = {
   },
   getBallotUserVotes: {
     async post(req, res) {
-      // grab data from ballot table
-      // use uid to find user id
-      // use id to see if there's votes
-      // if there are votes
-        // send back votes data
-      // else
-        // initialize votes at 0
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;
@@ -343,6 +350,44 @@ module.exports = {
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.updateVotes(req.body);
       res.json({ votesSaved: true });
+    },
+  },
+  confirmPayment: {
+    async post(req, res) {
+      console.log(req.body);
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+      let uid = decodedToken.uid;
+      req.body.uid = uid;
+      // TODO: dynamic dropoffID
+      const dropoffID = 1;
+      const pctFeePerPackage = await dropoffUtil.findPctFeePerPackageForDrop(dropoffID);
+      req.body.pctFeePerPackage = pctFeePerPackage;
+      const totalDollarAmount = req.body.price + 0.5 + (req.body.price * req.body.pctFeePerPackage);
+      req.body.totalDollarAmount = totalDollarAmount;
+      let charge = await stripe.charges.create({
+        amount: Math.round(totalDollarAmount * 100),
+        currency: 'usd',
+        card: req.body.token.id,
+        description: req.body.email,
+        receipt_email: req.body.email, // will only send in production
+      }, async (err, charge) => {
+        if (err) {
+          // console.log(JSON.stringify(err, null, 2));
+          console.log(err);
+        } else {
+          await transactionUtil.savePaymentInfo(req.body, dropoffID);
+          await res.json({ paymentCompleted: true, emailSentTo: req.body.email });
+        }
+      });
+    },
+  },
+  checkTransaction: {
+    async post(req, res) {
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+      let uid = decodedToken.uid;
+      req.body.uid = uid;
+      const checkTransactionResult = await transactionUtil.checkTransaction(req.body);
+      res.json(checkTransactionResult);
     },
   },
   voteNotification: {

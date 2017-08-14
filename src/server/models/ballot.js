@@ -52,25 +52,14 @@ module.exports.findFoodInfo = async (foodName) => {
   .catch(err => console.log(err));
 };
 
-module.exports.changeVoteCount = async (isChosen, foodID, dropoffID) => {
-  let changeCount;
-  // if vote is true
-    // change vote
-  if (isChosen) {
-    changeCount = 1;
-  } else {
-    changeCount = -1;
-  }
-
-  const findBallotRowResult = await models.Ballot.findOne({
+module.exports.changeVoteCount = async (voteCount, foodID, dropoffID) => {
+  await models.Ballot.update({
+    voteCount,
+  }, {
     where: {
       foodID,
       dropoffID,
     },
-  });
-
-  await findBallotRowResult.increment('voteCount', {
-    by: changeCount,
   });
 };
 

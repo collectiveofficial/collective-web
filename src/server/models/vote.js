@@ -21,9 +21,16 @@ module.exports.saveVotes = async (requestBody) => {
       isCurrent: requestBody.foodObj[foodItem],
     })
     .catch(err => console.log(err));
-
-    // increment vote count in ballot
-    await ballotUtil.changeVoteCount(requestBody.foodObj[foodItem], findFoodInfoResult.dataValues.foodID, findFoodInfoResult.dataValues.dropoffID);
+    // count all votes where isCurrent is true
+    const findAllTrueVotes = await models.Vote.findAll({
+      where: {
+        isCurrent: true,
+        foodID: findFoodInfoResult.dataValues.foodID,
+        dropoffID: findFoodInfoResult.dataValues.dropoffID,
+      },
+    });
+    // set ballot voteCount where foodID and dropoffID match
+    await ballotUtil.changeVoteCount(findAllTrueVotes.length, findFoodInfoResult.dataValues.foodID, findFoodInfoResult.dataValues.dropoffID);
   }
 };
 
@@ -41,7 +48,16 @@ module.exports.updateVotes = async (requestBody) => {
         ballotID: findFoodInfoResult.dataValues.id,
       },
     });
-    await ballotUtil.changeVoteCount(requestBody.foodObj[foodItem], findFoodInfoResult.dataValues.foodID, findFoodInfoResult.dataValues.dropoffID);
+    // count all votes where isCurrent is true
+    const findAllTrueVotes = await models.Vote.findAll({
+      where: {
+        isCurrent: true,
+        foodID: findFoodInfoResult.dataValues.foodID,
+        dropoffID: findFoodInfoResult.dataValues.dropoffID,
+      },
+    });
+    // set ballot voteCount where foodID and dropoffID match
+    await ballotUtil.changeVoteCount(findAllTrueVotes.length, findFoodInfoResult.dataValues.foodID, findFoodInfoResult.dataValues.dropoffID);
   }
 };
 

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
   Route,
-  Link
+  Link,
+  Redirect,
 } from 'react-router-dom';
 import s from './Home.css';
 import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
@@ -16,14 +17,17 @@ class Voting extends React.Component {
       votes: 6,
       price: 0,
       voteErrorMessage: '',
-      allowContinueToPayment: false,
+      allowContinueToPayment: '',
+      hasUserPaid: false,
+      votesHaveFinishedUpdating: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleContinueToPayment = this.handleContinueToPayment.bind(this);
+    this.handleSubmitUpdateVotes = this.handleSubmitUpdateVotes.bind(this);
   }
 
-  componentWillMount() {
+  async componentWillMount() {
     if (this.props.ballotsAndVotes.length > 0) {
       let votes = 6;
       for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
@@ -31,7 +35,20 @@ class Voting extends React.Component {
           votes--;
         }
       }
-      this.setState({ votes });
+      await this.setState({ votes });
+      const checkIfUserHasPaidResult = await fetch('/transaction/check', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify({
+          firebaseAccessToken: this.props.firebaseAccessToken,
+          dropoffID: 1, //TODO: implement dynamic dropoffID
+        }),
+      });
+      const checkIfUserHasPaidResultData = await checkIfUserHasPaidResult.json();
+      this.setState({ hasUserPaid: checkIfUserHasPaidResultData.hasUserPaid });
     }
   }
 
@@ -41,15 +58,12 @@ class Voting extends React.Component {
       return;
     }
     const newBallotsAndVotes = this.props.ballotsAndVotes;
-    console.log('-----> checked: ', checked);
     for (let i = 0; i < newBallotsAndVotes.length; i++) {
       if (newBallotsAndVotes[i].name === value) {
         newBallotsAndVotes[i].isCurrent = checked;
       }
     }
-    console.log('old this.props.ballotsAndVotes: ', this.props.ballotsAndVotes);
     this.props.updateBallotsAndVotes(newBallotsAndVotes);
-    console.log('new this.props.ballotsAndVotes: ', this.props.ballotsAndVotes);
     let newVote = this.state.votes;
     checked ? newVote-- : newVote++;
     this.setState({ votes: newVote });
@@ -57,7 +71,20 @@ class Voting extends React.Component {
 
   async handleContinueToPayment() {
     await this.setState({ voteErrorMessage: '' });
-    console.log('-------> handleContinueToPayment was triggered');
+    await this.setState({ allowContinueToPayment: '' });
+    if (this.state.votes !== 0) {
+      await this.setState({ voteErrorMessage: 'Remember to use all your votes! You can change them later.' });
+      this.setState({ allowContinueToPayment: false });
+    }
+    if (this.state.votes === 0) {
+      this.setState({ allowContinueToPayment: true });
+    }
+  }
+
+  async handleSubmitUpdateVotes() {
+    await this.setState({ voteErrorMessage: '' });
+    await this.setState({ allowContinueToPayment: '' });
+    await this.setState({ votesHaveFinishedUpdating: '' });
     if (this.state.votes !== 0) {
       await this.setState({ voteErrorMessage: 'Remember to use all your votes! You can change them later.' });
     }
@@ -67,7 +94,7 @@ class Voting extends React.Component {
         foodObj[this.props.ballotsAndVotes[i].name] = this.props.ballotsAndVotes[i].isCurrent;
       }
       // save votes to DB and allow to continue to payment
-      const response = await fetch('/vote/save', {
+      const response = await fetch('/vote/update', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -79,9 +106,10 @@ class Voting extends React.Component {
         }),
       });
       const responseData = await response.json();
-      if (responseData.votesSaved) {
-        this.setState({ allowContinueToPayment: true });
-      }
+      alert('Your votes have been updated.');
+      await this.setState({ votesHaveFinishedUpdating: responseData.votesSaved });
+    } else {
+      this.setState({ votesHaveFinishedUpdating: false });
     }
   }
 
@@ -89,7 +117,7 @@ class Voting extends React.Component {
     return (
       <div>
         {this.state.allowContinueToPayment ?
-          <Payment />
+          <Payment firebaseAccessToken={this.props.firebaseAccessToken} ballotsAndVotes={this.props.ballotsAndVotes}/>
           :
           <div className={s.cont}>
             <h1 className={s.top}>You have {this.state.votes} votes left</h1>
@@ -113,12 +141,45 @@ class Voting extends React.Component {
                   </Card>
                 </div>
               ))}
-              <RaisedButton label="Pay With Card" primary={true} onClick={this.handleContinueToPayment} />
+              {this.state.hasUserPaid ?
+                <Popup
+                  trigger={
+                    <RaisedButton
+                      label="Update Votes"
+                      primary={true}
+                      onClick={this.handleSubmitUpdateVotes}
+                    />
+                  }
+                  content={this.state.voteErrorMessage}
+                  open={this.state.votesHaveFinishedUpdating === false}
+                  offset={5}
+                  position="bottom left"
+                />
+                :
+                <Popup
+                  trigger={
+                    <RaisedButton
+                      label="Continue to Payment"
+                      primary={true}
+                      onClick={this.handleContinueToPayment}
+                    />
+                  }
+                  content={this.state.voteErrorMessage}
+                  open={this.state.allowContinueToPayment === false}
+                  offset={5}
+                  position="bottom left"
+                />
+              }
             </div>
           </div>
         }
+        {this.state.votesHaveFinishedUpdating ?
+          <Redirect to="/home" />
+          :
+          <div></div>
+        }
       </div>
-    )
+    );
   }
 }
 
