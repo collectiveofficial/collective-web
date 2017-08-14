@@ -69,8 +69,10 @@ class Payment extends React.Component {
       body: JSON.stringify({
         firebaseAccessToken: this.props.firebaseAccessToken,
         token,
-        price: (this.state.price + 0.5) * 100,
+        price: this.state.price,
         email,
+        dormPackagesOrdered: this.state.dorm,
+        cookingPackagesOrdered: this.state.cook,
       }),
     });
     const submitPaymentResultData = await submitPaymentResult.json();

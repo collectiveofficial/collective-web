@@ -4,8 +4,8 @@ const foodUtil = require('./food');
 const voteUtil = require('./vote');
 
 module.exports.savePaymentInfo = async (requestBody, dropoffID) => {
-  const userID = await models.userUtil.findUserID(requestBody.uid);
-  await models.Payment.create({
+  const userID = await userUtil.findUserID(requestBody.uid);
+  await models.Transaction.create({
     userID,
     hasVoted: true,
     hasPaid: true,
@@ -14,6 +14,6 @@ module.exports.savePaymentInfo = async (requestBody, dropoffID) => {
     cookingPackagesOrdered: requestBody.cookingPackagesOrdered,
     totalDollarAmount: requestBody.totalDollarAmount,
     revenueBeforeStripe: requestBody.totalDollarAmount - requestBody.price,
-    revenueAfterStripe: requestBody.totalDollarAmount - ((requestBody.totalDollarAmount * 0.029) + 0.3),
+    revenueAfterStripe: requestBody.totalDollarAmount - (requestBody.totalDollarAmount - ((requestBody.totalDollarAmount * 0.029) + 0.3)),
   });
 };

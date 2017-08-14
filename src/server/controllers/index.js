@@ -8,7 +8,7 @@ const dropoffUtil = require('../models/dropoff');
 const foodUtil = require('../models/food');
 const ballotUtil = require('../models/ballot');
 const voteUtil = require('../models/vote');
-const paymentUtil = require('../models/payment');
+const transactionUtil = require('../models/transaction');
 const admin = require('firebase-admin');
 const moment = require('moment-timezone');
 const configureStripe = require('stripe');
@@ -258,7 +258,7 @@ module.exports = {
       req.body.uid = uid;
       // TODO: dynamic dropoffID
       const dropoffID = 1;
-      const pctFeePerPackage = dropoffUtil.findPctFeePerPackageForDrop(dropoffID);
+      const pctFeePerPackage = await dropoffUtil.findPctFeePerPackageForDrop(dropoffID);
       req.body.pctFeePerPackage = pctFeePerPackage;
       const totalDollarAmount = req.body.price + 0.5 + (req.body.price * req.body.pctFeePerPackage);
       req.body.totalDollarAmount = totalDollarAmount;
@@ -267,12 +267,13 @@ module.exports = {
         currency: 'usd',
         card: req.body.token.id,
         description: req.body.email,
+        receipt_email: req.body.email, // will only send in production
       }, async (err, charge) => {
         if (err) {
           // console.log(JSON.stringify(err, null, 2));
           console.log(err);
         } else {
-          await paymentUtil.savePaymentInfo(req.body, dropoffID);
+          await transactionUtil.savePaymentInfo(req.body, dropoffID);
           await res.json({ paymentCompleted: true, emailSentTo: req.body.email });
         }
       });
