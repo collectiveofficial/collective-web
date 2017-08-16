@@ -299,6 +299,7 @@ class App extends Component {
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/about" component={about} />
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/foodwiki" component={foodwiki} />
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/community" component={community} />
+            <PublicRoute userAuthorized={this.state.userAuthorized} path="/feedback" component={feedback} />
             <PublicRoute render={() => <h3>No Match</h3>} />
           </Switch>
           <Footer />
