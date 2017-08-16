@@ -164,7 +164,7 @@ class Login extends React.Component {
                 firebaseAccessToken={this.props.firebaseAccessToken}
               />
               :
-              <form onSubmit={this.handleEmailContinue}>
+              <div>
                 <img
                   src="https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/20770387_10203435278718905_5967924942940849831_n.jpg?oh=db3ccb9562c5b3b2744d2418fcbc8cd2&oe=5A34AF97"
                   alt="collective logo"
@@ -201,7 +201,7 @@ class Login extends React.Component {
                 position="right center"
               /><br />
             </div>
-            <RaisedButton label="Log in" type="submit" primary={true} />
+            <RaisedButton label="Log in" type="submit" primary={true} onTouchTap={this.handleEmailContinue} />
             <br /> <br />
             <button
               className={s.loginBtn}
@@ -209,7 +209,7 @@ class Login extends React.Component {
               onClick={this.props.handleFacebookAuth}>
               Login with Facebook
             </button>
-          </form>
+          </div>
             }
           </div>
         </div>

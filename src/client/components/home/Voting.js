@@ -147,7 +147,7 @@ class Voting extends React.Component {
                     <RaisedButton
                       label="Update Votes"
                       primary={true}
-                      onClick={this.handleSubmitUpdateVotes}
+                      onTouchTap={this.handleSubmitUpdateVotes}
                     />
                   }
                   content={this.state.voteErrorMessage}
@@ -161,7 +161,7 @@ class Voting extends React.Component {
                     <RaisedButton
                       label="Continue to Payment"
                       primary={true}
-                      onClick={this.handleContinueToPayment}
+                      onTouchTap={this.handleContinueToPayment}
                     />
                   }
                   content={this.state.voteErrorMessage}

@@ -230,7 +230,7 @@ class Payment extends React.Component {
                                     // panelLabel="Give Money" prepended to the amount in the bottom pay button
                                     amount={this.state.price * 100} // cents
                                     currency="USD"
-                                    stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
+                                    stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
                                     email="bestfoodforward@osu.edu"
                                     // Note: Enabling either address option will give the user the ability to
                                     // fill out both. Addresses are sent as a second parameter in the token callback.
@@ -252,8 +252,7 @@ class Payment extends React.Component {
                                     >
                                     </StripeCheckout>
                               ) : (
-                                <RaisedButton label="Pay With Card" primary={true} onClick={this.handlePayment} >
-                                </RaisedButton>
+                                <RaisedButton label="Pay With Card" primary={true} onTouchTap={this.handlePayment} />
                               )}
                         </Feed.Summary>
                       </Feed.Content>
