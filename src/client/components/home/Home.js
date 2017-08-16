@@ -9,12 +9,6 @@ import Voting from './Voting.js';
 import { Card, CardMedia, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
 import {Button} from 'react-toolbox/lib/button';
 
-
-// style={{overlay : {position: 'fixed', top: 600, left: 600, right: 600, bottom: 600,
-//     backgroundColor: '#888888'}, content : {position: 'absolute', top: '40px', left: '40px',
-//     right: '40px', bottom: '40px', border: '1px solid #ccc', background: '#fff', overflow: 'auto',
-//     WebkitOverflowScrolling: 'touch', borderRadius: '4px', outline: 'none', padding: '20px'}}}
-
 class Home extends React.Component {
   constructor(props) {
     super(props);
