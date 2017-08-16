@@ -32,6 +32,9 @@
     },
     "sk_live_MY_SECRET_KEY": {
       "required": true
+    },
+    "sk_test_MY_SECRET_KEY": {
+      "required": true
     }
   },
   "formation": {
