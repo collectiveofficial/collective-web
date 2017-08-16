@@ -60,7 +60,7 @@ class Home extends React.Component {
                 ></iframe>
                 <div className={s.links}>
                   <Link className={s.link} to="/voting">Vote and Pay</Link>
-                  <Modal trigger={<div className={s.link} closeIcon="close">Provider info</div>}>
+                  <Modal trigger={<div className={s.link}>Provider info</div>} closeIcon="close">
                     <Modal.Header>{this.state.provider}</Modal.Header>
                     <Modal.Content image>
                       <Image wrapped size='medium' src='https://static1.squarespace.com/static/560d50c5e4b0f68fd092a78f/t/577cfee7893fc03a12adcedb/1495464043705/?format=1500w' />
