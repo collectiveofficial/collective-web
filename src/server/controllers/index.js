@@ -360,9 +360,10 @@ module.exports = {
       req.body.uid = uid;
       // TODO: dynamic dropoffID
       const dropoffID = 1;
-      const pctFeePerPackage = await dropoffUtil.findPctFeePerPackageForDrop(dropoffID);
-      req.body.pctFeePerPackage = pctFeePerPackage;
-      const totalDollarAmount = req.body.price + 0.5 + (req.body.price * req.body.pctFeePerPackage);
+      req.body.pctFeePerPackage = await dropoffUtil.findPctFeePerPackageForDrop(dropoffID);
+      req.body.cookingPackageFees = (req.body.cookingPackagesOrdered * 10) * req.body.pctFeePerPackage;
+      req.body.transactionFee = req.body.cookingPackagesOrdered > 0 ? 0.5 : 0;
+      const totalDollarAmount = (req.body.dormPackagesOrdered * 6) + ((req.body.cookingPackagesOrdered * 10) + req.body.cookingPackageFees) + req.body.transactionFee;
       req.body.totalDollarAmount = totalDollarAmount;
       let charge = await stripe.charges.create({
         amount: Math.round(totalDollarAmount * 100),
