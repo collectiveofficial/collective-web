@@ -98,7 +98,7 @@ class Payment extends React.Component {
       body: JSON.stringify({
         firebaseAccessToken: this.props.firebaseAccessToken,
         token,
-        price: this.state.price,
+        // price: this.state.price,
         email,
         dormPackagesOrdered: this.state.dorm,
         cookingPackagesOrdered: this.state.cook,
@@ -124,6 +124,10 @@ class Payment extends React.Component {
     const styles = {
       stripe: {
         visibility: 'hidden',
+      },
+      transperencyModal: {
+        display: 'inline',
+        float: 'right',
       },
     };
 
@@ -191,28 +195,18 @@ class Payment extends React.Component {
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
-                        Subtotal ${this.state.price}
-                      </Feed.Summary>
-                    </Feed.Content>
-                  </Feed.Event>
-                  <Feed.Event>
-                    <Feed.Content>
-                      <Feed.Summary>
-                        Processing Fee ${Math.round(this.state.price * 0.05 * 100) / 100}
-                      </Feed.Summary>
-                    </Feed.Content>
-                  </Feed.Event>
-                  <Feed.Event>
-                    <Feed.Content>
-                      <Feed.Summary>
-                        Transaction Fee $0.5
-                      </Feed.Summary>
-                    </Feed.Content>
-                  </Feed.Event>
-                  <Feed.Event>
-                    <Feed.Content>
-                      <Feed.Summary>
-                        Total ${Math.round((this.state.price + 0.5 + (this.state.price * 0.05)) * 100) / 100}
+                        Total ${this.state.price} <Modal trigger={<div className={s.mode}>?</div>} basic size='small' closeIcon='close' style={styles.transperencyModal}>
+                          <Modal.Content image>
+                            <Modal.Description>
+                              <p>We made this app to make it easier for everyone to vote and organize, on the buyer side</p>
+                              <p>as well as the seller side. The hope is that having a more automated system</p>
+                              <p> can allow us to put less hours into organizing bulk buys so that we can serve more.</p>
+                              <p>But, with that, comes payment transaction fees and hosting fees just to keep the site up.</p>
+                              <p>So your total will contain a small standard transaction fee for using Stripe (2.9% + $.30) as well as</p>
+                              <p>a small processing fee to cover web hosting. If you have any questions please contact us through our feedback <a href="https://docs.google.com/forms/d/e/1FAIpQLSdMJUSKNvto7jxcY800Z3ocrU7Hu7CSeu5B7M6s9ZJr7vGyzA/viewform?usp=sf_link" target="/blank">form</a>.</p>
+                              </Modal.Description>
+                          </Modal.Content>
+                        </Modal>
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
@@ -227,9 +221,9 @@ class Payment extends React.Component {
                                     description="Easy healthy eating" // the pop-in header subtitle
                                     ComponentClass="div"
                                     // panelLabel="Give Money" prepended to the amount in the bottom pay button
-                                    amount={this.state.price * 100 + 50} // cents
+                                    amount={this.state.price * 100} // cents
                                     currency="USD"
-                                    stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
+                                    stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
                                     email="bestfoodforward@osu.edu"
                                     // Note: Enabling either address option will give the user the ability to
                                     // fill out both. Addresses are sent as a second parameter in the token callback.
