@@ -11,7 +11,6 @@ import TextField from 'material-ui/TextField';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
-import schools from './universities_list.js';
 import { Modal } from 'semantic-ui-react';
 
 injectTapEventPlugin();
@@ -29,11 +28,7 @@ class RegisterForm extends React.Component {
       aptSuite: '',
       city: '',
       state: '',
-      // state: null,
       zipCode: '',
-      schools: '',
-      school: '',
-      // school: null,
       isFirstNameEmpty: false,
       isLastNameEmpty: false,
       isPhoneNumberEmpty: false,
@@ -42,28 +37,16 @@ class RegisterForm extends React.Component {
       isCityEmpty: false,
       isStateEmpty: false,
       isZipCodeEmpty: false,
-      isSchoolEmpty: false,
       userAuthorized: false,
       areThereEmptyFields: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleSchoolChange = this.handleSchoolChange.bind(this);
     this.handleStateChange = this.handleStateChange.bind(this);
     this.transferUserSignup = this.transferUserSignup.bind(this);
     this.submitUserInfo = this.submitUserInfo.bind(this);
     this.areThereEmptyFields = this.areThereEmptyFields.bind(this);
-  }
-
-  componentWillMount() {
-    const transformSchoolData = (school) => {
-      const parantheses = /\(([^\)]+)\)/;
-      const newlines = /\r?\n|\r/g;
-      return school.replace(parantheses, '').replace(newlines, '').trim();
-    };
-    var xschools = schools.schools['universities'].map(transformSchoolData);
-    this.setState({ schools: xschools });
   }
 
   componentDidMount() {
@@ -91,10 +74,6 @@ class RegisterForm extends React.Component {
     alert('A name was submitted: ' + this.state.value);
   }
 
-  handleSchoolChange (event, index, value) {
-    this.setState({ school: value });
-  }
-
   handleStateChange (event, index, value) {
     this.setState({ state: value });
   }
@@ -108,7 +87,6 @@ class RegisterForm extends React.Component {
     await this.setState({ isCityEmpty: false });
     await this.setState({ isStateEmpty: false });
     await this.setState({ isZipCodeEmpty: false });
-    await this.setState({ isSchoolEmpty: false });
 
     if (this.state.firstName.length === 0) {
       await this.setState({ isFirstNameEmpty: true });
@@ -134,11 +112,9 @@ class RegisterForm extends React.Component {
     if (this.state.zipCode.length === 0) {
       await this.setState({ isZipCodeEmpty: true });
     }
-    if (this.state.school.length === 0) {
-      await this.setState({ isSchoolEmpty: true });
-    }
+
     await this.setState({ areThereEmptyFields: this.state.isFirstNameEmpty || this.state.isLastNameEmpty || this.state.isPhoneNumberEmpty || this.state.isBirthdayEmpty ||
-    this.state.isStreetAddressEmpty || this.state.isCityEmpty || this.state.isStateEmpty || this.state.isZipCodeEmpty || this.state.isSchoolEmpty });
+    this.state.isStreetAddressEmpty || this.state.isCityEmpty || this.state.isStateEmpty || this.state.isZipCodeEmpty });
   }
 
   async submitUserInfo() {
@@ -153,7 +129,7 @@ class RegisterForm extends React.Component {
         body: JSON.stringify({
           firstName: this.state.firstName,
           lastName: this.state.lastName,
-          school: this.state.school,
+          // school: this.state.school,
           phoneNumber: this.state.phoneNumber,
           birthday: this.state.birthday,
           streetAddress: this.state.streetAddress,
@@ -195,20 +171,6 @@ class RegisterForm extends React.Component {
           onChange={(event) => this.setState({ lastName: event.target.value })}
           errorText={this.state.isLastNameEmpty ? 'Last name is required' : ''}
         /><br />
-        <SelectField
-          type='text'
-          value={this.state.school}
-          onChange={this.handleSchoolChange}
-          floatingLabelText="School"
-          floatingLabelFixed={true}
-          style={styles.field}
-          errorText={this.state.isSchoolEmpty ? 'School is required' : ''}
-        >
-          {this.state.schools.map((school, key) => {
-            return <MenuItem key={key} value={school} primaryText={school} />
-          })}
-        </SelectField>
-        <br />
         <TextField
          type='date'
          floatingLabelText="Date of Birth"
