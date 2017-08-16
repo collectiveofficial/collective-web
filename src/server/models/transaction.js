@@ -4,11 +4,10 @@ const foodUtil = require('./food');
 const voteUtil = require('./vote');
 
 module.exports.savePaymentInfo = async (requestBody, dropoffID) => {
-  const stripeFees = (requestBody.totalDollarAmount * 0.029) + 0.3;
-  const revenueBeforeStripe = Number((requestBody.cookingPackageFees + requestBody.transactionFee).toFixed(2));
-  const revenueAfterStripe = Number((revenueBeforeStripe - stripeFees).toFixed(2));
-  // 0.38 = 1 - 0.68
-  // revenueAfterStripe = revenueBeforeStripe - stripeFees
+  const stripeFees = Number(((requestBody.totalDollarAmount * 0.029) + 0.3).toFixed(2));
+  const feeChargedToBFF = requestBody.dormPackagesOrdered * 0.5;
+  const revenueBeforeStripe = Number((requestBody.cookingPackageFees + requestBody.transactionFee + feeChargedToBFF).toFixed(2));
+  const revenueAfterStripe = Number((revenueBeforeStripe - stripeFees).toFixed(2)); // 1.31
   const userID = await userUtil.findUserID(requestBody.uid);
   await models.Transaction.create({
     userID,
