@@ -198,6 +198,7 @@ class Payment extends React.Component {
                         Total = ${this.state.price} <Modal trigger={<Icon link size="large" name='help circle' />} basic size='small' closeIcon='close'>
                           <Modal.Content image>
                             <Modal.Description>
+                              <br /><br />
                               <p>We made this app to make it easier for everyone to vote and organize, on the buyer side as well as the seller side.</p>
                               <p>The hope is that having a more automated system can allow us to put less hours into organizing bulk buys</p>
                               <p>so that we can serve more. But, with that, comes payment transaction fees and hosting fees just to keep the site up.</p>
