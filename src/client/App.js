@@ -26,6 +26,9 @@ import BFFTerms from './components/legal/BFFterms.js';
 import Privacy from './components/legal/privacypolicy.js';
 
 initReactFastclick();
+// if ('ontouchstart' in document.documentElement) {
+//   document.body.style.cursor = 'pointer';
+// }
 
 const PrivateRoute = ({component: Component, userAuthorized, ...rest}) => {
   return (
