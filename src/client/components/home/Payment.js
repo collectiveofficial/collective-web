@@ -152,7 +152,7 @@ class Payment extends React.Component {
                           <Dropdown inline options={numOptions}
                             onChange={this.handleDorm}
                             defaultValue={numOptions[0].value}
-                          /><Modal trigger={<div className={s.mode}>dorm packages</div>} basic size='small'>
+                          /><Modal trigger={<a className={s.mode}>dorm packages</a>} basic size='small'>
                             <Modal.Header>Dorm package</Modal.Header>
                             <Modal.Content image>
                               <Modal.Description>
@@ -176,7 +176,7 @@ class Payment extends React.Component {
                           <Dropdown inline options={numOptions}
                             onChange={this.handleCook}
                             defaultValue={numOptions[0].value}
-                          /><Modal trigger={<div className={s.mode}>cooking packages</div>} basic size='small' closeIcon="close">
+                          /><Modal trigger={<a className={s.mode}>cooking packages</a>} basic size='small' closeIcon="close">
                             <Modal.Header>Cooking package</Modal.Header>
                             <Modal.Content image>
                               <Modal.Description>
@@ -195,14 +195,13 @@ class Payment extends React.Component {
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
-                        Total ${this.state.price} <Modal trigger={<div className={s.mode}>?</div>} basic size='small' closeIcon='close' style={styles.transperencyModal}>
+                        Total = ${this.state.price} <Modal trigger={<Icon link size="large" name='help circle' />} basic size='small' closeIcon='close'>
                           <Modal.Content image>
                             <Modal.Description>
-                              <p>We made this app to make it easier for everyone to vote and organize, on the buyer side</p>
-                              <p>as well as the seller side. The hope is that having a more automated system</p>
-                              <p> can allow us to put less hours into organizing bulk buys so that we can serve more.</p>
-                              <p>But, with that, comes payment transaction fees and hosting fees just to keep the site up.</p>
-                              <p>So your total will contain a small standard transaction fee for using Stripe (2.9% + $.30) as well as</p>
+                              <p>We made this app to make it easier for everyone to vote and organize, on the buyer side as well as the seller side.</p>
+                              <p>The hope is that having a more automated system can allow us to put less hours into organizing bulk buys</p>
+                              <p>so that we can serve more. But, with that, comes payment transaction fees and hosting fees just to keep the site up.</p>
+                              <p>So your total will contain a small standard transaction fee for using Stripe (2.9% = $.30) as well as</p>
                               <p>a small processing fee to cover web hosting. If you have any questions please contact us through our feedback <a href="https://docs.google.com/forms/d/e/1FAIpQLSdMJUSKNvto7jxcY800Z3ocrU7Hu7CSeu5B7M6s9ZJr7vGyzA/viewform?usp=sf_link" target="/blank">form</a>.</p>
                               </Modal.Description>
                           </Modal.Content>
@@ -223,7 +222,7 @@ class Payment extends React.Component {
                                     // panelLabel="Give Money" prepended to the amount in the bottom pay button
                                     amount={this.state.price * 100} // cents
                                     currency="USD"
-                                    stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
+                                    stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
                                     email="bestfoodforward@osu.edu"
                                     // Note: Enabling either address option will give the user the ability to
                                     // fill out both. Addresses are sent as a second parameter in the token callback.

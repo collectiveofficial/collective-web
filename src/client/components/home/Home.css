@@ -1,7 +1,9 @@
-
+.mode {
+  color: black;
+}
 
 .mode:hover {
-  color: grey;
+  color: blue;
   text-decoration: underline;
 }
 
