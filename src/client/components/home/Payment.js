@@ -152,7 +152,7 @@ class Payment extends React.Component {
                           <Dropdown inline options={numOptions}
                             onChange={this.handleDorm}
                             defaultValue={numOptions[0].value}
-                          /><Modal trigger={<a className={s.mode}>dorm packages</a>} basic size='small'>
+                          /><Modal trigger={<a className={s.mode}>dorm packages</a>} basic size='small' closeIcon="close">
                             <Modal.Header>Dorm package</Modal.Header>
                             <Modal.Content image>
                               <Modal.Description>
@@ -252,8 +252,7 @@ class Payment extends React.Component {
                                     >
                                     </StripeCheckout>
                               ) : (
-                                <RaisedButton label="Pay With Card" primary={true} onClick={this.handlePayment} >
-                                </RaisedButton>
+                                <RaisedButton label="Pay With Card" primary={true} onTouchTap={this.handlePayment} />
                               )}
                         </Feed.Summary>
                       </Feed.Content>

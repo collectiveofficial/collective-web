@@ -16,7 +16,7 @@ class Footer extends Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <span className={s.text}>Collective Foods</span>
+          <span className={s.text}>Collective Technologies Inc.</span>
           <span className={s.spacer}>·</span>
           <Link className={s.link} to="/home">Home</Link>
           <span className={s.spacer}>·</span>
@@ -26,9 +26,6 @@ class Footer extends Component {
           <span className={s.spacer}>·</span>
           <Link className={s.link} to="/feedback">Feedback</Link>
           <span className={s.spacer}>·</span>
-          {/* <Link className={s.link} to="/privacy">Privacy</Link> */}
-          {/* <span className={s.spacer}>·</span>
-          <Link className={s.link} to="/not-found">Not Found</Link> */}
         </div>
       </div>
     );
