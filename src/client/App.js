@@ -218,7 +218,6 @@ class App extends Component {
       },
       body: JSON.stringify({
         firebaseAccessToken: this.state.firebaseAccessToken,
-        dropoffID: 1,
       }),
     })
     const initialDataLoadResults = await initialDataLoad.json();

@@ -65,11 +65,20 @@ module.exports.changeVoteCount = async (voteCount, foodID, dropoffID) => {
 
 module.exports.getBallotUserVotes = async (requestBody) => {
   const ballots = [];
-  const getBallotUserVotesResult = await models.Ballot.findAll({
-    where: {
-      dropoffID: requestBody.dropoffID,
-    },
-  });
+  let getBallotUserVotesResult;
+  console.log('-------> requestBody.dropoffID: ', requestBody.dropoffID);
+  console.log('-------> typeof requestBody.dropoffID: ', typeof requestBody.dropoffID);
+  try {
+    getBallotUserVotesResult = await models.Ballot.findAll({
+      where: {
+        dropoffID: requestBody.dropoffID,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+
+  console.log('--------> getBallotUserVotesResult: ', getBallotUserVotesResult);
 
   for (let i = 0; i < getBallotUserVotesResult.length; i++) {
     const foodItem = {
@@ -78,10 +87,12 @@ module.exports.getBallotUserVotes = async (requestBody) => {
     };
     ballots.push(foodItem);
   }
+  await console.log('--------> ballots: ', ballots);
 
   const userID = await userUtil.findUserID(requestBody.uid);
+  await console.log('--------> userID: ', userID);
   const userVotes = await voteUtil.findVotesByUser(userID);
-
+  await console.log('--------> userVotes: ', userVotes);
   const ballotsAndVotes = await ballots.map((ballot) => {
     const ballotsVotes = {};
     ballotsVotes.name = ballot.name;
@@ -89,6 +100,7 @@ module.exports.getBallotUserVotes = async (requestBody) => {
     ballotsVotes.isCurrent = JSON.stringify(userVotes) === JSON.stringify({}) ? false : userVotes[ballot.name];
     return ballotsVotes;
   });
+  await console.log('--------> ballotsAndVotes: ', ballotsAndVotes);
 
   return ballotsAndVotes;
 };

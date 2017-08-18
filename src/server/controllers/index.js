@@ -325,6 +325,8 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;
+      // TODO: Implement dynamic dropoffID
+      req.body.dropoffID = 1;
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
       const responseObject = {
         ballotsAndVotes,

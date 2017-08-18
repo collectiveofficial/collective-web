@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
     cookingPackagesOrdered: DataTypes.INTEGER,
     totalDollarAmount: DataTypes.DECIMAL,
     revenueBeforeStripe: DataTypes.DECIMAL,
-    revenueAfterStripe: DataTypes.DECIMAL
+    revenueAfterStripe: DataTypes.DECIMAL,
   }, {
     classMethods: {
       associate: function(models) {
