@@ -88,20 +88,7 @@ module.exports = {
                 type: dataType,
               };
         }
-      // console.log('--------> modelObjAttrs: ', modelObjAttr);
-      // console.log('--------> modelObjAttrs[modelObjAttr].type.constructor.key: ', modelObjAttrs[modelObjAttr].type.constructor.key);
     }
-    // const modelCols = Object.keys(modelObjAttrs); // GET MODEL COLUMN NAMES
-    // let dataType;
-    // modelCols.forEach((modelCol) => {
-    //   if (modelCol !== 'id' && modelCol !== 'createdAt' && modelCol !== 'updatedAt') {
-    //     dataType = string2DataType[modelObjAttrs[modelCol].type.constructor.key]; // GET MODEL DATATYPES
-    //     // NOTE TO SELF: if we ever want more than just type in the object, look above ^^
-    //     newModelMigrationObj[modelCol] = {
-    //       type: dataType,
-    //     };
-    //   }
-    // });
     newModelMigrationObj.createdAt = {
       allowNull: false,
       type: Sequelize.DATE,
@@ -110,7 +97,6 @@ module.exports = {
       allowNull: false,
       type: Sequelize.DATE,
     };
-    console.log('--------> newModelMigrationObj: ', newModelMigrationObj);
     queryInterface.showAllTables().then((tableNames) => {
       if (tableNames.indexOf(liveTableName) < 0) {
         return queryInterface.createTable(liveTableName, newModelMigrationObj);
