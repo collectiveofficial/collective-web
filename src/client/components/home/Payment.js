@@ -5,7 +5,7 @@ import {
   Redirect,
 } from 'react-router-dom';
 import s from './Home.css';
-import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
+import { Card, Icon, Popup, Dropdown, Feed, Modal } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
 import RaisedButton from 'material-ui/RaisedButton';
 import { ref, firebaseAuth } from '../../config';
@@ -100,7 +100,6 @@ class Payment extends React.Component {
       body: JSON.stringify({
         firebaseAccessToken: this.props.firebaseAccessToken,
         token,
-        // price: this.state.price,
         email,
         dormPackagesOrdered: this.state.dorm,
         cookingPackagesOrdered: this.state.cook,

@@ -1,15 +1,9 @@
 import React, { Component } from 'react';
 import {
-  Route,
-  Link,
   Redirect,
 } from 'react-router-dom';
-import s from './Home.css';
-import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
+import { Button } from 'semantic-ui-react';
 import { Message } from 'semantic-ui-react'
-import StripeCheckout from 'react-stripe-checkout';
-import RaisedButton from 'material-ui/RaisedButton';
-import { ref, firebaseAuth } from '../../config';
 
 class PaymentConfirmation extends React.Component {
   constructor(props) {
@@ -17,7 +11,6 @@ class PaymentConfirmation extends React.Component {
     this.state = {
       doesUserWantHome: false,
     };
-
   }
 
   render() {
