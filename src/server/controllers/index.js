@@ -325,6 +325,8 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;
+      // TODO: Implement dynamic dropoffID
+      req.body.dropoffID = 1;
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
       const responseObject = {
         ballotsAndVotes,
@@ -365,15 +367,18 @@ module.exports = {
       req.body.transactionFee = req.body.cookingPackagesOrdered > 0 ? 0.5 : 0;
       const totalDollarAmount = (req.body.dormPackagesOrdered * 6) + ((req.body.cookingPackagesOrdered * 10) + req.body.cookingPackageFees) + req.body.transactionFee;
       req.body.totalDollarAmount = totalDollarAmount;
+      const dormPackageEmailDescription = req.body.dormPackagesOrdered > 0 ? `${req.body.dormPackagesOrdered} x Dorm Package${req.body.dormPackagesOrdered < 2 ? '' : 's'}` : '';
+      const cookingPackageEmailDescription = req.body.cookingPackagesOrdered > 0 ? `${req.body.cookingPackagesOrdered} x Cooking Package${req.body.cookingPackagesOrdered < 2 ? '' : 's'}` : '';
+      const conditionalNextLine = req.body.dormPackagesOrdered > 0 && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
+      const description = `${dormPackageEmailDescription}${conditionalNextLine}${cookingPackageEmailDescription}`;
       let charge = await stripe.charges.create({
         amount: Math.round(totalDollarAmount * 100),
         currency: 'usd',
         card: req.body.token.id,
-        description: req.body.email,
-        receipt_email: req.body.email, // will only send in production
+        description,
+        receipt_email: req.body.email, // will only send in production, must go to dashboard to send test receipts from test Payments
       }, async (err, charge) => {
         if (err) {
-          // console.log(JSON.stringify(err, null, 2));
           console.log(err);
         } else {
           await transactionUtil.savePaymentInfo(req.body, dropoffID);
