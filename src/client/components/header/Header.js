@@ -31,14 +31,14 @@ class Header extends Component {
             <Link className={s.link} to="/foodwiki">FoodWiki</Link>
             <Link className={s.link} to="/community">Community</Link>
             {this.props.authenticated ?
-              <div
+              <a
                 className={s.link}
                 onClick={() => {
                   this.props.logOut();
                 }}
-              >
+                href="javascript:void(0)">
                 Log Out
-              </div>
+              </a>
               :
               <span>
                 <Link className={s.link, s.highlight} to="/login" onClick={this.props.showUser}>Log In</Link>
