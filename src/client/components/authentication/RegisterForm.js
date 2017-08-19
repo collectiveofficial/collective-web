@@ -221,7 +221,7 @@ class RegisterForm extends React.Component {
         /><br />
         <AutoComplete
           searchText={this.state.state}
-          onUpdateInput={this.handleUpdateInput}
+          onUpdateInput={state => this.setState({ state: state.toUpperCase() })}
           floatingLabelText="State"
           floatingLabelFixed={true}
           dataSource={usStates}
