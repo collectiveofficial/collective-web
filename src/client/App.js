@@ -200,10 +200,13 @@ class App extends Component {
     if (userAlreadyExists && hasUserFinishedSignUp) {
       console.log('authorize user');
       await this.authorizeUser();
-    } else if ((userAlreadyExists && !hasUserFinishedSignUp) || saveUserOnFacebookSignUpExecuted) {
+    } else if ((userAlreadyExists && !hasUserFinishedSignUp)) {
       await this.setRouteToRegisterFormState(true);
-      // const sendEmailVerification = await result.user.sendEmailVerification();
-      // await console.log('sendEmailVerification successful.');
+    } else if (saveUserOnFacebookSignUpExecuted) {
+      const currentFirebaseUser = await firebaseAuth().currentUser;
+      const sendEmailVerification = await currentFirebaseUser.sendEmailVerification();
+      await console.log('sendEmailVerification successful.');
+      await this.setRouteToRegisterFormState(true);
     }
   }
 

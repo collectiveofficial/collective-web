@@ -5,15 +5,19 @@ import {
   Link,
   Redirect
 } from 'react-router-dom';
-import firebase from 'firebase';
 import s from './Register.css';
 import TextField from 'material-ui/TextField';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Modal } from 'semantic-ui-react';
 
 injectTapEventPlugin();
+
+const usStates = ['AK','AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','GU','HI',
+'IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MH','MI','MN','MO',
+'MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA',
+'PR','PW','RI','SC','SD','TN','TX','UT','VA','VI','VT','WA','WI',
+'WV','WY'];
 
 class RegisterForm extends React.Component {
   constructor(props) {
@@ -39,14 +43,15 @@ class RegisterForm extends React.Component {
       isZipCodeEmpty: false,
       userAuthorized: false,
       areThereEmptyFields: '',
+      isInvalidState: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleStateChange = this.handleStateChange.bind(this);
     this.transferUserSignup = this.transferUserSignup.bind(this);
     this.submitUserInfo = this.submitUserInfo.bind(this);
     this.areThereEmptyFields = this.areThereEmptyFields.bind(this);
+    this.handleUpdateInput = this.handleUpdateInput.bind(this);
   }
 
   componentDidMount() {
@@ -74,8 +79,8 @@ class RegisterForm extends React.Component {
     alert('A name was submitted: ' + this.state.value);
   }
 
-  handleStateChange (event, index, value) {
-    this.setState({ state: value });
+  handleUpdateInput(state) {
+    this.setState({ state });
   }
 
   async areThereEmptyFields() {
@@ -87,6 +92,7 @@ class RegisterForm extends React.Component {
     await this.setState({ isCityEmpty: false });
     await this.setState({ isStateEmpty: false });
     await this.setState({ isZipCodeEmpty: false });
+    this.setState({ isInvalidState: false });
 
     if (this.state.firstName.length === 0) {
       await this.setState({ isFirstNameEmpty: true });
@@ -112,9 +118,12 @@ class RegisterForm extends React.Component {
     if (this.state.zipCode.length === 0) {
       await this.setState({ isZipCodeEmpty: true });
     }
+    if (usStates.indexOf(this.state.state) < 0) {
+      this.setState({ isInvalidState: true });
+    }
 
     await this.setState({ areThereEmptyFields: this.state.isFirstNameEmpty || this.state.isLastNameEmpty || this.state.isPhoneNumberEmpty || this.state.isBirthdayEmpty ||
-    this.state.isStreetAddressEmpty || this.state.isCityEmpty || this.state.isStateEmpty || this.state.isZipCodeEmpty });
+    this.state.isStreetAddressEmpty || this.state.isCityEmpty || this.state.isStateEmpty || this.state.isZipCodeEmpty || this.state.isInvalidState });
   }
 
   async submitUserInfo() {
@@ -210,23 +219,17 @@ class RegisterForm extends React.Component {
          onChange={(event) => this.setState({ city: event.target.value })}
          errorText={this.state.isCityEmpty ? 'City is required' : ''}
         /><br />
-        <SelectField
-          type='text'
-          value={this.state.state}
-          onChange={this.handleStateChange}
+        <AutoComplete
+          searchText={this.state.state}
+          onUpdateInput={this.handleUpdateInput}
           floatingLabelText="State"
           floatingLabelFixed={true}
+          dataSource={usStates}
+          filter={AutoComplete.fuzzyFilter}
           style={styles.field}
-          errorText={this.state.isStateEmpty ? 'State is required' : ''}
-        >
-          {['AK','AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','GU','HI',
-          'IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MH','MI','MN','MO',
-          'MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA',
-          'PR','PW','RI','SC','SD','TN','TX','UT','VA','VI','VT','WA','WI',
-          'WV','WY'].map((state, key) => {
-            return <MenuItem key={key} value={state} primaryText={state} />
-          })}
-        </SelectField><br />
+          openOnFocus={true}
+          errorText={this.state.isStateEmpty ? 'State is required' : this.state.isInvalidState ? 'Must be a valid US state abbreviation' : ''}
+        /><br />
         <TextField
          type='text'
          floatingLabelText="Zip Code"
