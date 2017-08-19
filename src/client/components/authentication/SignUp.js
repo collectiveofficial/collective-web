@@ -247,9 +247,9 @@ class SignUp extends React.Component {
                       position="right center"
                     /><br />
                   </div>
+                  <br />
+                  <RaisedButton label="Continue" primary={true} onTouchTap={this.handleEmailContinue} /><br /><br />
                 </div>
-                <br />
-                <RaisedButton label="Continue" primary={true} onTouchTap={this.handleEmailContinue} /><br /><br />
                 <button
                   className={s.loginBtn}
                   id="btn-social-login"
@@ -257,11 +257,6 @@ class SignUp extends React.Component {
                 >
                   Continue with Facebook
                 </button>
-                {/* {this.props.userAuthorized ?
-                  <Redirect to="/home" />
-                  :
-                  <div></div>
-                } */}
               </div>
             }
           </div>
