@@ -56,12 +56,6 @@ class SignUp extends React.Component {
       } else {
         this.setState({ isWeakPassword: false });
       }
-      // if (errorCode === 'auth/email-already-in-use') {
-      //   this.setState({ isEmailAlreadyInUse: true });
-      //   this.setState({ passwordErrorMessage: 'This email is already in use. Please log in or register with another email.' });
-      // } else {
-      //   this.setState({ isEmailAlreadyInUse: false });
-      // }
       console.log(error);
     });
   }
@@ -149,8 +143,9 @@ class SignUp extends React.Component {
         // go through logic
         if (this.state.isPasswordValidated) {
           firebaseEmailSignUpUser = await this.createNativeUser(this.state.emailInput, this.state.passwordInput);
-          // const sendEmailVerification = await firebaseEmailSignUpUser.sendEmailVerification();
-          // await console.log('sendEmailVerification successful.');
+          const currentFirebaseUser = await firebaseAuth().currentUser;
+          const sendEmailVerification = await currentFirebaseUser.sendEmailVerification();
+          await console.log('sendEmailVerification successful.');
         }
         const isValidLogin = !(this.state.isInvalidEmail || this.state.isEmailAlreadyInUse);
         if (isValidLogin && this.state.isPasswordValidated) {
@@ -247,9 +242,9 @@ class SignUp extends React.Component {
                       position="right center"
                     /><br />
                   </div>
+                  <br />
+                  <RaisedButton label="Continue" primary={true} onTouchTap={this.handleEmailContinue} /><br /><br />
                 </div>
-                <br />
-                <RaisedButton label="Continue" primary={true} onTouchTap={this.handleEmailContinue} /><br /><br />
                 <button
                   className={s.loginBtn}
                   id="btn-social-login"
@@ -257,11 +252,6 @@ class SignUp extends React.Component {
                 >
                   Continue with Facebook
                 </button>
-                {/* {this.props.userAuthorized ?
-                  <Redirect to="/home" />
-                  :
-                  <div></div>
-                } */}
               </div>
             }
           </div>
