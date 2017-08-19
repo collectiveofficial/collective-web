@@ -5,12 +5,9 @@ import {
   Link,
   Redirect
 } from 'react-router-dom';
-import firebase from 'firebase';
 import s from './Register.css';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Modal } from 'semantic-ui-react';
 
