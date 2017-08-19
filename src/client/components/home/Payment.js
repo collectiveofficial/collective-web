@@ -119,7 +119,6 @@ class Payment extends React.Component {
     }
   }
 
-
   render() {
     const styles = {
       stripe: {
@@ -130,7 +129,6 @@ class Payment extends React.Component {
         float: 'right',
       },
     };
-
 
     return (
       <div>
@@ -206,11 +204,6 @@ class Payment extends React.Component {
                               <p>web hosting services and other partners to bring you the best experience possible. The total amount</p>
                               <p> includes transaction fees for our payment providers and a small processing fee to cover web hosting</p>
                               <p>and other infrastructure services. If you have any questions please contact us through our feedback <a href="https://docs.google.com/forms/d/e/1FAIpQLSdMJUSKNvto7jxcY800Z3ocrU7Hu7CSeu5B7M6s9ZJr7vGyzA/viewform?usp=sf_link" target="/blank">form</a>.</p>
-                              {/* <p>We made this app to make it easier for everyone to vote and organize, on the buyer side as well as the seller side.</p>
-                              <p>The hope is that having a more automated system can allow us to put less hours into organizing bulk buys</p>
-                              <p>so that we can serve more. But, with that, comes payment transaction fees and hosting fees just to keep the site up.</p>
-                              <p>So your total will contain a small standard transaction fee for using Stripe (2.9% = $.30) as well as</p>
-                              <p>a small processing fee to cover web hosting. If you have any questions please contact us through our feedback <a href="https://docs.google.com/forms/d/e/1FAIpQLSdMJUSKNvto7jxcY800Z3ocrU7Hu7CSeu5B7M6s9ZJr7vGyzA/viewform?usp=sf_link" target="/blank">form</a>.</p> */}
                               </Modal.Description>
                           </Modal.Content>
                         </Modal>

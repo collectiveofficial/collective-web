@@ -218,7 +218,6 @@ class App extends Component {
       },
       body: JSON.stringify({
         firebaseAccessToken: this.state.firebaseAccessToken,
-        dropoffID: 1,
       }),
     })
     const initialDataLoadResults = await initialDataLoad.json();
@@ -234,7 +233,7 @@ class App extends Component {
     return (
       <MuiThemeProvider>
         <div>
-          <Header authenticated={this.state.authenticated} logOut={this.logOut} showUser={this.showUser} />
+          <Header authenticated={this.state.authenticated} logOut={this.logOut} showUser={this.showUser} userAuthorized={this.state.userAuthorized} />
           <Switch>
             <DenyAuthorizedRoute userAuthorized={this.state.userAuthorized} path='/' exact component={() =>
               (<SignUp
