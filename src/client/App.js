@@ -210,13 +210,13 @@ class App extends Component {
       await this.authorizeUser();
     } else if ((userAlreadyExists && !hasUserFinishedSignUp)) {
       // await this.setRouteToRegisterFormState(true);
-      this.props.appActionCreators.setRouteToRegisterForm(true);
+      this.props.dispatch(appActionCreators.setRouteToRegisterForm(true));
     } else if (saveUserOnFacebookSignUpExecuted) {
       const currentFirebaseUser = await firebaseAuth().currentUser;
       const sendEmailVerification = await currentFirebaseUser.sendEmailVerification();
       await console.log('sendEmailVerification successful.');
       // await this.setRouteToRegisterFormState(true);
-      this.props.appActionCreators.setRouteToRegisterForm(true);
+      this.props.dispatch(appActionCreators.setRouteToRegisterForm(true));
     }
   }
 
