@@ -25,7 +25,7 @@ class Header extends Component {
             {this.props.userAuthorized ?
               <div>
                 <Link className={s.link, s.highlight} to="/voting">Vote Now</Link>
-                <Link className={s.link} to="/settings">Settings</Link>
+                <Link className={s.link} to="/order-info">Order Info</Link>
               </div>
               :
               <div></div>

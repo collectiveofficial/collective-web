@@ -24,7 +24,7 @@ import { nativeLogout } from './utils/auth.js';
 import Terms from './components/legal/collectiveterms.js';
 import BFFTerms from './components/legal/BFFterms.js';
 import Privacy from './components/legal/privacypolicy.js';
-import Settings from './components/settings/Settings.js';
+import OrderInfo from './components/orderInfo/OrderInfo.js';
 
 initReactFastclick();
 // if ('ontouchstart' in document.documentElement) {
@@ -280,8 +280,8 @@ class App extends Component {
                 firebaseAccessToken={this.state.firebaseAccessToken}
               />)}
             />
-            <PrivateRoute userAuthorized={this.state.userAuthorized} path="/settings" component={() =>
-              (<Settings
+            <PrivateRoute userAuthorized={this.state.userAuthorized} path="/order-info" component={() =>
+              (<OrderInfo
                 userTransactionHistory={this.state.userTransactionHistory}
               />)} />
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/foodwiki" component={foodwiki} />
