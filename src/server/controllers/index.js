@@ -3,6 +3,7 @@ const request = require('request-promise');
 const dotenv = require('dotenv').config();
 const twilio = require('twilio');
 const cron = require('cron');
+const fs = require('fs');
 const userUtil = require('../models/user');
 const dropoffUtil = require('../models/dropoff');
 const foodUtil = require('../models/food');
@@ -10,6 +11,7 @@ const ballotUtil = require('../models/ballot');
 const voteUtil = require('../models/vote');
 const transactionUtil = require('../models/transaction');
 const admin = require('firebase-admin');
+const json2csv = require('json2csv');
 const moment = require('moment-timezone');
 const configureStripe = require('stripe');
 let STRIPE_SECRET_KEY;
@@ -132,12 +134,55 @@ const initializeData = async () => {
     const doesBallotExist = await ballotUtil.doesBallotExist();
     if (!doesBallotExist) {
       // populate ballots first drop's food items for first dropoff
+      // TODO: dynamic dropoffID
       await ballotUtil.populateBallots(1, voteDateTimeBeg, voteDateTimeEnd);
     }
   };
+
+  const sendNightlyCSVupdates = async () => {
+    // TODO: dynamic dropoffID
+    const dropoffID = 1;
+    let fields;
+    let csv;
+    let fileName;
+
+    const sendFoodNamesAndVoteCounts = async () => {
+      // just food name and vote count for now
+      fields = ['Food Name', 'Vote Count'];
+      const foodNamesAndVoteCounts = await ballotUtil.getFoodNamesAndVoteCounts(dropoffID);
+      csv = json2csv({ data: foodNamesAndVoteCounts, fields });
+      fileName = 'foodNamesAndVoteCounts.csv';
+      await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
+        if (err) {
+          console.log('file failed to create');
+          throw err;
+        }
+        console.log('file created');
+      });
+    };
+
+    const sendUserNamesAndPackagesOrdered = async () => {
+      fields = ['Last Name', 'First Name', 'Dorm Packages Ordered', 'Cooking Packages Ordered'];
+      // csv in ascending alphabetical order
+      const userNamesAndPackagesOrdered = await transactionUtil.getUserNamesAndPackagesOrdered(dropoffID);
+      csv = json2csv({ data: userNamesAndPackagesOrdered, fields });
+      fileName = 'userNamesAndPackagesOrdered.csv';
+      await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
+        if (err) {
+          console.log('file failed to create');
+          throw err;
+        }
+        console.log('file created');
+      });
+    };
+    await sendFoodNamesAndVoteCounts();
+    await sendUserNamesAndPackagesOrdered();
+  };
+
   await initializeFirstDropoff();
   await initializeFirstDropFoodItems();
   await initializeFirstDropBallots();
+  await sendNightlyCSVupdates();
 };
 
 initializeData();

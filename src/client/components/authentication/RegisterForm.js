@@ -41,7 +41,6 @@ class RegisterForm extends React.Component {
       isCityEmpty: false,
       isStateEmpty: false,
       isZipCodeEmpty: false,
-      userAuthorized: false,
       areThereEmptyFields: '',
       isInvalidState: false,
     };
@@ -51,7 +50,6 @@ class RegisterForm extends React.Component {
     this.transferUserSignup = this.transferUserSignup.bind(this);
     this.submitUserInfo = this.submitUserInfo.bind(this);
     this.areThereEmptyFields = this.areThereEmptyFields.bind(this);
-    this.handleUpdateInput = this.handleUpdateInput.bind(this);
   }
 
   componentDidMount() {
@@ -77,10 +75,6 @@ class RegisterForm extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
     alert('A name was submitted: ' + this.state.value);
-  }
-
-  handleUpdateInput(state) {
-    this.setState({ state });
   }
 
   async areThereEmptyFields() {
@@ -138,7 +132,6 @@ class RegisterForm extends React.Component {
         body: JSON.stringify({
           firstName: this.state.firstName,
           lastName: this.state.lastName,
-          // school: this.state.school,
           phoneNumber: this.state.phoneNumber,
           birthday: this.state.birthday,
           streetAddress: this.state.streetAddress,
@@ -221,7 +214,7 @@ class RegisterForm extends React.Component {
         /><br />
         <AutoComplete
           searchText={this.state.state}
-          onUpdateInput={this.handleUpdateInput}
+          onUpdateInput={state => this.setState({ state: state.toUpperCase() })}
           floatingLabelText="State"
           floatingLabelFixed={true}
           dataSource={usStates}
@@ -247,11 +240,6 @@ class RegisterForm extends React.Component {
            <Modal.Actions>
              <RaisedButton label="Cancel" secondary={true} onTouchTap={() => { this.setState({ areThereEmptyFields: '' }); }} />
              <RaisedButton label="Continue" primary={true} onTouchTap={this.submitUserInfo} /><br /><br />
-             {this.state.userAuthorized ?
-               <Redirect to="/home" />
-               :
-               <div></div>
-             }
            </Modal.Actions>
          </Modal>
       </div>
