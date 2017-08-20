@@ -139,54 +139,53 @@ const initializeData = async () => {
     }
   };
 
+  const sendNightlyCSVupdates = async () => {
+    // TODO: dynamic dropoffID
+    const dropoffID = 1;
+    let fields;
+    let csv;
+    let fileName;
+
+    const sendFoodNamesAndVoteCounts = async () => {
+      // just food name and vote count for now
+      fields = ['Food Name', 'Vote Count'];
+      const foodNamesAndVoteCounts = await ballotUtil.getFoodNamesAndVoteCounts(dropoffID);
+      csv = json2csv({ data: foodNamesAndVoteCounts, fields });
+      fileName = 'foodNamesAndVoteCounts.csv';
+      await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
+        if (err) {
+          console.log('file failed to create');
+          throw err;
+        }
+        console.log('file created');
+      });
+    };
+
+    const sendUserNamesAndPackagesOrdered = async () => {
+      fields = ['Last Name', 'First Name', 'Dorm Packages Ordered', 'Cooking Packages Ordered'];
+      // csv in ascending alphabetical order
+      const userNamesAndPackagesOrdered = await transactionUtil.getUserNamesAndPackagesOrdered(dropoffID);
+      csv = json2csv({ data: userNamesAndPackagesOrdered, fields });
+      fileName = 'userNamesAndPackagesOrdered.csv';
+      await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
+        if (err) {
+          console.log('file failed to create');
+          throw err;
+        }
+        console.log('file created');
+      });
+    };
+    await sendFoodNamesAndVoteCounts();
+    await sendUserNamesAndPackagesOrdered();
+  };
 
   await initializeFirstDropoff();
   await initializeFirstDropFoodItems();
   await initializeFirstDropBallots();
-};
-
-const sendNightlyCSVupdates = async () => {
-  // TODO: dynamic dropoffID
-  const dropoffID = 1;
-  let fields;
-  let csv;
-  let fileName;
-
-  const sendFoodNamesAndVoteCounts = async () => {
-    // just food name and vote count for now
-    fields = ['Food Name', 'Vote Count'];
-    const foodNamesAndVoteCounts = await ballotUtil.getFoodNamesAndVoteCounts(dropoffID);
-    csv = json2csv({ data: foodNamesAndVoteCounts, fields });
-    fileName = 'foodNamesAndVoteCounts.csv';
-    await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
-      if (err) {
-        console.log('file failed to create');
-        throw err;
-      }
-      console.log('file created');
-    });
-  };
-
-  const sendUserNamesAndPackagesOrdered = async () => {
-    fields = ['Last Name', 'First Name', 'Dorm Packages Ordered', 'Cooking Packages Ordered'];
-    // csv in ascending alphabetical order
-    const userNamesAndPackagesOrdered = await transactionUtil.getUserNamesAndPackagesOrdered(dropoffID);
-    csv = json2csv({ data: userNamesAndPackagesOrdered, fields });
-    fileName = 'userNamesAndPackagesOrdered.csv';
-    await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
-      if (err) {
-        console.log('file failed to create');
-        throw err;
-      }
-      console.log('file created');
-    });
-  };
-  await sendFoodNamesAndVoteCounts();
-  await sendUserNamesAndPackagesOrdered();
+  await sendNightlyCSVupdates();
 };
 
 initializeData();
-sendNightlyCSVupdates();
 
 console.log(firebaseAdminApp);
 
