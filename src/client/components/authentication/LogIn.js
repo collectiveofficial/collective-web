@@ -235,7 +235,7 @@ const mapStateToProps = (state, props) => {
   return {
     // appReducers
     userAuthorized: state.appReducer._userAuthorized,
-    firebaseAccessToken: state.appReducers._firebaseAccessToken,
+    firebaseAccessToken: state.appReducer._firebaseAccessToken,
     routeToRegisterForm: state.appReducer._routeToRegisterForm,
     userWantsEmailSignup: state.appReducer._userWantsEmailSignup,
     facebookData: state.appReducer._facebookData,
