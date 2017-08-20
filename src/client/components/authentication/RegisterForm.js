@@ -41,7 +41,6 @@ class RegisterForm extends React.Component {
       isCityEmpty: false,
       isStateEmpty: false,
       isZipCodeEmpty: false,
-      userAuthorized: false,
       areThereEmptyFields: '',
       isInvalidState: false,
     };
@@ -241,11 +240,6 @@ class RegisterForm extends React.Component {
            <Modal.Actions>
              <RaisedButton label="Cancel" secondary={true} onTouchTap={() => { this.setState({ areThereEmptyFields: '' }); }} />
              <RaisedButton label="Continue" primary={true} onTouchTap={this.submitUserInfo} /><br /><br />
-             {this.state.userAuthorized ?
-               <Redirect to="/home" />
-               :
-               <div></div>
-             }
            </Modal.Actions>
          </Modal>
       </div>

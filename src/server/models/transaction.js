@@ -37,3 +37,28 @@ module.exports.checkTransaction = async (requestBody) => {
     return { hasUserPaid: false };
   }
 };
+
+module.exports.getUserNamesAndPackagesOrdered = async (dropoffID) => {
+  let userNamesAndPackagesOrdered = [];
+  const transactions = await models.Transaction.findAll({
+    where: {
+      dropoffID,
+    },
+  });
+  for (let i = 0; i < transactions.length; i++) {
+    const nameObj = await userUtil.findUserNameByID(transactions[i].dataValues.userID);
+    const dataObj = {
+      'Last Name': nameObj.lastName,
+      'First Name': nameObj.firstName,
+      'Dorm Packages Ordered': transactions[i].dataValues.dormPackagesOrdered,
+      'Cooking Packages Ordered': transactions[i].dataValues.cookingPackagesOrdered,
+    };
+    userNamesAndPackagesOrdered.push(dataObj);
+  }
+  userNamesAndPackagesOrdered = userNamesAndPackagesOrdered.sort((a, b) => {
+    const lastNameA = a['Last Name'].toUpperCase();
+    const lastNameB = b['Last Name'].toUpperCase();
+    return (lastNameA < lastNameB) ? -1 : (lastNameA > lastNameB) ? 1 : 0;
+  });
+  return userNamesAndPackagesOrdered;
+};
