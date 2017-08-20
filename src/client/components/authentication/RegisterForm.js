@@ -5,6 +5,9 @@ import {
   Link,
   Redirect
 } from 'react-router-dom';
+import { connect } from 'react-redux';
+import * as loginActionCreators from '../../action-creators/loginActions';
+import * as registerActionCreators from '../../action-creators/registerActions';
 import s from './Register.css';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
@@ -22,29 +25,6 @@ const usStates = ['AK','AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','GU','H
 class RegisterForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phoneNumber: '',
-      birthday: '',
-      streetAddress: '',
-      aptSuite: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      isFirstNameEmpty: false,
-      isLastNameEmpty: false,
-      isPhoneNumberEmpty: false,
-      isBirthdayEmpty: false,
-      isStreetAddressEmpty: false,
-      isCityEmpty: false,
-      isStateEmpty: false,
-      isZipCodeEmpty: false,
-      userAuthorized: false,
-      areThereEmptyFields: '',
-      isInvalidState: false,
-    };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -61,74 +41,101 @@ class RegisterForm extends React.Component {
 
   async transferUserSignup() {
     if (this.props.userWantsEmailSignup) {
-      await this.setState({ email: this.props.emailInput });
+      // await this.setState({ emailInput: this.props.emailInput });
+      this.props.dispatch(loginActionCreators.setEmailInput(this.props.emailInput));
     } else {
-      await this.setState({ email: this.props.facebookData.email });
-      await this.setState({ firstName: this.props.facebookData.first_name });
-      await this.setState({ lastName: this.props.facebookData.last_name });
+      // await this.setState({ emailInput: this.props.facebookData.email });
+      // await this.setState({ firstName: this.props.facebookData.first_name });
+      // await this.setState({ lastName: this.props.facebookData.last_name });
+      this.props.dispatch(loginActionCreators.setEmailInput(this.props.facebookData.email));
+      this.props.dispatch(registerActionCreators.setFirstName(this.props.facebookData.first_name ));
+      this.props.dispatch(registerActionCreators.setLastName(this.props.facebookData.last_name ));
     }
   }
 
   handleChange(event) {
     event.preventDefault();
-    this.setState({ value: event.target.value });
+    // this.setState({ value: event.target.value });
+    this.props.dispatch(registerActionCreators.setValue(event.target.value));
   }
 
   handleSubmit(event) {
     event.preventDefault();
-    alert('A name was submitted: ' + this.state.value);
+    alert('A name was submitted: ' + this.props.value);
   }
 
   handleUpdateInput(state) {
-    this.setState({ state });
+    // this.setState({ state });
+    this.props.dispatch(registerActionCreators.setState(state));
   }
 
   async areThereEmptyFields() {
-    await this.setState({ isFirstNameEmpty: false });
-    await this.setState({ isLastNameEmpty: false });
-    await this.setState({ isPhoneNumberEmpty: false });
-    await this.setState({ isBirthdayEmpty: false });
-    await this.setState({ isStreetAddressEmpty: false });
-    await this.setState({ isCityEmpty: false });
-    await this.setState({ isStateEmpty: false });
-    await this.setState({ isZipCodeEmpty: false });
-    this.setState({ isInvalidState: false });
+    // await this.setState({ isFirstNameEmpty: false });
+    // await this.setState({ isLastNameEmpty: false });
+    // await this.setState({ isPhoneNumberEmpty: false });
+    // await this.setState({ isBirthdayEmpty: false });
+    // await this.setState({ isStreetAddressEmpty: false });
+    // await this.setState({ isCityEmpty: false });
+    // await this.setState({ isStateEmpty: false });
+    // await this.setState({ isZipcodeEmpty: false });
+    // this.setState({ isInvalidState: false });
+    this.props.dispatch(registerActionCreators.setIsFirstNameEmpty(false));
+    this.props.dispatch(registerActionCreators.setIsLastNameEmpty(false));
+    this.props.dispatch(registerActionCreators.setIsPhoneNumberEmpty(false));
+    this.props.dispatch(registerActionCreators.setIsBirthdayEmpty(false));
+    this.props.dispatch(registerActionCreators.setIsStreetAddressEmpty(false));
+    this.props.dispatch(registerActionCreators.setIsCityEmpty(false));
+    this.props.dispatch(registerActionCreators.setIsStateEmpty(false));
+    this.props.dispatch(registerActionCreators.setIsZipcodeEmpty(false));
+    this.props.dispatch(registerActionCreators.setIsInvalidState(false));
 
-    if (this.state.firstName.length === 0) {
-      await this.setState({ isFirstNameEmpty: true });
+    if (this.props.firstName.length === 0) {
+      // await this.setState({ isFirstNameEmpty: true });
+      this.props.dispatch(registerActionCreators.setIsFirstNameEmpty(true));
     }
-    if (this.state.lastName.length === 0) {
-      await this.setState({ isLastNameEmpty: true });
+    if (this.props.lastName.length === 0) {
+      // await this.setState({ isLastNameEmpty: true });
+      this.props.dispatch(registerActionCreators.setIsLastNameEmpty(true));
     }
-    if (this.state.phoneNumber.length === 0) {
-      await this.setState({ isPhoneNumberEmpty: true });
+    if (this.props.phoneNumber.length === 0) {
+      // await this.setState({ isPhoneNumberEmpty: true });
+      this.props.dispatch(registerActionCreators.setIsPhoneNumberEmpty(true));
     }
-    if (this.state.birthday.length === 0) {
-      await this.setState({ isBirthdayEmpty: true });
+    if (this.props.birthday.length === 0) {
+      // await this.setState({ isBirthdayEmpty: true });
+      this.props.dispatch(registerActionCreators.setIsBirthdayEmpty(true));
     }
-    if (this.state.streetAddress.length === 0) {
-      await this.setState({ isStreetAddressEmpty: true });
+    if (this.props.streetAddress.length === 0) {
+      // await this.setState({ isStreetAddressEmpty: true });
+      this.props.dispatch(registerActionCreators.setIsStreetAddressEmpty(true));
     }
-    if (this.state.city.length === 0) {
-      await this.setState({ isCityEmpty: true });
+    if (this.props.city.length === 0) {
+      // await this.setState({ isCityEmpty: true });
+      this.props.dispatch(registerActionCreators.setIsCityEmpty(true));
     }
-    if (this.state.state.length === 0) {
-      await this.setState({ isStateEmpty: true });
+    if (this.props.state.length === 0) {
+      // await this.setState({ isStateEmpty: true });
+      this.props.dispatch(registerActionCreators.setIsStateEmpty(true));
     }
-    if (this.state.zipCode.length === 0) {
-      await this.setState({ isZipCodeEmpty: true });
+    if (this.props.zipcode.length === 0) {
+      // await this.setState({ isZipcodeEmpty: true });
+      this.props.dispatch(registerActionCreators.setIsZipcodeEmpty(true));
     }
-    if (usStates.indexOf(this.state.state) < 0) {
-      this.setState({ isInvalidState: true });
+    if (usStates.indexOf(this.props.state) < 0) {
+      // this.setState({ isInvalidState: true });
+      this.props.dispatch(registerActionCreators.setIsInvalidState(true));
     }
 
-    await this.setState({ areThereEmptyFields: this.state.isFirstNameEmpty || this.state.isLastNameEmpty || this.state.isPhoneNumberEmpty || this.state.isBirthdayEmpty ||
-    this.state.isStreetAddressEmpty || this.state.isCityEmpty || this.state.isStateEmpty || this.state.isZipCodeEmpty || this.state.isInvalidState });
+    // await this.setState({ areThereEmptyFields: this.props.isFirstNameEmpty || this.props.isLastNameEmpty || this.props.isPhoneNumberEmpty || this.props.isBirthdayEmpty ||
+    // this.props.isStreetAddressEmpty || this.props.isCityEmpty || this.props.isStateEmpty || this.props.isZipcodeEmpty || this.props.isInvalidState });
+    this.props.dispatch(registerActionCreators.setAreThereEmptyFields(this.props.isFirstNameEmpty || this.props.isLastNameEmpty || this.props.isPhoneNumberEmpty || this.props.isBirthdayEmpty ||
+    this.props.isStreetAddressEmpty || this.props.isCityEmpty || this.props.isStateEmpty || this.props.isZipcodeEmpty || this.props.isInvalidState));
+    //TODO REFACTOR ^^
   }
 
   async submitUserInfo() {
     await this.areThereEmptyFields();
-    if (this.state.areThereEmptyFields === false) {
+    if (this.props.areThereEmptyFields === false) {
       const response = await fetch('/auth/register-form/submit', {
         method: 'POST',
         headers: {
@@ -136,16 +143,16 @@ class RegisterForm extends React.Component {
           'Content-Type': 'application/json; charset=utf-8'
         },
         body: JSON.stringify({
-          firstName: this.state.firstName,
-          lastName: this.state.lastName,
-          // school: this.state.school,
-          phoneNumber: this.state.phoneNumber,
-          birthday: this.state.birthday,
-          streetAddress: this.state.streetAddress,
-          aptSuite: this.state.aptSuite,
-          city: this.state.city,
-          state: this.state.state,
-          zipCode: this.state.zipCode,
+          firstName: this.props.firstName,
+          lastName: this.props.lastName,
+          // school: this.props.school,
+          phoneNumber: this.props.phoneNumber,
+          birthday: this.props.birthday,
+          streetAddress: this.props.streetAddress,
+          aptSuite: this.props.aptSuite,
+          city: this.props.city,
+          state: this.props.state,
+          zipcode: this.props.zipcode,
           firebaseAccessToken: this.props.firebaseAccessToken,
         }),
       })
@@ -164,63 +171,70 @@ class RegisterForm extends React.Component {
       <form onSubmit={this.handleSubmit}>
         <TextField
           type='text'
-          value={this.state.firstName}
+          value={this.props.firstName}
           floatingLabelText="First Name"
           floatingLabelFixed={true}
           style={styles.field}
-          onChange={(event) => this.setState({ firstName: event.target.value })}
-          errorText={this.state.isFirstNameEmpty ? 'First name is required' : ''}
+          /* onChange={(event) => this.setState({ firstName: event.target.value })}*/
+          onChange={(event) => this.props.dispatch(registerActionCreators.setFirstName(event.target.value))}
+          errorText={this.props.isFirstNameEmpty ? 'First name is required' : ''}
         /><br />
         <TextField
           type='text'
-          value={this.state.lastName}
+          value={this.props.lastName}
           floatingLabelText="Last Name"
           floatingLabelFixed={true}
           style={styles.field}
-          onChange={(event) => this.setState({ lastName: event.target.value })}
-          errorText={this.state.isLastNameEmpty ? 'Last name is required' : ''}
+          /* onChange={(event) => this.setState({ lastName: event.target.value })} */
+          onChange={(event) => this.props.dispatch(registerActionCreators.setLastName(event.target.value))}
+          errorText={this.props.isLastNameEmpty ? 'Last name is required' : ''}
         /><br />
         <TextField
          type='date'
          floatingLabelText="Date of Birth"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.setState({ birthday: event.target.value })}
-         errorText={this.state.isBirthdayEmpty ? 'Birthday is required' : ''}
+        /*  onChange={(event) => this.setState({ birthday: event.target.value })} */
+         onChange={(event) => this.props.dispatch(registerActionCreators.setBirthday(event.target.value))}
+         errorText={this.props.isBirthdayEmpty ? 'Birthday is required' : ''}
         /><br />
         <TextField
          type='tel'
          floatingLabelText="Cell Phone"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.setState({ phoneNumber: event.target.value })}
-         errorText={this.state.isPhoneNumberEmpty ? 'Phone number is required' : ''}
+        /*  onChange={(event) => this.setState({ phoneNumber: event.target.value })} */
+         onChange={(event) => this.props.dispatch(registerActionCreators.setPhoneNumber(event.target.value))}
+         errorText={this.props.isPhoneNumberEmpty ? 'Phone number is required' : ''}
         /><br />
         <TextField
          type='text'
          floatingLabelText="Street Address"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.setState({ streetAddress: event.target.value })}
-         errorText={this.state.isStreetAddressEmpty ? 'Street address is required' : ''}
+        /*  onChange={(event) => this.setState({ streetAddress: event.target.value })} */
+         onChange={(event) => this.props.dispatch(registerActionCreators.setStreetAddress(event.target.value))}
+         errorText={this.props.isStreetAddressEmpty ? 'Street address is required' : ''}
         /><br />
         <TextField
          type='text'
          floatingLabelText="Apt #/Suite"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.setState({ aptSuite: event.target.value })}
+        /*  onChange={(event) => this.setState({ aptSuite: event.target.value })}*/
+         onChange={(event) => this.props.dispatch(registerActionCreators.setAptSuite(event.target.value))}
         /><br />
         <TextField
          type='text'
          floatingLabelText="City"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.setState({ city: event.target.value })}
-         errorText={this.state.isCityEmpty ? 'City is required' : ''}
+        /* onChange={(event) => this.setState({ city: event.target.value })}*/
+         onChange={(event) => this.props.dispatch(registerActionCreators.setCity(event.target.value))}
+         errorText={this.props.isCityEmpty ? 'City is required' : ''}
         /><br />
-        <AutoComplete
-          searchText={this.state.state}
+        <AutoComplete /* TODO BUG HERE*/
+          searchText={this.props.state}
           onUpdateInput={this.handleUpdateInput}
           floatingLabelText="State"
           floatingLabelFixed={true}
@@ -228,30 +242,27 @@ class RegisterForm extends React.Component {
           filter={AutoComplete.fuzzyFilter}
           style={styles.field}
           openOnFocus={true}
-          errorText={this.state.isStateEmpty ? 'State is required' : this.state.isInvalidState ? 'Must be a valid US state abbreviation' : ''}
+          errorText={this.props.isStateEmpty ? 'State is required' : this.props.isInvalidState ? 'Must be a valid US state abbreviation' : ''}
         /><br />
         <TextField
          type='text'
          floatingLabelText="Zip Code"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.setState({ zipCode: event.target.value })}
-         errorText={this.state.isZipCodeEmpty ? 'Zip code is required' : ''}
+        /*  onChange={(event) => this.setState({ zipcode: event.target.value })}*/
+         onChange={(event) => this.props.dispatch(registerActionCreators.setZipcode(event.target.value))}
+         errorText={this.props.isZipcodeEmpty ? 'Zip code is required' : ''}
         /><br />
        <div>
          <RaisedButton label="Submit" primary={true} onTouchTap={this.areThereEmptyFields} /><br /><br />
-         <Modal open={this.state.areThereEmptyFields === false}>
+         <Modal open={this.props.areThereEmptyFields === false}>
            <Modal.Content>
              <p>By clicking continue I have read and agreed to Collective's <Link to="terms">terms of use</Link> and <Link to="privacy">privacy policy</Link> as well as Best Food Forward's <Link to="bff">terms of use</Link>, and I agree to not hold any involved individuals or entities liable for anything related to the use, consumption, storage, or purchasing of food within this site.</p>
            </Modal.Content>
            <Modal.Actions>
-             <RaisedButton label="Cancel" secondary={true} onTouchTap={() => { this.setState({ areThereEmptyFields: '' }); }} />
+            /*  <RaisedButton label="Cancel" secondary={true} onTouchTap={() => { this.setState({ areThereEmptyFields: '' }); }} />*/
+             <RaisedButton label="Cancel" secondary={true} onTouchTap={() => { this.props.dispatch(registerActionCreators.setAreThereEmptyFields('')); }} />
              <RaisedButton label="Continue" primary={true} onTouchTap={this.submitUserInfo} /><br /><br />
-             {this.state.userAuthorized ?
-               <Redirect to="/home" />
-               :
-               <div></div>
-             }
            </Modal.Actions>
          </Modal>
       </div>
@@ -260,4 +271,42 @@ class RegisterForm extends React.Component {
   }
 }
 
-export default RegisterForm;
+const mapStateToProps = (state, props) => {
+  return {
+    // appReducers
+    userAuthorized: state.appReducer._userAuthorized,
+    firebaseAccessToken: state.appReducer._firebaseAccessToken,
+    userWantsEmailSignup: state.appReducer._userWantsEmailSignup,
+    facebookData: state.appReducer._facebookData,
+
+    // loginReducers
+    emailInput: state.loginReducer._emailInput,
+    passwordInput: state.loginReducer._passwordInput,
+
+    //registerReducers
+    firstName: state.registerReducer._firstName,
+    lastName: state.registerReducer._lastName,
+    phoneNumber: state.registerReducer._phoneNumber,
+    birthday: state.registerReducer._birthday,
+    streetAddress: state.registerReducer._streetAddress,
+    aptSuite: state.registerReducer._aptSuite,
+    city: state.registerReducer._city,
+    state: state.registerReducer._state,
+    zipcode: state.registerReducer._zipcode,
+    isFirstNameEmpty: state.registerReducer._isFirstNameEmpty,
+    isLastNameEmpty: state.registerReducer._isLastNameEmpty,
+    isPhoneNumberEmpty: state.registerReducer._isPhoneNumberEmpty,
+    isBirthdayEmpty: state.registerReducer._isBirthdayEmpty,
+    isStreetAddressEmpty: state.registerReducer._isStreetAddressEmpty,
+    isCityEmpty: state.registerReducer._isCityEmpty,
+    isStateEmpty: state.registerReducer._isStateEmpty,
+    isZipcodeEmpty: state.registerReducer._isZipcodeEmpty,
+    areThereEmptyFields: state.registerReducer._areThereEmptyFields,
+    isInvalidState: state.registerReducer._isInvalidState,
+    value: state.registerReducer._value // TODO rename
+  }
+};
+
+const ConnectedRegisterForm = connect(mapStateToProps)(RegisterForm);
+
+export default ConnectedRegisterForm;

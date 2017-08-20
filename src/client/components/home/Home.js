@@ -3,6 +3,8 @@ import {
   Route,
   Link
 } from 'react-router-dom';
+import { connect } from 'react-redux';
+import * as homeActionCreators from '../../action-creators/homeActions'
 import { Image, Modal } from 'semantic-ui-react';
 import s from './Home.css';
 import Voting from './Voting.js';
@@ -12,22 +14,6 @@ import {Button} from 'react-toolbox/lib/button';
 class Home extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      date: "26 August 2017 from 9am to Noon",
-      vote: "Voting window is from 11 August to 23 August",
-      remainingCalendar: [
-        ['9 September 2017',  "Voting window is from 27 August to 6 September"],
-      ['23 September 2017',  "Voting window is from 10 September to 20 September"],
-      ['7 October 2017',  "Voting window is from 24 September to 4 October"],
-      ['28 October 2017',  "Voting window is from 8 October to 25 October"],
-      ['10 November 2017', "Voting window is from 29 October to 8 November"],
-      ['2 December 2017',  "Voting window is from 11 November to 29 November"]
-      ],
-      items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
-      provider: "DNO Produce",
-      //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
-      location: "https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university",
-    };
   }
 
   render() {
@@ -45,17 +31,17 @@ class Home extends React.Component {
             </div>
             <Card style={{width: "800px", margin: "0 0 30px 0"}}>
               <CardTitle
-                title={this.state.date}
-                subtitle={this.state.vote}
+                title={this.props.date}
+                subtitle={this.props.vote}
               />
               <iframe
                 className={s.map}
-                src={this.state.location}
+                src={this.props.location}
                 ></iframe>
                 <div className={s.links}>
                   <Link className={s.link} to="/voting">Vote and Pay</Link>
                   <Modal trigger={<a className={s.link} href="javascript:void(0)">Provider info</a>} closeIcon="close">
-                    <Modal.Header>{this.state.provider}</Modal.Header>
+                    <Modal.Header>{this.props.provider}</Modal.Header>
                     <Modal.Content image>
                       <Image wrapped size='medium' src='https://static1.squarespace.com/static/560d50c5e4b0f68fd092a78f/t/577cfee7893fc03a12adcedb/1495464043705/?format=1500w' />
                       <Modal.Description>
@@ -70,7 +56,7 @@ class Home extends React.Component {
                   </Modal>
                 </div>
             </Card>
-            {this.state.remainingCalendar.map((x) => (
+            {this.props.remainingCalendar.map((x) => (
               <Card style={{width: "800px", margin: "0 0 30px 0"}}>
               <CardTitle
                 title={x[0]}
@@ -85,4 +71,19 @@ class Home extends React.Component {
   }
 }
 
-export default Home;
+const mapStateToProps = (state, props) => {
+  console.log('MAP STATE TO PROPS: ',state, props)
+  return {
+    authenticated: state.appReducer._userAuthenticated, // TODO RENAME
+    date: state.homeReducer._date,
+    vote: state.homeReducer._vote,
+    remainingCalendar: state.homeReducer._remainingCalendar,
+    items: state.homeReducer._items,
+    provider: state.homeReducer._provider,
+    location: state.homeReducer._location,
+  }
+};
+
+const ConnectedHome = connect(mapStateToProps)(Home);
+
+export default ConnectedHome;

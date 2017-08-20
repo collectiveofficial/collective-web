@@ -3,6 +3,7 @@ import {
   Route,
   Link
 } from 'react-router-dom';
+import { connect } from 'react-redux';
 import s from './Header.css';
 import RaisedButton from 'material-ui/RaisedButton';
 import { ref, firebaseAuth } from '../../config';
@@ -11,8 +12,6 @@ import { Button, Image, Modal } from 'semantic-ui-react';
 class Header extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
   }
 
   render() {
@@ -51,4 +50,12 @@ class Header extends Component {
   }
 }
 
-export default Header;
+const mapStateToProps = (state, props) => {
+  return {
+    authenticated: state.appReducer._userAuthenticated, // TODO RENAME
+    userAuthorized: state.appReducer._userAuthorized
+  }
+};
+
+const ConnectedHeader = connect(mapStateToProps)(Header);
+export default ConnectedHeader;

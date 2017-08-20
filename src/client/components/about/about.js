@@ -9,8 +9,6 @@ import { Icon, Popup, List, Image } from 'semantic-ui-react';
 class about extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
   }
 
   render() {

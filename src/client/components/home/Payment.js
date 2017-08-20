@@ -4,6 +4,8 @@ import {
   Link,
   Redirect,
 } from 'react-router-dom';
+import { connect } from 'react-redux';
+import * as paymentActionCreators from '../../action-creators/paymentActions'
 import s from './Home.css';
 import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
@@ -24,15 +26,6 @@ const numOptions = [
 class Payment extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      modalIsOpen: false,
-      price: 0,
-      paymentErrorMessage: '',
-      dorm: 0,
-      cook: 0,
-      hasPaymentCompleted: false,
-      votesSaved: false,
-    };
     this.handleDorm = this.handleDorm.bind(this);
     this.handleCook = this.handleCook.bind(this);
     this.onToken = this.onToken.bind(this);
@@ -40,17 +33,21 @@ class Payment extends React.Component {
   }
 
   handleDorm(e, { value }) {
-    this.setState({ dorm: value });
-    let newPrice = this.state.price;
-    newPrice = ((value * 6) + (this.state.cook * 11));
-    this.setState({ price: newPrice });
+    // this.setState({ dorm: value });
+    this.props.dispatch(paymentActionCreators.setDorm(value));
+    let newPrice = this.props.price;
+    newPrice = ((value * 6) + (this.props.cook * 11));
+    // this.setState({ price: newPrice });
+    this.props.dispatch(paymentActionCreators.setPrice(newPrice));
   }
 
   handleCook(e, { value }) {
-    this.setState({ cook: value });
-    let newPrice = this.state.price;
-    newPrice = ((this.state.dorm * 6) + (value * 11));
-    this.setState({ price: newPrice });
+    // this.setState({ cook: value });
+    this.props.dispatch(paymentActionCreators.setCook(value));
+    let newPrice = this.props.price;
+    newPrice = ((this.props.dorm * 6) + (value * 11));
+    // this.setState({ price: newPrice });
+    this.props.dispatch(paymentActionCreators.setPrice(newPrice));
   }
 
   async submitInitialVotes() {
@@ -72,21 +69,26 @@ class Payment extends React.Component {
     });
     const responseData = await response.json();
     if (responseData.votesSaved) {
-      this.setState({ votesSaved: true });
+      // this.setState({ votesSaved: true });
+      this.props.dispatch(paymentActionCreators.setVotesSaved(true));
     } else {
-      this.setState({ votesSaved: false });
+      // this.setState({ votesSaved: false });
+      this.props.dispatch(paymentActionCreators.setVotesSaved(false));
     }
   }
 
   async handlePayment() {
-    await this.setState({ paymentErrorMessage: '' });
-    if (this.state.price === 0) {
-      await this.setState({ paymentErrorMessage: 'Please specify an amount for the packages.' });
+    // await this.setState({ paymentErrorMessage: '' });
+    this.props.dispatch(paymentActionCreators.setPaymentErrorMessage(''));
+    if (this.props.price === 0) {
+      // await this.setState({ paymentErrorMessage: 'Please specify an amount for the packages.' });
+      this.props.dispatch(paymentActionCreators.setPaymentErrorMessage('Please specify an amount for the packages.'));
     }
   }
 
   async onToken(token) {
-    await this.setState({ hasPaymentCompleted: false });
+    // await this.setState({ hasPaymentCompleted: false });
+    this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(false));
     const email = await firebaseAuth().currentUser.email;
     console.log('--------> email: ', email);
     const submitPaymentResult = await fetch('/confirm-payment', {
@@ -98,24 +100,26 @@ class Payment extends React.Component {
       body: JSON.stringify({
         firebaseAccessToken: this.props.firebaseAccessToken,
         token,
-        // price: this.state.price,
+        // price: this.props.price,
         email,
-        dormPackagesOrdered: this.state.dorm,
-        cookingPackagesOrdered: this.state.cook,
+        dormPackagesOrdered: this.props.dorm,
+        cookingPackagesOrdered: this.props.cook,
       }),
     });
     const submitPaymentResultData = await submitPaymentResult.json();
     if (submitPaymentResultData.paymentCompleted) {
       await this.submitInitialVotes();
-      if (this.state.votesSaved) {
+      if (this.props.votesSaved) {
         alert(`Thank you for voting! Your votes are now recorded. Your receipt has been sent to ${submitPaymentResultData.emailSentTo}`);
-        await this.setState({ hasPaymentCompleted: true });
+        // await this.setState({ hasPaymentCompleted: true });
+        this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(true));
       } else {
         alert('Voting failed. Please contact Collective to resolve this issue. We appreciate your patience.');
       }
     } else {
       alert('Payment failed. Please contact Collective to resolve this issue. We appreciate your patience.');
-      await this.setState({ hasPaymentCompleted: false });
+      // await this.setState({ hasPaymentCompleted: false });
+      this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(false));
     }
   }
 
@@ -193,7 +197,7 @@ class Payment extends React.Component {
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
-                        Total = ${this.state.price} <Modal trigger={<Icon link size="large" name='help circle' />} basic size='small' closeIcon='close'>
+                        Total = ${this.props.price} <Modal trigger={<Icon link size="large" name='help circle' />} basic size='small' closeIcon='close'>
                           <Modal.Content image>
                             <Modal.Description>
                               <br /><br />
@@ -214,14 +218,14 @@ class Payment extends React.Component {
                     trigger={<Feed.Event onClick={this.handlePayment}>
                       <Feed.Content>
                         <Feed.Summary>
-                              {this.state.price > 0 ? (
+                              {this.props.price > 0 ? (
                                 <StripeCheckout
                                     // style={styles.stripe}
                                     name="Best Food Forward/Collective" // the pop-in header title
                                     description="Easy healthy eating" // the pop-in header subtitle
                                     ComponentClass="div"
                                     // panelLabel="Give Money" prepended to the amount in the bottom pay button
-                                    amount={this.state.price * 100} // cents
+                                    amount={this.props.price * 100} // cents
                                     currency="USD"
                                     stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
                                     email="bestfoodforward@osu.edu"
@@ -251,8 +255,8 @@ class Payment extends React.Component {
                       </Feed.Content>
                     </Feed.Event>
                     }
-                    content={this.state.paymentErrorMessage}
-                    open={this.state.paymentErrorMessage.length > 0}
+                    content={this.props.paymentErrorMessage}
+                    open={this.props.paymentErrorMessage.length > 0}
                     offset={20}
                     position="right center"
                   />
@@ -261,7 +265,7 @@ class Payment extends React.Component {
             </Card>
           </div>
         </div>
-        {this.state.hasPaymentCompleted ?
+        {this.props.hasPaymentCompleted ?
           <Redirect to="/home" />
           :
           <div></div>
@@ -271,4 +275,24 @@ class Payment extends React.Component {
   }
 }
 
-export default Payment;
+const mapStateToProps = (state, props) => {
+  return {
+    // App Reducers
+    ballotsAndVotes: state.appReducer._ballotsAndVotes,
+    firebaseAccessToken: state.appReducer._firebaseAccessToken,
+    // Payment reducers
+    modalIsOpen: state.paymentReducer._modalIsOpenState,
+    price: state.paymentReducer._price,
+    paymentErrorMessage: state.paymentReducer._paymentErrorMessage,
+    dorm: state.paymentReducer._dorm,
+    cook: state.paymentReducer._cook,
+    hasPaymentCompleted: state.paymentReducer._hasPaymentCompleted,
+    votesSaved: state.paymentReducer._votesSaved,
+  }
+};
+
+
+
+const ConnectedPayment = connect(mapStateToProps)(Payment);
+
+export default ConnectedPayment;

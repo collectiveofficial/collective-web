@@ -4,6 +4,9 @@ import {
   Link,
   Redirect,
 } from 'react-router-dom';
+import { connect } from 'react-redux';
+import * as appActionCreators from '../../action-creators/appActions'
+import * as votingActionCreators from '../../action-creators/votingActions' // TODO RENAME 2 VOTE
 import s from './Home.css';
 import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
@@ -13,14 +16,6 @@ import Payment from './Payment.js';
 class Voting extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      votes: 6,
-      price: 0,
-      voteErrorMessage: '',
-      allowContinueToPayment: '',
-      hasUserPaid: false,
-      votesHaveFinishedUpdating: '',
-    };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleContinueToPayment = this.handleContinueToPayment.bind(this);
@@ -35,7 +30,8 @@ class Voting extends React.Component {
           votes--;
         }
       }
-      await this.setState({ votes });
+      // await this.setState({ votes });
+      this.props.dispatch(votingActionCreators.setVotes(votes));
       const checkIfUserHasPaidResult = await fetch('/transaction/check', {
         method: 'POST',
         headers: {
@@ -48,12 +44,13 @@ class Voting extends React.Component {
         }),
       });
       const checkIfUserHasPaidResultData = await checkIfUserHasPaidResult.json();
-      this.setState({ hasUserPaid: checkIfUserHasPaidResultData.hasUserPaid });
+      // this.setState({ hasUserPaid: checkIfUserHasPaidResultData.hasUserPaid });
+      this.props.dispatch(votingActionCreators.setHasUserPaid(checkIfUserHasPaidResultData.hasUserPaid))
     }
   }
 
   handleChange(e, { value, checked }) {
-    if (this.state.votes === 0 && checked === true) {
+    if (this.props.votes === 0 && checked === true) {
       checked = false;
       return;
     }
@@ -63,32 +60,43 @@ class Voting extends React.Component {
         newBallotsAndVotes[i].isCurrent = checked;
       }
     }
-    this.props.updateBallotsAndVotes(newBallotsAndVotes);
-    let newVote = this.state.votes;
+    // this.props.updateBallotsAndVotes(newBallotsAndVotes);
+    this.props.dispatch(appActionCreators.setBallotsAndVotes(newBallotsAndVotes));
+    let newVote = this.props.votes;
     checked ? newVote-- : newVote++;
-    this.setState({ votes: newVote });
+    // this.setState({ votes: newVote });
+    this.props.dispatch(votingActionCreators.setVotes(newVote));
   }
 
   async handleContinueToPayment() {
-    await this.setState({ voteErrorMessage: '' });
-    await this.setState({ allowContinueToPayment: '' });
-    if (this.state.votes !== 0) {
-      await this.setState({ voteErrorMessage: 'Remember to use all your votes! You can change them later.' });
-      this.setState({ allowContinueToPayment: false });
+    // await this.setState({ voteErrorMessage: '' });
+    // await this.setState({ allowContinueToPayment: '' });
+    this.props.dispatch(votingActionCreators.setVoteErrorMessage(''));
+    this.props.dispatch(votingActionCreators.setAllowContinueToPayment(''));
+    if (this.props.votes !== 0) {
+      // await this.setState({ voteErrorMessage: 'Remember to use all your votes! You can change them later.' });
+      // this.setState({ allowContinueToPayment: false });
+      this.props.dispatch(votingActionCreators.setVoteErrorMessage('Remember to use all your votes! You can change them later.'));
+      this.props.dispatch(votingActionCreators.setAllowContinueToPayment(false));
     }
-    if (this.state.votes === 0) {
-      this.setState({ allowContinueToPayment: true });
+    if (this.props.votes === 0) {
+      // this.setState({ allowContinueToPayment: true });
+      this.props.dispatch(votingActionCreators.setAllowContinueToPayment(true));
     }
   }
 
   async handleSubmitUpdateVotes() {
-    await this.setState({ voteErrorMessage: '' });
-    await this.setState({ allowContinueToPayment: '' });
-    await this.setState({ votesHaveFinishedUpdating: '' });
-    if (this.state.votes !== 0) {
-      await this.setState({ voteErrorMessage: 'Remember to use all your votes! You can change them later.' });
+    // await this.setState({ voteErrorMessage: '' });
+    // await this.setState({ allowContinueToPayment: '' });
+    // await this.setState({ votesHaveFinishedUpdating: '' });
+    this.props.dispatch(votingActionCreators.setVoteErrorMessage(''));
+    this.props.dispatch(votingActionCreators.setAllowContinueToPayment(''));
+    this.props.dispatch(votingActionCreators.setVotesHaveFinishedUpdating(''));
+    if (this.props.votes !== 0) {
+      // await this.setState({ voteErrorMessage: 'Remember to use all your votes! You can change them later.' });
+      this.props.dispatch(votingActionCreators.setVoteErrorMessage('Remember to use all your votes! You can change them later.'));
     }
-    if (this.state.votes === 0) {
+    if (this.props.votes === 0) {
       const foodObj = {};
       for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
         foodObj[this.props.ballotsAndVotes[i].name] = this.props.ballotsAndVotes[i].isCurrent;
@@ -107,20 +115,23 @@ class Voting extends React.Component {
       });
       const responseData = await response.json();
       alert('Your votes have been updated.');
-      await this.setState({ votesHaveFinishedUpdating: responseData.votesSaved });
+      // await this.setState({ votesHaveFinishedUpdating: responseData.votesSaved });
+      this.props.dispatch(votingActionCreators.setVotesHaveFinishedUpdating(responseData.votesSaved));
     } else {
-      this.setState({ votesHaveFinishedUpdating: false });
+      // this.setState({ votesHaveFinishedUpdating: false });
+      this.props.dispatch(votingActionCreators.setVotesHaveFinishedUpdating(false));
     }
   }
 
   render() {
+    console.log('Voting props: ', this.props);
     return (
       <div>
-        {this.state.allowContinueToPayment ?
-          <Payment firebaseAccessToken={this.props.firebaseAccessToken} ballotsAndVotes={this.props.ballotsAndVotes}/>
+        {this.props.allowContinueToPayment ?
+          <Payment/>
           :
           <div className={s.cont}>
-            <h1 className={s.top}>You have {this.state.votes} votes left</h1>
+            <h1 className={s.top}>You have {this.props.votes} votes left</h1>
             <div className={s.flexcontainer}>
               {this.props.ballotsAndVotes.map((ballotAndVote) => (
                 <div className={s.ballot}>
@@ -141,7 +152,7 @@ class Voting extends React.Component {
                   </Card>
                 </div>
               ))}
-              {this.state.hasUserPaid ?
+              {this.props.hasUserPaid ?
                 <Popup
                   trigger={
                     <RaisedButton
@@ -150,8 +161,8 @@ class Voting extends React.Component {
                       onTouchTap={this.handleSubmitUpdateVotes}
                     />
                   }
-                  content={this.state.voteErrorMessage}
-                  open={this.state.votesHaveFinishedUpdating === false}
+                  content={this.props.voteErrorMessage}
+                  open={this.props.votesHaveFinishedUpdating === false}
                   offset={5}
                   position="bottom left"
                 />
@@ -164,8 +175,8 @@ class Voting extends React.Component {
                       onTouchTap={this.handleContinueToPayment}
                     />
                   }
-                  content={this.state.voteErrorMessage}
-                  open={this.state.allowContinueToPayment === false}
+                  content={this.props.voteErrorMessage}
+                  open={this.props.allowContinueToPayment === false}
                   offset={5}
                   position="bottom left"
                 />
@@ -173,7 +184,7 @@ class Voting extends React.Component {
             </div>
           </div>
         }
-        {this.state.votesHaveFinishedUpdating ?
+        {this.props.votesHaveFinishedUpdating ?
           <Redirect to="/home" />
           :
           <div></div>
@@ -183,4 +194,23 @@ class Voting extends React.Component {
   }
 }
 
-export default Voting;
+const mapStateToProps = (state, props) => {
+  console.log('Voting: ',state, props);
+  return {
+    // App Reducers
+    ballotsAndVotes: state.appReducer._ballotsAndVotes,
+    firebaseAccessToken: state.appReducer._firebaseAccessToken,
+
+    // Voting Reducers
+    votes: state.votingReducer._votes,
+    price: state.votingReducer._price,
+    voteErrorMessage: state.votingReducer._voteErrorMessage,
+    allowContinueToPayment: state.votingReducer._allowContinueToPayment,
+    hasUserPaid: state.votingReducer._hasUserPaid,
+    votesHaveFinishedUpdating: state.votingReducer._votesHaveFinishedUpdating
+  }
+};
+
+const ConnectedVoting = connect(mapStateToProps)(Voting);
+
+export default ConnectedVoting;
