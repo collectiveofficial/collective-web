@@ -62,3 +62,24 @@ module.exports.getUserNamesAndPackagesOrdered = async (dropoffID) => {
   });
   return userNamesAndPackagesOrdered;
 };
+
+module.exports.getUserTransactionHistory = async (uid) => {
+  const transactions = [];
+  let dataObj;
+  const userID = await userUtil.findUserID(uid);
+  const getUserTransactionHistoryResults = await models.Transaction.findAll({
+    where: {
+      userID,
+    },
+  });
+  for (let i = 0; i < getUserTransactionHistoryResults.length; i++) {
+    dataObj = {
+      date: getUserTransactionHistoryResults[i].dataValues.createdAt,
+      dormPackagesOrdered: getUserTransactionHistoryResults[i].dataValues.dormPackagesOrdered,
+      cookingPackagesOrdered: getUserTransactionHistoryResults[i].dataValues.cookingPackagesOrdered,
+      totalDollarAmount: getUserTransactionHistoryResults[i].dataValues.totalDollarAmount,
+    }
+    transactions.push(dataObj);
+  }
+  return transactions;
+}

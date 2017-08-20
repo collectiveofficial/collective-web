@@ -117,7 +117,10 @@ class Voting extends React.Component {
     return (
       <div>
         {this.state.allowContinueToPayment ?
-          <Payment firebaseAccessToken={this.props.firebaseAccessToken} ballotsAndVotes={this.props.ballotsAndVotes}/>
+          <Payment
+            firebaseAccessToken={this.props.firebaseAccessToken}
+            ballotsAndVotes={this.props.ballotsAndVotes}
+          />
           :
           <div className={s.cont}>
             <h1 className={s.top}>You have {this.state.votes} votes left</h1>

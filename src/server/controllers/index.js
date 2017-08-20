@@ -373,8 +373,11 @@ module.exports = {
       // TODO: Implement dynamic dropoffID
       req.body.dropoffID = 1;
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
+      const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
+      console.log('------> userTransactionHistory: ', userTransactionHistory);
       const responseObject = {
         ballotsAndVotes,
+        userTransactionHistory,
       };
       await res.json(responseObject);
     },

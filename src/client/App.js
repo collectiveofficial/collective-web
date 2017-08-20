@@ -24,6 +24,7 @@ import { nativeLogout } from './utils/auth.js';
 import Terms from './components/legal/collectiveterms.js';
 import BFFTerms from './components/legal/BFFterms.js';
 import Privacy from './components/legal/privacypolicy.js';
+import Settings from './components/settings/Settings.js';
 
 initReactFastclick();
 // if ('ontouchstart' in document.documentElement) {
@@ -74,6 +75,7 @@ class App extends Component {
       routeToRegisterForm: false,
       userAuthorized: false,
       ballotsAndVotes: '',
+      userTransactionHistory: '',
     };
     this.logOut = this.logOut.bind(this);
     this.showUser = this.showUser.bind(this);
@@ -224,8 +226,11 @@ class App extends Component {
       }),
     })
     const initialDataLoadResults = await initialDataLoad.json();
-    await this.setState({ ballotsAndVotes: initialDataLoadResults.ballotsAndVotes });
-    await console.log('-------> this.state.ballotsAndVotes: ', this.state.ballotsAndVotes);
+    this.setState({ ballotsAndVotes: initialDataLoadResults.ballotsAndVotes });
+    this.setState({ userTransactionHistory: initialDataLoadResults.userTransactionHistory });
+    // console.log('-------> initialDataLoadResults.userTransactionHistory: ', initialDataLoadResults.userTransactionHistory);
+    console.log('-------> this.state.ballotsAndVotes: ', this.state.ballotsAndVotes);
+    console.log('-------> this.state.userTransactionHistory: ', this.state.userTransactionHistory);
   }
 
   updateBallotsAndVotes(newBallotsAndVotes) {
@@ -273,6 +278,11 @@ class App extends Component {
                 ballotsAndVotes={this.state.ballotsAndVotes}
                 updateBallotsAndVotes={this.updateBallotsAndVotes}
                 firebaseAccessToken={this.state.firebaseAccessToken}
+              />)}
+            />
+            <PrivateRoute userAuthorized={this.state.userAuthorized} path="/settings" component={() =>
+              (<Settings
+                userTransactionHistory={this.state.userTransactionHistory}
               />)} />
             <PublicRoute userAuthorized={this.state.userAuthorized} path="/foodwiki" component={foodwiki} />
             <DenyAuthorizedRoute userAuthorized={this.state.userAuthorized} path="/signup" component={() =>
