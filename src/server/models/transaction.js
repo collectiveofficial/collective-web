@@ -37,3 +37,49 @@ module.exports.checkTransaction = async (requestBody) => {
     return { hasUserPaid: false };
   }
 };
+
+module.exports.getUserNamesAndPackagesOrdered = async (dropoffID) => {
+  let userNamesAndPackagesOrdered = [];
+  const transactions = await models.Transaction.findAll({
+    where: {
+      dropoffID,
+    },
+  });
+  for (let i = 0; i < transactions.length; i++) {
+    const nameObj = await userUtil.findUserNameByID(transactions[i].dataValues.userID);
+    const dataObj = {
+      'Last Name': nameObj.lastName,
+      'First Name': nameObj.firstName,
+      'Dorm Packages Ordered': transactions[i].dataValues.dormPackagesOrdered,
+      'Cooking Packages Ordered': transactions[i].dataValues.cookingPackagesOrdered,
+    };
+    userNamesAndPackagesOrdered.push(dataObj);
+  }
+  userNamesAndPackagesOrdered = userNamesAndPackagesOrdered.sort((a, b) => {
+    const lastNameA = a['Last Name'].toUpperCase();
+    const lastNameB = b['Last Name'].toUpperCase();
+    return (lastNameA < lastNameB) ? -1 : (lastNameA > lastNameB) ? 1 : 0;
+  });
+  return userNamesAndPackagesOrdered;
+};
+
+module.exports.getUserTransactionHistory = async (uid) => {
+  const transactions = [];
+  let dataObj;
+  const userID = await userUtil.findUserID(uid);
+  const getUserTransactionHistoryResults = await models.Transaction.findAll({
+    where: {
+      userID,
+    },
+  });
+  for (let i = 0; i < getUserTransactionHistoryResults.length; i++) {
+    dataObj = {
+      date: getUserTransactionHistoryResults[i].dataValues.createdAt,
+      dormPackagesOrdered: getUserTransactionHistoryResults[i].dataValues.dormPackagesOrdered,
+      cookingPackagesOrdered: getUserTransactionHistoryResults[i].dataValues.cookingPackagesOrdered,
+      totalDollarAmount: getUserTransactionHistoryResults[i].dataValues.totalDollarAmount,
+    }
+    transactions.push(dataObj);
+  }
+  return transactions;
+}

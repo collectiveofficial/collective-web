@@ -93,3 +93,26 @@ module.exports.getBallotUserVotes = async (requestBody) => {
   });
   return ballotsAndVotes;
 };
+
+module.exports.getFoodNamesAndVoteCounts = async (dropoffID) => {
+  let foodNamesAndVoteCounts = [];
+  let foodName;
+  let voteCount;
+  let dataObj;
+  const ballots = await models.Ballot.findAll({
+    where: {
+      dropoffID,
+    },
+  });
+  ballots.forEach((ballot) => {
+    foodName = ballot.dataValues.foodName;
+    voteCount = ballot.dataValues.voteCount;
+    dataObj = {
+      'Food Name': foodName,
+      'Vote Count': voteCount,
+    };
+    foodNamesAndVoteCounts.push(dataObj);
+  });
+  foodNamesAndVoteCounts = foodNamesAndVoteCounts.sort((a, b) => b['Vote Count'] - a['Vote Count']);
+  return foodNamesAndVoteCounts;
+};
