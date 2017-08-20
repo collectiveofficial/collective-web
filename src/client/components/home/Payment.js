@@ -41,6 +41,11 @@ class Payment extends React.Component {
     this.handlePayment = this.handlePayment.bind(this);
   }
 
+  async componentWillMount() {
+    const email = await firebaseAuth().currentUser.email;
+    this.setState({ email });
+  }
+
   handleDorm(e, { value }) {
     this.setState({ dorm: value });
     let newPrice = this.state.price;
@@ -89,8 +94,6 @@ class Payment extends React.Component {
 
   async onToken(token) {
     await this.setState({ hasPaymentCompleted: false });
-    const email = await firebaseAuth().currentUser.email;
-    console.log('--------> email: ', email);
     const submitPaymentResult = await fetch('/confirm-payment', {
       method: 'POST',
       headers: {
@@ -100,7 +103,7 @@ class Payment extends React.Component {
       body: JSON.stringify({
         firebaseAccessToken: this.props.firebaseAccessToken,
         token,
-        email,
+        email: this.state.email,
         dormPackagesOrdered: this.state.dorm,
         cookingPackagesOrdered: this.state.cook,
       }),
@@ -109,7 +112,6 @@ class Payment extends React.Component {
     if (submitPaymentResultData.paymentCompleted) {
       await this.submitInitialVotes();
       if (this.state.votesSaved) {
-        this.setState({ email: submitPaymentResultData.emailSentTo });
         this.setState({ hasPaymentCompleted: true });
       } else {
         alert('Voting failed. Please contact Collective to resolve this issue. We appreciate your patience.');
@@ -228,7 +230,7 @@ class Payment extends React.Component {
                           amount={this.state.price * 100} // cents
                           currency="USD"
                           stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
-                          email="bestfoodforward@osu.edu"
+                          email={this.state.email}
                           // Note: Enabling either address option will give the user the ability to
                           // fill out both. Addresses are sent as a second parameter in the token callback.
                           shippingAddress
