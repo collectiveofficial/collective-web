@@ -190,7 +190,7 @@ class Login extends React.Component {
                       hintText="Email"
                       style={styles.iconStyles}
                       /* onChange={(event) => this.setState({ emailInput: event.target.value })} */
-                      onChange={(event) => this.props.loginActionCreators.setEmailInput(event.target.value)}
+                      onChange={(event) => this.props.dispatch(loginActionCreators.setEmailInput(event.target.value))}
                     />
                   }
                   content={this.props.emailErrorMessage}
@@ -205,7 +205,7 @@ class Login extends React.Component {
                     hintText="Password"
                     style={styles.iconStyles}
                     /* onChange={(event) => this.setState({ passwordInput: event.target.value })} */
-                    onChange={(event) => this.props.loginActionCreators.setPasswordInput(event.target.value)}
+                    onChange={(event) => this.props.dispatch(loginActionCreators.setPasswordInput(event.target.value))}
                   />
                 }
                 content={this.props.passwordErrorMessage}
@@ -234,22 +234,22 @@ class Login extends React.Component {
 const mapStateToProps = (state, props) => {
   return {
     // appReducers
-    userAuthorized: state._userAuthorized,
-    firebaseAccessToken: state._firebaseAccessToken,
-    routeToRegisterForm: state._routeToRegisterForm,
-    userWantsEmailSignup: state._userWantsEmailSignup,
-    facebookData: state._facebookData,
+    userAuthorized: state.appReducer._userAuthorized,
+    firebaseAccessToken: state.appReducers._firebaseAccessToken,
+    routeToRegisterForm: state.appReducer._routeToRegisterForm,
+    userWantsEmailSignup: state.appReducer._userWantsEmailSignup,
+    facebookData: state.appReducer._facebookData,
 
     // loginReducers
-    emailInput: state._emailInput,
-    passwordInput: state._passwordInput,
-    isEmailValidated: state._isEmailValidated,
-    isPasswordValidated: state._isPasswordValidated,
-    isWrongPassword: state._isWrongPassword,
-    emailErrorMessage: state._emailErrorMessage,
-    isUserDisabled:state._isUserDisabled,
-    isUserNotFound:state._isUserNotFound,
-    passwordErrorMessage: state._passwordErrorMessage,
+    emailInput: state.loginReducer._emailInput,
+    passwordInput: state.loginReducer._passwordInput,
+    isEmailValidated: state.loginReducer._isEmailValidated,
+    isPasswordValidated: state.loginReducer._isPasswordValidated,
+    isWrongPassword: state.loginReducer._isWrongPassword,
+    emailErrorMessage: state.loginReducer._emailErrorMessage,
+    isUserDisabled:state.loginReducer._isUserDisabled,
+    isUserNotFound:state.loginReducer._isUserNotFound,
+    passwordErrorMessage: state.loginReducer._passwordErrorMessage,
   }
 };
 
