@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Icon, Message, Header } from 'semantic-ui-react';
-import RaisedButton from 'material-ui/RaisedButton';
 import Orders from "./Orders.js";
 
 class Settings extends React.Component {
