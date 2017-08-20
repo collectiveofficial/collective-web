@@ -22,7 +22,7 @@ import { withRouter } from 'react-router';
 // }
 const store = createStore();
 const history = createBrowserHistory();
-const AppAvoid = withRouter(App) // React Route + connect() bug
+const AppAvoid = withRouter(App); // React Route + connect() bug
 ReactDOM.render((
   <Provider store={ store }>
     <Router history={history}>

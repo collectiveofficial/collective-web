@@ -17,7 +17,6 @@ var initialIsStateEmptyState = false;
 var initialIsZipcodeEmptyState = false;
 var initialAreThereEmptyFieldsState = '';
 var initialIsInvalidStateState = false;
-var initialValueState = '';
 
 export function _firstName(state=initialFirstNameState, action) {
   switch (action.type) {
@@ -222,17 +221,6 @@ export function _isInvalidState(state=initialIsInvalidStateState, action) {
     case 'SET_IS_INVALID_STATE':
       console.log('_isInvalidState state called with state: ', state, 'and action: ', action);
       return action.bool;
-
-    default:
-      return state
-  }
-}
-
-export function _value(state=initialValueState, action) {
-  switch (action.type) {
-    case 'SET_VALUE':
-      console.log('_value state called with state: ', state, 'and action: ', action);
-      return action.text;
 
     default:
       return state

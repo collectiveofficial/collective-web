@@ -70,65 +70,16 @@ class RegisterForm extends React.Component {
   }
 
   async areThereEmptyFields() {
-    // await this.setState({ isFirstNameEmpty: false });
-    // await this.setState({ isLastNameEmpty: false });
-    // await this.setState({ isPhoneNumberEmpty: false });
-    // await this.setState({ isBirthdayEmpty: false });
-    // await this.setState({ isStreetAddressEmpty: false });
-    // await this.setState({ isCityEmpty: false });
-    // await this.setState({ isStateEmpty: false });
-    // await this.setState({ isZipcodeEmpty: false });
-    // this.setState({ isInvalidState: false });
-    this.props.dispatch(registerActionCreators.setIsFirstNameEmpty(false));
-    this.props.dispatch(registerActionCreators.setIsLastNameEmpty(false));
-    this.props.dispatch(registerActionCreators.setIsPhoneNumberEmpty(false));
-    this.props.dispatch(registerActionCreators.setIsBirthdayEmpty(false));
-    this.props.dispatch(registerActionCreators.setIsStreetAddressEmpty(false));
-    this.props.dispatch(registerActionCreators.setIsCityEmpty(false));
-    this.props.dispatch(registerActionCreators.setIsStateEmpty(false));
-    this.props.dispatch(registerActionCreators.setIsZipcodeEmpty(false));
-    this.props.dispatch(registerActionCreators.setIsInvalidState(false));
-
-    if (this.props.firstName.length === 0) {
-      // await this.setState({ isFirstNameEmpty: true });
-      this.props.dispatch(registerActionCreators.setIsFirstNameEmpty(true));
-    }
-    if (this.props.lastName.length === 0) {
-      // await this.setState({ isLastNameEmpty: true });
-      this.props.dispatch(registerActionCreators.setIsLastNameEmpty(true));
-    }
-    if (this.props.phoneNumber.length === 0) {
-      // await this.setState({ isPhoneNumberEmpty: true });
-      this.props.dispatch(registerActionCreators.setIsPhoneNumberEmpty(true));
-    }
-    if (this.props.birthday.length === 0) {
-      // await this.setState({ isBirthdayEmpty: true });
-      this.props.dispatch(registerActionCreators.setIsBirthdayEmpty(true));
-    }
-    if (this.props.streetAddress.length === 0) {
-      // await this.setState({ isStreetAddressEmpty: true });
-      this.props.dispatch(registerActionCreators.setIsStreetAddressEmpty(true));
-    }
-    if (this.props.city.length === 0) {
-      // await this.setState({ isCityEmpty: true });
-      this.props.dispatch(registerActionCreators.setIsCityEmpty(true));
-    }
-    if (this.props.state.length === 0) {
-      // await this.setState({ isStateEmpty: true });
-      this.props.dispatch(registerActionCreators.setIsStateEmpty(true));
-    }
-    if (this.props.zipcode.length === 0) {
-      // await this.setState({ isZipcodeEmpty: true });
-      this.props.dispatch(registerActionCreators.setIsZipcodeEmpty(true));
-    }
-    if (usStates.indexOf(this.props.state) < 0) {
-      // this.setState({ isInvalidState: true });
-      this.props.dispatch(registerActionCreators.setIsInvalidState(true));
-    }
-
-    // await this.setState({ areThereEmptyFields: this.props.isFirstNameEmpty || this.props.isLastNameEmpty || this.props.isPhoneNumberEmpty || this.props.isBirthdayEmpty ||
-    // this.props.isStreetAddressEmpty || this.props.isCityEmpty || this.props.isStateEmpty || this.props.isZipcodeEmpty || this.props.isInvalidState });
-    this.props.dispatch(registerActionCreators.setAreThereEmptyFields(this.props.isFirstNameEmpty || this.props.isLastNameEmpty || this.props.isPhoneNumberEmpty || this.props.isBirthdayEmpty ||
+    await this.props.dispatch(registerActionCreators.setIsFirstNameEmpty(this.props.firstName.length === 0));
+    await this.props.dispatch(registerActionCreators.setIsLastNameEmpty(this.props.lastName.length === 0));
+    await this.props.dispatch(registerActionCreators.setIsPhoneNumberEmpty(this.props.phoneNumber.length === 0));
+    await this.props.dispatch(registerActionCreators.setIsBirthdayEmpty(this.props.birthday.length === 0));
+    await this.props.dispatch(registerActionCreators.setIsStreetAddressEmpty(this.props.streetAddress.length === 0));
+    await this.props.dispatch(registerActionCreators.setIsCityEmpty(this.props.city.length === 0));
+    await this.props.dispatch(registerActionCreators.setIsStateEmpty(this.props.state.length === 0));
+    await this.props.dispatch(registerActionCreators.setIsZipcodeEmpty(this.props.zipcode.length === 0));
+    await this.props.dispatch(registerActionCreators.setIsInvalidState(usStates.indexOf(this.props.state) < 0));
+    await this.props.dispatch(registerActionCreators.setAreThereEmptyFields(this.props.isFirstNameEmpty || this.props.isLastNameEmpty || this.props.isPhoneNumberEmpty || this.props.isBirthdayEmpty ||
     this.props.isStreetAddressEmpty || this.props.isCityEmpty || this.props.isStateEmpty || this.props.isZipcodeEmpty || this.props.isInvalidState));
     //TODO REFACTOR ^^
   }
@@ -175,7 +126,6 @@ class RegisterForm extends React.Component {
           floatingLabelText="First Name"
           floatingLabelFixed={true}
           style={styles.field}
-          /* onChange={(event) => this.setState({ firstName: event.target.value })}*/
           onChange={(event) => this.props.dispatch(registerActionCreators.setFirstName(event.target.value))}
           errorText={this.props.isFirstNameEmpty ? 'First name is required' : ''}
         /><br />
@@ -185,7 +135,6 @@ class RegisterForm extends React.Component {
           floatingLabelText="Last Name"
           floatingLabelFixed={true}
           style={styles.field}
-          /* onChange={(event) => this.setState({ lastName: event.target.value })} */
           onChange={(event) => this.props.dispatch(registerActionCreators.setLastName(event.target.value))}
           errorText={this.props.isLastNameEmpty ? 'Last name is required' : ''}
         /><br />
@@ -194,7 +143,6 @@ class RegisterForm extends React.Component {
          floatingLabelText="Date of Birth"
          floatingLabelFixed={true}
          style={styles.field}
-        /*  onChange={(event) => this.setState({ birthday: event.target.value })} */
          onChange={(event) => this.props.dispatch(registerActionCreators.setBirthday(event.target.value))}
          errorText={this.props.isBirthdayEmpty ? 'Birthday is required' : ''}
         /><br />
@@ -203,7 +151,6 @@ class RegisterForm extends React.Component {
          floatingLabelText="Cell Phone"
          floatingLabelFixed={true}
          style={styles.field}
-        /*  onChange={(event) => this.setState({ phoneNumber: event.target.value })} */
          onChange={(event) => this.props.dispatch(registerActionCreators.setPhoneNumber(event.target.value))}
          errorText={this.props.isPhoneNumberEmpty ? 'Phone number is required' : ''}
         /><br />
@@ -212,7 +159,6 @@ class RegisterForm extends React.Component {
          floatingLabelText="Street Address"
          floatingLabelFixed={true}
          style={styles.field}
-        /*  onChange={(event) => this.setState({ streetAddress: event.target.value })} */
          onChange={(event) => this.props.dispatch(registerActionCreators.setStreetAddress(event.target.value))}
          errorText={this.props.isStreetAddressEmpty ? 'Street address is required' : ''}
         /><br />
@@ -221,7 +167,6 @@ class RegisterForm extends React.Component {
          floatingLabelText="Apt #/Suite"
          floatingLabelFixed={true}
          style={styles.field}
-        /*  onChange={(event) => this.setState({ aptSuite: event.target.value })}*/
          onChange={(event) => this.props.dispatch(registerActionCreators.setAptSuite(event.target.value))}
         /><br />
         <TextField
@@ -229,11 +174,10 @@ class RegisterForm extends React.Component {
          floatingLabelText="City"
          floatingLabelFixed={true}
          style={styles.field}
-        /* onChange={(event) => this.setState({ city: event.target.value })}*/
          onChange={(event) => this.props.dispatch(registerActionCreators.setCity(event.target.value))}
          errorText={this.props.isCityEmpty ? 'City is required' : ''}
         /><br />
-        <AutoComplete /* TODO BUG HERE*/
+        <AutoComplete
           searchText={this.props.state}
           onUpdateInput={this.handleUpdateInput}
           floatingLabelText="State"
@@ -249,7 +193,6 @@ class RegisterForm extends React.Component {
          floatingLabelText="Zip Code"
          floatingLabelFixed={true}
          style={styles.field}
-        /*  onChange={(event) => this.setState({ zipcode: event.target.value })}*/
          onChange={(event) => this.props.dispatch(registerActionCreators.setZipcode(event.target.value))}
          errorText={this.props.isZipcodeEmpty ? 'Zip code is required' : ''}
         /><br />
@@ -260,7 +203,6 @@ class RegisterForm extends React.Component {
              <p>By clicking continue I have read and agreed to Collective's <Link to="terms">terms of use</Link> and <Link to="privacy">privacy policy</Link> as well as Best Food Forward's <Link to="bff">terms of use</Link>, and I agree to not hold any involved individuals or entities liable for anything related to the use, consumption, storage, or purchasing of food within this site.</p>
            </Modal.Content>
            <Modal.Actions>
-            /*  <RaisedButton label="Cancel" secondary={true} onTouchTap={() => { this.setState({ areThereEmptyFields: '' }); }} />*/
              <RaisedButton label="Cancel" secondary={true} onTouchTap={() => { this.props.dispatch(registerActionCreators.setAreThereEmptyFields('')); }} />
              <RaisedButton label="Continue" primary={true} onTouchTap={this.submitUserInfo} /><br /><br />
            </Modal.Actions>
@@ -303,7 +245,6 @@ const mapStateToProps = (state, props) => {
     isZipcodeEmpty: state.registerReducer._isZipcodeEmpty,
     areThereEmptyFields: state.registerReducer._areThereEmptyFields,
     isInvalidState: state.registerReducer._isInvalidState,
-    value: state.registerReducer._value // TODO rename
   }
 };
 

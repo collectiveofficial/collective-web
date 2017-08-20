@@ -189,7 +189,6 @@ class Login extends React.Component {
                     trigger={<TextField
                       hintText="Email"
                       style={styles.iconStyles}
-                      /* onChange={(event) => this.setState({ emailInput: event.target.value })} */
                       onChange={(event) => this.props.dispatch(loginActionCreators.setEmailInput(event.target.value))}
                     />
                   }
@@ -204,7 +203,6 @@ class Login extends React.Component {
                     type="password"
                     hintText="Password"
                     style={styles.iconStyles}
-                    /* onChange={(event) => this.setState({ passwordInput: event.target.value })} */
                     onChange={(event) => this.props.dispatch(loginActionCreators.setPasswordInput(event.target.value))}
                   />
                 }
