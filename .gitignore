@@ -62,3 +62,7 @@ typings/
 
 # bundle
 src/client/public/dist/
+
+# CSV Files
+src/server/adminData/foodNamesAndVoteCounts.csv
+src/server/adminData/userNamesAndPackagesOrdered.csv
