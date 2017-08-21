@@ -1,5 +1,6 @@
 const Promise = require('bluebird');
 const models = require('../../database/models/index');
+const groupUtil = require('./group');
 
 module.exports.checkIfUserIsFacebookAuth = function (email) {
   return models.User.findOne({
@@ -143,8 +144,9 @@ module.exports.checkIfFacebookUserFinishedSignUp = function (uid) {
   .catch(err => console.log(err));
 };
 
-module.exports.saveSubmittedUserInfo = function (user) {
-  models.User.update({
+module.exports.saveSubmittedUserInfo = async (user) => {
+  const userGroupId = await groupUtil.findGroupIDbyName(user.school);
+  await models.User.update({
     firstName: user.firstName,
     lastName: user.lastName,
     phoneNumber: user.phoneNumber,
@@ -154,14 +156,14 @@ module.exports.saveSubmittedUserInfo = function (user) {
     city: user.city,
     state: user.state,
     zipCode: user.zipCode,
-    fullAddress: user.aptSuite.length > 0 ? `${user.streetAddress}, ${user.aptSuite}, ${user.city}, ${user.state}, ${user.zipCode}`:`${user.streetAddress}, ${user.city}, ${user.state} ${user.zipCode}`,
+    fullAddress: user.aptSuite.length > 0 ? `${user.streetAddress}, ${user.aptSuite}, ${user.city}, ${user.state} ${user.zipCode}` : `${user.streetAddress}, ${user.city}, ${user.state} ${user.zipCode}`,
     hasUserFinishedSignUp: true,
+    userGroupId,
   }, {
     where: {
       firebaseUID: user.uid,
-    }
-  })
-  .catch(err => console.log(err));
+    },
+  });
 };
 
 module.exports.findUserID = async (firebaseUID) => {
