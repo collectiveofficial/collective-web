@@ -144,6 +144,16 @@ module.exports.checkIfFacebookUserFinishedSignUp = function (uid) {
   .catch(err => console.log(err));
 };
 
+// TODO: remove this function later
+module.exports.populateAllUserGroupID = async (userGroupId) => {
+  await models.User.update({
+    userGroupId,
+  }, {
+    where: {
+    },
+  });
+};
+
 module.exports.saveSubmittedUserInfo = async (user) => {
   const userGroupId = await groupUtil.findGroupIDbyName(user.school);
   await models.User.update({

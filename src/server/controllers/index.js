@@ -128,6 +128,11 @@ const firstGroup = {
 };
 
 const initializeData = async () => {
+  const populateAllUserGroupID = async () => {
+    const userGroupID = 1;
+    await userUtil.populateAllUserGroupID(userGroupID);
+  };
+
   const initializeFirstGroup = async () => {
     // initialize group
     const doesFirstGroupExist = await groupUtil.doesFirstGroupExist();
@@ -202,6 +207,7 @@ const initializeData = async () => {
     await sendUserNamesAndPackagesOrdered();
   };
 
+  await populateAllUserGroupID();
   await initializeFirstGroup();
   await initializeFirstDropoff();
   await initializeFirstDropFoodItems();
