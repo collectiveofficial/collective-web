@@ -9,7 +9,8 @@ module.exports = function(sequelize, DataTypes) {
     state: DataTypes.STRING,
     zipCode: DataTypes.INTEGER,
     fullAddress: DataTypes.STRING,
-    descriptor: DataTypes.STRING
+    descriptor: DataTypes.STRING,
+    currentDropoffID: DataTypes.INTEGER,
   }, {
     classMethods: {
       associate: function(models) {
