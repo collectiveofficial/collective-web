@@ -36,21 +36,6 @@ module.exports.populateDropoff = (user) => {
   .catch(err => console.log(err));
 };
 
-module.exports.updateVoteDates = async (id, dates) => {
-  try {
-    await models.Dropoff.update({
-      voteDateTimeBeg: dates.voteDateTimeBeg,
-      voteDateTimeEnd: dates.voteDateTimeEnd,
-    }, {
-      where: {
-        id,
-      },
-    });
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 module.exports.findPctFeePerPackageForDrop = async (dropoffID) => {
   const findDropoffByIDResult = await models.Dropoff.findOne({
     where: {

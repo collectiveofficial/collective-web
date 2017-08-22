@@ -23,6 +23,23 @@ if (process.env.NODE_ENV === 'production') {
   STRIPE_SECRET_KEY = process.env.sk_test_MY_SECRET_KEY;
 }
 
+// this.state = {
+//   date: "26 August 2017 from 9am to Noon",
+//   vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
+//   remainingCalendar: [
+//     ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
+//   ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
+//   ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
+//   ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
+//   ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
+//   ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
+//   ],
+//   items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
+//   provider: "DNO Produce",
+//   //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
+//   location: "https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university",
+// };
+
 const stripe = configureStripe(STRIPE_SECRET_KEY);
 
 const firebaseAdminApp = admin.initializeApp({
@@ -37,8 +54,8 @@ const firebaseAdminApp = admin.initializeApp({
 
 const intendedPickupTimeStart = moment.tz('2017-08-26 09:00:00', 'America/New_York');
 const intendedPickupTimeEnd = moment.tz('2017-08-26 12:00:00', 'America/New_York');
-const voteDateTimeBeg = moment.tz('2017-08-11 09:00:00', 'America/New_York');
-const voteDateTimeEnd = moment.tz('2017-08-23 12:00:00', 'America/New_York');
+const voteDateTimeBeg = moment.tz('2017-08-11 00:00:00', 'America/New_York');
+const voteDateTimeEnd = moment.tz('2017-08-23 11:59:59', 'America/New_York');
 
 const firstDropoff = {
   intendedShipDate: '2017-08-26',
@@ -128,11 +145,6 @@ const firstGroup = {
 };
 
 const initializeData = async () => {
-  const populateAllUserGroupID = async () => {
-    const userGroupID = 1;
-    await userUtil.populateAllUserGroupID(userGroupID);
-  };
-
   const initializeFirstGroup = async () => {
     // initialize group
     const doesFirstGroupExist = await groupUtil.doesFirstGroupExist();
@@ -166,33 +178,6 @@ const initializeData = async () => {
       await ballotUtil.populateBallots(1, voteDateTimeBeg, voteDateTimeEnd);
     }
   };
-
-    const updateVoteDates = async () => {
-      // this.state = {
-      //   date: "26 August 2017 from 9am to Noon",
-      //   vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
-      //   remainingCalendar: [
-      //     ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
-      //   ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
-      //   ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
-      //   ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
-      //   ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
-      //   ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
-      //   ],
-      //   items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
-      //   provider: "DNO Produce",
-      //   //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
-      //   location: "https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university",
-      // };
-      const dates = {
-        voteDateTimeBeg: moment.tz('2017-08-11 00:00:00', 'America/New_York'),
-        voteDateTimeEnd: moment.tz('2017-08-23 11:59:59', 'America/New_York'),
-      };
-      // TODO: dynamic dropoffID
-      const dropoffID = 1;
-      await dropoffUtil.updateVoteDates(dropoffID, dates);
-      await ballotUtil.updateVoteDates(dropoffID, dates);
-    };
 
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
@@ -251,12 +236,10 @@ const initializeData = async () => {
     });
   };
 
-  await populateAllUserGroupID();
   await initializeFirstGroup();
   await initializeFirstDropoff();
   await initializeFirstDropFoodItems();
   await initializeFirstDropBallots();
-  await updateVoteDates();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
 };
