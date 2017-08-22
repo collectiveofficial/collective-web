@@ -82,4 +82,38 @@ module.exports.getUserTransactionHistory = async (uid) => {
     transactions.push(dataObj);
   }
   return transactions;
-}
+};
+
+module.exports.getUsersWhoHaveNotPaid = async (dropoffID, groupID) => {
+  let transactionsByDropoffIDresult;
+  let userID;
+  let user;
+  let dataObj;
+  try {
+    transactionsByDropoffIDresult = await models.Transaction.findAll({
+      where: {
+        dropoffID,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  const usersThatHavePaidIds = new Set(transactionsByDropoffIDresult.map(x => x.dataValues.userID));
+  const usersObjByIds = await userUtil.getUniqueUsersByGroupID(groupID);
+  const userIds = new Set(Object.keys(usersObjByIds));
+  const usersWhoHaveNotPaid = [];
+  console.log('HEY FUCKER USERIDS: ', userIds);
+  console.log('HEY FUCKER TRANSIDS: ', usersThatHavePaidIds);
+  const usersWhoHaveNotPaidIds = [...userIds].filter(x => !usersThatHavePaidIds.has(Number(x)));
+  for (let i = 0; i < usersWhoHaveNotPaidIds.length; i++) {
+    // if (userID !== uniqueUsersObj[userID]) {
+    dataObj = {
+      'Last Name': usersObjByIds[usersWhoHaveNotPaidIds[i]].lastName,
+      'First Name': usersObjByIds[usersWhoHaveNotPaidIds[i]].firstName,
+      Email: usersObjByIds[usersWhoHaveNotPaidIds[i]].email,
+    };
+    usersWhoHaveNotPaid.push(dataObj);
+    // }
+  }
+  return [...new Set(usersWhoHaveNotPaid)];
+};

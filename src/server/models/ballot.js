@@ -52,6 +52,21 @@ module.exports.findFoodInfo = async (foodName) => {
   .catch(err => console.log(err));
 };
 
+module.exports.updateVoteDates = async (dropoffID, dates) => {
+  try {
+    await models.Ballot.update({
+      voteDateTimeBeg: dates.voteDateTimeBeg,
+      voteDateTimeEnd: dates.voteDateTimeEnd,
+    }, {
+      where: {
+        dropoffID,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports.changeVoteCount = async (voteCount, foodID, dropoffID) => {
   await models.Ballot.update({
     voteCount,

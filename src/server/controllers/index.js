@@ -10,6 +10,7 @@ const foodUtil = require('../models/food');
 const ballotUtil = require('../models/ballot');
 const voteUtil = require('../models/vote');
 const transactionUtil = require('../models/transaction');
+const groupUtil = require('../models/group');
 const admin = require('firebase-admin');
 const json2csv = require('json2csv');
 const moment = require('moment-timezone');
@@ -113,7 +114,34 @@ const firstDropFoodItems = [{
   imageUrl: 'http://palmaworld.com/wp-content/uploads/2017/01/green-pepper.jpg',
 }];
 
+const firstGroup = {
+  name: 'Ohio State University, Columbus',
+  type: 'university',
+  streetAddress: '160 W Woodruff Ave',
+  aptSuite: 'Building 1108',
+  city: 'Columbus',
+  state: 'OH',
+  zipCode: '43210',
+  descriptor: 'Best Food Forward is made for students by students, utilizing a democratic, cooperative framework to make it easier for people to eat healthy.',
+  // TODO: dynamic dropoff ID (current datetime)
+  currentDropoffID: 1,
+};
+
 const initializeData = async () => {
+  const populateAllUserGroupID = async () => {
+    const userGroupID = 1;
+    await userUtil.populateAllUserGroupID(userGroupID);
+  };
+
+  const initializeFirstGroup = async () => {
+    // initialize group
+    const doesFirstGroupExist = await groupUtil.doesFirstGroupExist();
+    // if group at id 1 does not exist
+    if (!doesFirstGroupExist) {
+      await groupUtil.populateGroup(firstGroup);
+    }
+  };
+
   const initializeFirstDropoff = async () => {
     // initialize dropoff
     const doesFirstDropoffExist = await dropoffUtil.doesFirstDropoffExist();
@@ -138,6 +166,33 @@ const initializeData = async () => {
       await ballotUtil.populateBallots(1, voteDateTimeBeg, voteDateTimeEnd);
     }
   };
+
+    const updateVoteDates = async () => {
+      // this.state = {
+      //   date: "26 August 2017 from 9am to Noon",
+      //   vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
+      //   remainingCalendar: [
+      //     ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
+      //   ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
+      //   ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
+      //   ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
+      //   ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
+      //   ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
+      //   ],
+      //   items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
+      //   provider: "DNO Produce",
+      //   //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
+      //   location: "https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university",
+      // };
+      const dates = {
+        voteDateTimeBeg: moment.tz('2017-08-11 00:00:00', 'America/New_York'),
+        voteDateTimeEnd: moment.tz('2017-08-23 11:59:59', 'America/New_York'),
+      };
+      // TODO: dynamic dropoffID
+      const dropoffID = 1;
+      await dropoffUtil.updateVoteDates(dropoffID, dates);
+      await ballotUtil.updateVoteDates(dropoffID, dates);
+    };
 
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
@@ -179,10 +234,31 @@ const initializeData = async () => {
     await sendUserNamesAndPackagesOrdered();
   };
 
+  const sendVotingReminderCSVupdates = async () => {
+    const fields = ['Last Name', 'First Name', 'Email'];
+    // TODO: dynamic groupID
+    const dropoffID = 1;
+    const groupID = 1;
+    const usersWhoHaveNotPaid = await transactionUtil.getUsersWhoHaveNotPaid(dropoffID, groupID);
+    const csv = json2csv({ data: usersWhoHaveNotPaid, fields });
+    const fileName = 'usersWhoHaveNotPaid.csv';
+    await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
+      if (err) {
+        console.log('file failed to create');
+        throw err;
+      }
+      console.log('file created');
+    });
+  };
+
+  await populateAllUserGroupID();
+  await initializeFirstGroup();
   await initializeFirstDropoff();
   await initializeFirstDropFoodItems();
   await initializeFirstDropBallots();
+  await updateVoteDates();
   await sendNightlyCSVupdates();
+  await sendVotingReminderCSVupdates();
 };
 
 initializeData();
@@ -446,20 +522,21 @@ module.exports = {
   },
   voteNotification: {
     get(req, res) {
-      // date: "26 August 2017 from 9am to Noon",
-      // vote: "Voting window is from 21 August to 25 August",
-      // remainingCalendar: [
-      //   ['9 September 2017',  "Voting window is from 27 August to 7 September"],
-      // ['23 September 2017',  "Voting window is from 10 September to 21 September"],
-      // ['7 October 2017',  "Voting window is from 24 September to 5 October"],
-      // ['28 October 2017',  "Voting window is from 8 October to 26 October"],
-      // ['10 November 2017', "Voting window is from 29 October to 8 November"],
-      // ['2 December 2017',  "Voting window is from 11 November to 30 November"]
-      // ]
-      // const dropDates = {
-      //   '26 August 2017': {
-      //     time: '9 AM to Noon',
-      //   }
+      // this.state = {
+      //   date: "26 August 2017 from 9am to Noon",
+      //   vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
+      //   remainingCalendar: [
+      //     ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
+      //   ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
+      //   ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
+      //   ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
+      //   ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
+      //   ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
+      //   ],
+      //   items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
+      //   provider: "DNO Produce",
+      //   //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
+      //   location: "https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university",
       // };
       // '00 56 9 27 7 * *'
       const job1 = new cron.CronJob('00 03 13 * * *', () => {
