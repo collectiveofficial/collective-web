@@ -101,9 +101,7 @@ module.exports.getUsersWhoHaveNotPaid = async (dropoffID, groupID) => {
   const usersThatHavePaidIds = new Set(transactionsByDropoffIDresult.map(x => x.dataValues.userID));
   const usersObjByIds = await userUtil.getUniqueUsersByGroupID(groupID);
   const userIds = new Set(Object.keys(usersObjByIds));
-  const usersWhoHaveNotPaid = [];
-  console.log('HEY FUCKER USERIDS: ', userIds);
-  console.log('HEY FUCKER TRANSIDS: ', usersThatHavePaidIds);
+  let usersWhoHaveNotPaid = [];
   const usersWhoHaveNotPaidIds = [...userIds].filter(x => !usersThatHavePaidIds.has(Number(x)));
   for (let i = 0; i < usersWhoHaveNotPaidIds.length; i++) {
     // if (userID !== uniqueUsersObj[userID]) {
@@ -113,7 +111,9 @@ module.exports.getUsersWhoHaveNotPaid = async (dropoffID, groupID) => {
       Email: usersObjByIds[usersWhoHaveNotPaidIds[i]].email,
     };
     usersWhoHaveNotPaid.push(dataObj);
+    usersWhoHaveNotPaid.push(Object.assign({}, dataObj));
     // }
   }
-  return [...new Set(usersWhoHaveNotPaid)];
+  usersWhoHaveNotPaid = usersWhoHaveNotPaid.filter((x, index, self) => self.findIndex(t => t.Email === x.Email) === index)
+  return usersWhoHaveNotPaid;
 };
