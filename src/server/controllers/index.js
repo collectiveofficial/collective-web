@@ -72,6 +72,8 @@ const firstDropoff = {
   pctFeePerPackage: 0.05,
   totalRevenueBeforeStripe: 0,
   totalRevenueAftereStripe: 0,
+  // TODO: dynamic groupID
+  groupID: 1,
 };
 
 const firstDropFoodItems = [{
@@ -156,6 +158,13 @@ const initializeData = async () => {
     }
   };
 
+  const updateCurrentDropoffID = async () => {
+    // TODO: dynamic voting dropoff ID (current datetime)
+    const currentVotingDropoffID = 1;
+    const groupID = 1;
+    await groupUtil.updateCurrentVotingDropoffID(currentVotingDropoffID, groupID);
+  };
+
   const updateCurrentVotingDropoffID = async () => {
     // TODO: dynamic voting dropoff ID (current datetime)
     const currentVotingDropoffID = 1;
@@ -170,6 +179,12 @@ const initializeData = async () => {
     if (!doesFirstDropoffExist) {
       await dropoffUtil.populateDropoff(firstDropoff);
     }
+  };
+
+  const updateGroupIDonDropoffs = async () => {
+    const dropoffID = 1;
+    const groupID = 1;
+    await dropoffUtil.updateGroupIDonDropoffs(dropoffID, groupID);
   };
 
   const initializeFirstDropFoodItems = async () => {
@@ -246,8 +261,10 @@ const initializeData = async () => {
   };
 
   await initializeFirstGroup();
-  await updateCurrentVotingDropoffID();
+  await updateCurrentDropoffID();
+  // await updateCurrentVotingDropoffID();
   await initializeFirstDropoff();
+  await updateGroupIDonDropoffs();
   await initializeFirstDropFoodItems();
   await initializeFirstDropBallots();
   await sendNightlyCSVupdates();

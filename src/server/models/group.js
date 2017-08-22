@@ -1,4 +1,5 @@
 const models = require('../../database/models/index');
+const moment = require('moment-timezone');
 
 module.exports.doesFirstGroupExist = async () => {
   let findGroupResult;
@@ -49,6 +50,20 @@ module.exports.findGroupIDbyName = async (name) => {
     console.log(err);
   }
   return findGroupResult.dataValues.id;
+};
+
+module.exports.updateCurrentDropoffID = async (currentDropoffID, groupID) => {
+  const dateNowInEST = moment.tz(new Date(), 'America/New_York');
+  const intendedPickupTimeEnd = await dropoffUtil.findIntendedPickupTimeEnd(currentDropoffID, groupID);
+  if (dateNowInEST > intendedPickupTimeEnd) {
+    await models.Group.update({
+      currentDropoffID,
+    }, {
+      where: {
+        id: groupID,
+      },
+    });
+  }
 };
 
 module.exports.updateCurrentVotingDropoffID = async (currentVotingDropoffID, groupID) => {
