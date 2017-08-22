@@ -194,5 +194,30 @@ module.exports.findUserNameByID = async (id) => {
   return {
     firstName: user.dataValues.firstName,
     lastName: user.dataValues.lastName,
+    email: user.dataValues.email,
   };
+};
+
+module.exports.getUniqueUsersByGroupID = async (userGroupId) => {
+  let usersObjByIds = {};
+  const usersByGroupID = await models.User.findAll({
+    where: {
+      userGroupId,
+    },
+  });
+  console.log('usersByGroupID', usersByGroupID);
+  for (let i = 0; i < usersByGroupID.length; i++) {
+    usersObjByIds[usersByGroupID[i].dataValues.id] = {
+      lastName: usersByGroupID[i].dataValues.lastName,
+      firstName: usersByGroupID[i].dataValues.firstName,
+      email: usersByGroupID[i].dataValues.email,
+    };
+  }
+  // for (let email in uniqueUsersObjByEmail) {
+  //   uniqueUsersObjById[uniqueUsersObjByEmail[email].id] = {
+  //     lastName: uniqueUsersObjByEmail[email].lastName,
+  //     firstName: uniqueUsersObjByEmail[email].firstName,
+  //   };
+  // }
+  return usersObjByIds;
 };
