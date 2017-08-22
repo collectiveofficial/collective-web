@@ -1,5 +1,6 @@
-var schools = {
-  universities: ["Ohio State University, Columbus (ohio-state.edu)"],
-}
+const schools = {
+  universities: ['Ohio State University, Columbus'],
+};
 
-exports.schools = schools;
+export default schools;
+// exports.schools = schools;

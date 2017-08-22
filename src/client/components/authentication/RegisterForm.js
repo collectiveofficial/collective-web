@@ -10,6 +10,7 @@ import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Modal } from 'semantic-ui-react';
+import schools from './universities_list.js';
 
 injectTapEventPlugin();
 
@@ -43,6 +44,7 @@ class RegisterForm extends React.Component {
       isZipCodeEmpty: false,
       areThereEmptyFields: '',
       isInvalidState: false,
+      isInvalidSchool: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -86,7 +88,9 @@ class RegisterForm extends React.Component {
     await this.setState({ isCityEmpty: false });
     await this.setState({ isStateEmpty: false });
     await this.setState({ isZipCodeEmpty: false });
-    this.setState({ isInvalidState: false });
+    await this.setState({ isSchoolEmpty: false });
+    await this.setState({ isInvalidState: false });
+    await this.setState({ isInvalidSchool: false });
 
     if (this.state.firstName.length === 0) {
       await this.setState({ isFirstNameEmpty: true });
@@ -106,18 +110,28 @@ class RegisterForm extends React.Component {
     if (this.state.city.length === 0) {
       await this.setState({ isCityEmpty: true });
     }
-    if (this.state.state.length === 0) {
-      await this.setState({ isStateEmpty: true });
-    }
     if (this.state.zipCode.length === 0) {
       await this.setState({ isZipCodeEmpty: true });
     }
+    if (this.state.state.length === 0) {
+      await this.setState({ isStateEmpty: true });
+    }
+    if (this.state.state.length === 0) {
+      await this.setState({ isSchoolEmpty: true });
+    }
     if (usStates.indexOf(this.state.state) < 0) {
-      this.setState({ isInvalidState: true });
+      await this.setState({ isInvalidState: true });
+    }
+    if (schools.universities.indexOf(this.state.school) < 0) {
+      await this.setState({ isInvalidSchool: true });
     }
 
-    await this.setState({ areThereEmptyFields: this.state.isFirstNameEmpty || this.state.isLastNameEmpty || this.state.isPhoneNumberEmpty || this.state.isBirthdayEmpty ||
-    this.state.isStreetAddressEmpty || this.state.isCityEmpty || this.state.isStateEmpty || this.state.isZipCodeEmpty || this.state.isInvalidState });
+    await this.setState({ areThereEmptyFields: this.state.isFirstNameEmpty ||
+      this.state.isLastNameEmpty || this.state.isPhoneNumberEmpty ||
+      this.state.isBirthdayEmpty || this.state.isStreetAddressEmpty ||
+      this.state.isCityEmpty || this.state.isStateEmpty || this.state.isZipCodeEmpty
+      || this.state.isStateEmpty || this.state.isInvalidState ||
+      this.state.isSchoolEmpty || this.state.isInvalidSchool });
   }
 
   async submitUserInfo() {
@@ -139,6 +153,7 @@ class RegisterForm extends React.Component {
           city: this.state.city,
           state: this.state.state,
           zipCode: this.state.zipCode,
+          school: this.state.school,
           firebaseAccessToken: this.props.firebaseAccessToken,
         }),
       })
@@ -172,6 +187,17 @@ class RegisterForm extends React.Component {
           style={styles.field}
           onChange={(event) => this.setState({ lastName: event.target.value })}
           errorText={this.state.isLastNameEmpty ? 'Last name is required' : ''}
+        /><br />
+        <AutoComplete
+          searchText={this.state.school}
+          onUpdateInput={school => this.setState({ school })}
+          floatingLabelText="School"
+          floatingLabelFixed={true}
+          dataSource={schools.universities}
+          filter={AutoComplete.fuzzyFilter}
+          style={styles.field}
+          openOnFocus={true}
+          errorText={this.state.isSchoolEmpty ? 'School is required' : this.state.isInvalidSchool ? 'Please select a school from this list.' : ''}
         /><br />
         <TextField
          type='date'

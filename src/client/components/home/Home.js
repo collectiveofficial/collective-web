@@ -14,14 +14,14 @@ class Home extends React.Component {
     super(props);
     this.state = {
       date: "26 August 2017 from 9am to Noon",
-      vote: "Voting window is from 11 August to 23 August",
+      vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
       remainingCalendar: [
-        ['9 September 2017',  "Voting window is from 27 August to 6 September"],
-      ['23 September 2017',  "Voting window is from 10 September to 20 September"],
-      ['7 October 2017',  "Voting window is from 24 September to 4 October"],
-      ['28 October 2017',  "Voting window is from 8 October to 25 October"],
-      ['10 November 2017', "Voting window is from 29 October to 8 November"],
-      ['2 December 2017',  "Voting window is from 11 November to 29 November"]
+        ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
+      ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
+      ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
+      ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
+      ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
+      ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
       ],
       items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
       provider: "DNO Produce",
