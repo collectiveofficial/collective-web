@@ -204,12 +204,12 @@ class Payment extends React.Component {
                           <Modal.Description>
                             <br /><br />
                             <p>Collective works to make organization easier for groups. And in order to meet</p>
-                            <p>these needs we must cover basic costs for insurance, web hosting, and card</p>
-                            <p>transaction fees. In order to legally use Stripe, our secure payment system</p>
+                            <p>these needs, we must cover basic costs for insurance, web hosting, and card</p>
+                            <p>transaction fees. In order to legally use Stripe, our secure payment system,</p>
                             <p>we must cover a standard 2.9% + $.30 fee for every transaction ($.47 on every</p>
-                            <p>dorm package and $.68 on every cooking package). Our number one goal is to meet</p>
-                            <p>the needs of our customers, so we will do whatever we can to keep these prices</p>
-                            <p>low. But if you have any questions please contact us through our feedback <a href="https://docs.google.com/forms/d/e/1FAIpQLSdMJUSKNvto7jxcY800Z3ocrU7Hu7CSeu5B7M6s9ZJr7vGyzA/viewform?usp=sf_link" target="/blank">form</a>.</p>
+                            <p>dorm package and $.68 on every cooking package). Our number one goal is to inexpensively</p>
+                            <p>provide high-quality groceries, so we will do whatever we can to keep these prices low</p>
+                            <p>while still keeping the site up. If you have any questions please contact us through our feedback <a href="https://docs.google.com/forms/d/e/1FAIpQLSdMJUSKNvto7jxcY800Z3ocrU7Hu7CSeu5B7M6s9ZJr7vGyzA/viewform?usp=sf_link" target="/blank">form</a>.</p>
                           </Modal.Description>
                         </Modal.Content>
                       </Modal>
