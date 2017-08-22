@@ -10,6 +10,7 @@ const foodUtil = require('../models/food');
 const ballotUtil = require('../models/ballot');
 const voteUtil = require('../models/vote');
 const transactionUtil = require('../models/transaction');
+const groupUtil = require('../models/group');
 const admin = require('firebase-admin');
 const json2csv = require('json2csv');
 const moment = require('moment-timezone');
@@ -113,7 +114,34 @@ const firstDropFoodItems = [{
   imageUrl: 'http://palmaworld.com/wp-content/uploads/2017/01/green-pepper.jpg',
 }];
 
+const firstGroup = {
+  name: 'Ohio State University, Columbus',
+  type: 'university',
+  streetAddress: '160 W Woodruff Ave',
+  aptSuite: 'Building 1108',
+  city: 'Columbus',
+  state: 'OH',
+  zipCode: '43210',
+  descriptor: 'Best Food Forward is made for students by students, utilizing a democratic, cooperative framework to make it easier for people to eat healthy.',
+  // TODO: dynamic dropoff ID (current datetime)
+  currentDropoffID: 1,
+};
+
 const initializeData = async () => {
+  const populateAllUserGroupID = async () => {
+    const userGroupID = 1;
+    await userUtil.populateAllUserGroupID(userGroupID);
+  };
+
+  const initializeFirstGroup = async () => {
+    // initialize group
+    const doesFirstGroupExist = await groupUtil.doesFirstGroupExist();
+    // if group at id 1 does not exist
+    if (!doesFirstGroupExist) {
+      await groupUtil.populateGroup(firstGroup);
+    }
+  };
+
   const initializeFirstDropoff = async () => {
     // initialize dropoff
     const doesFirstDropoffExist = await dropoffUtil.doesFirstDropoffExist();
@@ -179,6 +207,8 @@ const initializeData = async () => {
     await sendUserNamesAndPackagesOrdered();
   };
 
+  await populateAllUserGroupID();
+  await initializeFirstGroup();
   await initializeFirstDropoff();
   await initializeFirstDropFoodItems();
   await initializeFirstDropBallots();
