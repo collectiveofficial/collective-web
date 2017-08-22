@@ -142,6 +142,8 @@ const firstGroup = {
   descriptor: 'Best Food Forward is made for students by students, utilizing a democratic, cooperative framework to make it easier for people to eat healthy.',
   // TODO: dynamic dropoff ID (current datetime)
   currentDropoffID: 1,
+  // TODO: dynamic voting dropoff ID (current datetime)
+  currentVotingDropoffID: 1,
 };
 
 const initializeData = async () => {
@@ -152,6 +154,13 @@ const initializeData = async () => {
     if (!doesFirstGroupExist) {
       await groupUtil.populateGroup(firstGroup);
     }
+  };
+
+  const updateCurrentVotingDropoffID = async () => {
+    // TODO: dynamic voting dropoff ID (current datetime)
+    const currentVotingDropoffID = 1;
+    const groupID = 1;
+    await groupUtil.updateCurrentVotingDropoffID(currentVotingDropoffID, groupID);
   };
 
   const initializeFirstDropoff = async () => {
@@ -237,6 +246,7 @@ const initializeData = async () => {
   };
 
   await initializeFirstGroup();
+  await updateCurrentVotingDropoffID();
   await initializeFirstDropoff();
   await initializeFirstDropFoodItems();
   await initializeFirstDropBallots();

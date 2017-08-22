@@ -50,3 +50,13 @@ module.exports.findGroupIDbyName = async (name) => {
   }
   return findGroupResult.dataValues.id;
 };
+
+module.exports.updateCurrentVotingDropoffID = async (currentVotingDropoffID, groupID) => {
+  await models.Group.update({
+    currentVotingDropoffID,
+  }, {
+    where: {
+      id: groupID,
+    },
+  });
+};
