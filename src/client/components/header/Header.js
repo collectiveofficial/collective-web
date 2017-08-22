@@ -31,8 +31,8 @@ class Header extends Component {
               <div></div>
             }
             <Link className={s.link} to="/about">About</Link>
-            <Link className={s.link} to="/foodwiki">FoodWiki</Link>
-            <Link className={s.link} to="/community">Community</Link>
+            {/* <Link className={s.link} to="/foodwiki">FoodWiki</Link>
+            <Link className={s.link} to="/community">Community</Link> */}
             {this.props.authenticated ?
               <a
                 className={s.link}
