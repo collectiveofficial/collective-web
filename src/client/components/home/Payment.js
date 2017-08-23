@@ -203,12 +203,11 @@ class Payment extends React.Component {
                         <Modal.Content image>
                           <Modal.Description>
                             <br /><br />
-                            <p>Collective works to make organization easier for groups. And in order to meet</p>
-                            <p>these needs, we must cover basic costs for web hosting, and transaction fees.</p>
-                            <p>In order to use Stripe, our secure payment system, we must</p>
-                            <p>cover a standard 2.9% + $.30 fee for every transaction.</p>
-                            <p>Our number one goal is to inexpensively provide high-quality groceries,</p>
-                            <p>so we will do whatever we can to keep these prices low while still keeping the site up. </p>
+                            <p>Collective's primary goal is to empower food coops and community groups</p>
+                            <p>through technological solutions to basic organizational challenges.</p>
+                            <p>While maintaining low customer cost is a priority, we must still cover basic</p>
+                            <p>expenses in order to maintain our site while securely handling payments.</p>
+                            <p>So every payment includes a standard 2.9% + $.30 fee through our payment provider Stripe.</p>
                             <p>If you have any questions please contact us through our feedback <a href="https://docs.google.com/forms/d/e/1FAIpQLSdMJUSKNvto7jxcY800Z3ocrU7Hu7CSeu5B7M6s9ZJr7vGyzA/viewform?usp=sf_link" target="/blank">form</a>.</p>
                           </Modal.Description>
                         </Modal.Content>
