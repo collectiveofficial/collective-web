@@ -156,7 +156,7 @@ class Payment extends React.Component {
                             <Dropdown inline options={numOptions}
                               onChange={this.handleDorm}
                               defaultValue={numOptions[0].value}
-                            /><Modal trigger={<a className={s.mode}>dorm packages</a>} basic size='small' closeIcon="close">
+                            /><Modal trigger={<a className={s.mode}>dorm packages ($6)</a>} basic size='small' closeIcon="close">
                             <Modal.Header>Dorm package</Modal.Header>
                             <Modal.Content image>
                               <Modal.Description>
@@ -180,7 +180,7 @@ class Payment extends React.Component {
                           <Dropdown inline options={numOptions}
                             onChange={this.handleCook}
                             defaultValue={numOptions[0].value}
-                          /><Modal trigger={<a className={s.mode}>cooking packages</a>} basic size='small' closeIcon="close">
+                          /><Modal trigger={<a className={s.mode}>cooking packages ($11)</a>} basic size='small' closeIcon="close">
                           <Modal.Header>Cooking package</Modal.Header>
                           <Modal.Content image>
                             <Modal.Description>
@@ -203,13 +203,12 @@ class Payment extends React.Component {
                         <Modal.Content image>
                           <Modal.Description>
                             <br /><br />
-                            <p>Collective’s cutting edge automation streamlines the process for buyers and sellers to vote,</p>
-                            <p>organize and arrange payments for bulk buys. Our employees work around the clock to leverage</p>
-                            <p>the necessary technology and infraustructure to scale and provide the best produce to the most</p>
-                            <p>amount of people at an affordable price. Our infrastructure includes trusted payment providers,</p>
-                            <p>web hosting services and other partners to bring you the best experience possible. The total amount</p>
-                            <p> includes transaction fees for our payment providers and a small processing fee to cover web hosting</p>
-                            <p>and other infrastructure services. If you have any questions please contact us through our feedback <a href="https://docs.google.com/forms/d/e/1FAIpQLSdMJUSKNvto7jxcY800Z3ocrU7Hu7CSeu5B7M6s9ZJr7vGyzA/viewform?usp=sf_link" target="/blank">form</a>.</p>
+                            <p>Collective's primary goal is to empower food coops and community groups</p>
+                            <p>through technological solutions to basic organizational challenges.</p>
+                            <p>While maintaining low customer cost is a priority, we must still cover basic</p>
+                            <p>expenses in order to maintain our site while securely handling payments.</p>
+                            <p>So every payment includes a standard 2.9% + $.30 fee through our payment provider Stripe.</p>
+                            <p>If you have any questions please contact us through our feedback <a href="https://docs.google.com/forms/d/e/1FAIpQLSdMJUSKNvto7jxcY800Z3ocrU7Hu7CSeu5B7M6s9ZJr7vGyzA/viewform?usp=sf_link" target="/blank">form</a>.</p>
                           </Modal.Description>
                         </Modal.Content>
                       </Modal>
