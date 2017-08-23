@@ -156,7 +156,7 @@ class Payment extends React.Component {
                             <Dropdown inline options={numOptions}
                               onChange={this.handleDorm}
                               defaultValue={numOptions[0].value}
-                            /><Modal trigger={<a className={s.mode}>dorm packages</a>} basic size='small' closeIcon="close">
+                            /><Modal trigger={<a className={s.mode}>dorm packages ($6 each)</a>} basic size='small' closeIcon="close">
                             <Modal.Header>Dorm package</Modal.Header>
                             <Modal.Content image>
                               <Modal.Description>
@@ -180,7 +180,7 @@ class Payment extends React.Component {
                           <Dropdown inline options={numOptions}
                             onChange={this.handleCook}
                             defaultValue={numOptions[0].value}
-                          /><Modal trigger={<a className={s.mode}>cooking packages</a>} basic size='small' closeIcon="close">
+                          /><Modal trigger={<a className={s.mode}>cooking packages ($11 each)</a>} basic size='small' closeIcon="close">
                           <Modal.Header>Cooking package</Modal.Header>
                           <Modal.Content image>
                             <Modal.Description>
@@ -204,12 +204,12 @@ class Payment extends React.Component {
                           <Modal.Description>
                             <br /><br />
                             <p>Collective works to make organization easier for groups. And in order to meet</p>
-                            <p>these needs, we must cover basic costs for insurance, web hosting, and card</p>
-                            <p>transaction fees. In order to legally use Stripe, our secure payment system,</p>
-                            <p>we must cover a standard 2.9% + $.30 fee for every transaction ($.47 on every</p>
-                            <p>dorm package and $.68 on every cooking package). Our number one goal is to inexpensively</p>
-                            <p>provide high-quality groceries, so we will do whatever we can to keep these prices low</p>
-                            <p>while still keeping the site up. If you have any questions please contact us through our feedback <a href="https://docs.google.com/forms/d/e/1FAIpQLSdMJUSKNvto7jxcY800Z3ocrU7Hu7CSeu5B7M6s9ZJr7vGyzA/viewform?usp=sf_link" target="/blank">form</a>.</p>
+                            <p>these needs, we must cover basic costs for web hosting, and transaction fees.</p>
+                            <p>In order to use Stripe, our secure payment system, we must</p>
+                            <p>cover a standard 2.9% + $.30 fee for every transaction.</p>
+                            <p>Our number one goal is to inexpensively provide high-quality groceries,</p>
+                            <p>so we will do whatever we can to keep these prices low while still keeping the site up. </p>
+                            <p>If you have any questions please contact us through our feedback <a href="https://docs.google.com/forms/d/e/1FAIpQLSdMJUSKNvto7jxcY800Z3ocrU7Hu7CSeu5B7M6s9ZJr7vGyzA/viewform?usp=sf_link" target="/blank">form</a>.</p>
                           </Modal.Description>
                         </Modal.Content>
                       </Modal>
