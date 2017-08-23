@@ -156,7 +156,7 @@ class Payment extends React.Component {
                             <Dropdown inline options={numOptions}
                               onChange={this.handleDorm}
                               defaultValue={numOptions[0].value}
-                            /><Modal trigger={<a className={s.mode}>dorm packages ($6 each)</a>} basic size='small' closeIcon="close">
+                            /><Modal trigger={<a className={s.mode}>dorm packages ($6)</a>} basic size='small' closeIcon="close">
                             <Modal.Header>Dorm package</Modal.Header>
                             <Modal.Content image>
                               <Modal.Description>
@@ -180,7 +180,7 @@ class Payment extends React.Component {
                           <Dropdown inline options={numOptions}
                             onChange={this.handleCook}
                             defaultValue={numOptions[0].value}
-                          /><Modal trigger={<a className={s.mode}>cooking packages ($11 each)</a>} basic size='small' closeIcon="close">
+                          /><Modal trigger={<a className={s.mode}>cooking packages ($11)</a>} basic size='small' closeIcon="close">
                           <Modal.Header>Cooking package</Modal.Header>
                           <Modal.Content image>
                             <Modal.Description>
