@@ -36,10 +36,11 @@ module.exports.populateBallot = async (dropoff, food) => {
   });
 };
 
-module.exports.findFoodInfo = async (foodName) => {
+module.exports.findFoodInfo = async (foodName, dropoffID) => {
   return models.Ballot.findOne({
     where: {
       foodName,
+      dropoffID,
     },
   })
   .then((findFoodInfoResult) => {
@@ -80,7 +81,7 @@ module.exports.getBallotUserVotes = async (requestBody) => {
     ballots.push(foodItem);
   }
   const userID = await userUtil.findUserID(requestBody.uid);
-  const userVotes = await voteUtil.findVotesByUser(userID);
+  const userVotes = await voteUtil.findVotesByUserAndDropoff(userID, requestBody.dropoffID);
   const ballotsAndVotes = await ballots.map((ballot) => {
     const ballotsVotes = {};
     ballotsVotes.name = ballot.name;
