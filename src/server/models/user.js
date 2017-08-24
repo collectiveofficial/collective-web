@@ -144,16 +144,6 @@ module.exports.checkIfFacebookUserFinishedSignUp = function (uid) {
   .catch(err => console.log(err));
 };
 
-// TODO: remove this function later
-module.exports.populateAllUserGroupID = async (userGroupId) => {
-  await models.User.update({
-    userGroupId,
-  }, {
-    where: {
-    },
-  });
-};
-
 module.exports.saveSubmittedUserInfo = async (user) => {
   const userGroupId = await groupUtil.findGroupIDbyName(user.school);
   await models.User.update({
@@ -205,7 +195,6 @@ module.exports.getUniqueUsersByGroupID = async (userGroupId) => {
       userGroupId,
     },
   });
-  console.log('usersByGroupID', usersByGroupID);
   for (let i = 0; i < usersByGroupID.length; i++) {
     usersObjByIds[usersByGroupID[i].dataValues.id] = {
       lastName: usersByGroupID[i].dataValues.lastName,
@@ -213,11 +202,5 @@ module.exports.getUniqueUsersByGroupID = async (userGroupId) => {
       email: usersByGroupID[i].dataValues.email,
     };
   }
-  // for (let email in uniqueUsersObjByEmail) {
-  //   uniqueUsersObjById[uniqueUsersObjByEmail[email].id] = {
-  //     lastName: uniqueUsersObjByEmail[email].lastName,
-  //     firstName: uniqueUsersObjByEmail[email].firstName,
-  //   };
-  // }
   return usersObjByIds;
 };

@@ -171,7 +171,8 @@ class Login extends React.Component {
                   height="30"
                   width="30"
                 />
-                <h2>Log in to see more</h2>
+                <h2>Log in to Collective</h2>
+                <h2>Built to empower groups</h2>
                 <div>
                   <MailOutline />
                   <Popup

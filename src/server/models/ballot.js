@@ -3,10 +3,10 @@ const userUtil = require('./user');
 const foodUtil = require('./food');
 const voteUtil = require('./vote');
 
-module.exports.doesBallotExist = () => {
+module.exports.doesBallotExist = (dropoffID) => {
   return models.Ballot.findOne({
     where: {
-      id: 1,
+      dropoffID,
     }
   })
   .then((doesBallotExistResult) => {
@@ -19,23 +19,20 @@ module.exports.doesBallotExist = () => {
   .catch(err => console.log(err));
 };
 
-module.exports.populateBallots = async (dropoffID, voteDateTimeBeg, voteDateTimeEnd) => {
-  const findAllFirstDropFoodItems = await foodUtil.findAllFirstDropFoodItems();
-  await findAllFirstDropFoodItems.forEach((foodItem) => {
-    models.Ballot.create({
-      dropoffID,
-      foodID: foodItem.dataValues.id,
-      foodName: foodItem.dataValues.name,
-      imageUrl: foodItem.dataValues.imageUrl,
-      voteCount: 0,
-      wasShipped: false,
-      elected: false,
-      notShippedDesc: null,
-      notShippedClass: null,
-      shipDate: null,
-      voteDateTimeBeg,
-      voteDateTimeEnd,
-    });
+module.exports.populateBallot = async (dropoff, food) => {
+  await models.Ballot.create({
+    dropoffID: dropoff.id,
+    foodID: food.id,
+    foodName: food.name,
+    imageUrl: food.imageUrl,
+    voteCount: 0,
+    wasShipped: false,
+    elected: false,
+    notShippedDesc: null,
+    notShippedClass: null,
+    shipDate: null,
+    voteDateTimeBeg: dropoff.voteDateTimeBeg,
+    voteDateTimeEnd: dropoff.voteDateTimeEnd,
   });
 };
 
@@ -50,21 +47,6 @@ module.exports.findFoodInfo = async (foodName) => {
     return findFoodInfoResult;
   })
   .catch(err => console.log(err));
-};
-
-module.exports.updateVoteDates = async (dropoffID, dates) => {
-  try {
-    await models.Ballot.update({
-      voteDateTimeBeg: dates.voteDateTimeBeg,
-      voteDateTimeEnd: dates.voteDateTimeEnd,
-    }, {
-      where: {
-        dropoffID,
-      },
-    });
-  } catch (err) {
-    console.log(err);
-  }
 };
 
 module.exports.changeVoteCount = async (voteCount, foodID, dropoffID) => {
