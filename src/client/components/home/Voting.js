@@ -44,7 +44,6 @@ class Voting extends React.Component {
         },
         body: JSON.stringify({
           firebaseAccessToken: this.props.firebaseAccessToken,
-          dropoffID: 1, //TODO: implement dynamic dropoffID
         }),
       });
       const checkIfUserHasPaidResultData = await checkIfUserHasPaidResult.json();
