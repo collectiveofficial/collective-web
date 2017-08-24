@@ -38,7 +38,7 @@ module.exports.checkTransaction = async (requestBody) => {
   }
 };
 
-module.exports.getUserNamesAndPackagesOrdered = async (dropoffID) => {
+module.exports.getUserNamesEmailsAndPackagesOrdered = async (dropoffID) => {
   let userNamesAndPackagesOrdered = [];
   const transactions = await models.Transaction.findAll({
     where: {
@@ -46,10 +46,11 @@ module.exports.getUserNamesAndPackagesOrdered = async (dropoffID) => {
     },
   });
   for (let i = 0; i < transactions.length; i++) {
-    const nameObj = await userUtil.findUserNameByID(transactions[i].dataValues.userID);
+    const nameObj = await userUtil.findUserNameAndEmailByID(transactions[i].dataValues.userID);
     const dataObj = {
       'Last Name': nameObj.lastName,
       'First Name': nameObj.firstName,
+      Email: nameObj.email,
       'Dorm Packages Ordered': transactions[i].dataValues.dormPackagesOrdered,
       'Cooking Packages Ordered': transactions[i].dataValues.cookingPackagesOrdered,
     };

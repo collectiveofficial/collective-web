@@ -175,7 +175,7 @@ module.exports.findUserID = async (firebaseUID) => {
   return findUserIDResult.dataValues.id;
 };
 
-module.exports.findUserNameByID = async (id) => {
+module.exports.findUserNameAndEmailByID = async (id) => {
   const user = await models.User.findOne({
     where: {
       id,
