@@ -362,10 +362,10 @@ const initializeData = async () => {
     };
 
     const sendUserNamesAndPackagesOrdered = async () => {
-      fields = ['Last Name', 'First Name', 'Dorm Packages Ordered', 'Cooking Packages Ordered'];
+      fields = ['Last Name', 'First Name', 'Email', 'Dorm Packages Ordered', 'Cooking Packages Ordered'];
       // csv in ascending alphabetical order
-      const userNamesAndPackagesOrdered = await transactionUtil.getUserNamesAndPackagesOrdered(dropoffID);
-      csv = json2csv({ data: userNamesAndPackagesOrdered, fields });
+      const userNamesEmailsAndPackagesOrdered = await transactionUtil.getUserNamesEmailsAndPackagesOrdered(dropoffID);
+      csv = json2csv({ data: userNamesEmailsAndPackagesOrdered, fields });
       fileName = 'userNamesAndPackagesOrdered.csv';
       await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
         if (err) {
