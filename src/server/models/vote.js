@@ -7,7 +7,7 @@ module.exports.saveVotes = async (requestBody) => {
   for (let foodItem in requestBody.foodObj) {
     // find food id from name in ballot table
     // find ballot id from food id in ballot table
-    const findFoodInfoResult = await ballotUtil.findFoodInfo(foodItem);
+    const findFoodInfoResult = await ballotUtil.findFoodInfo(foodItem, requestBody.dropoffID);
     const userID = await userUtil.findUserID(requestBody.uid);
     // TODO: save findFoodInfoResult's foodID, foodName, ballotID into Vote
     await models.Vote.create({
@@ -61,17 +61,18 @@ module.exports.updateVotes = async (requestBody) => {
   }
 };
 
-module.exports.findVotesByUser = async (userID) => {
+module.exports.findVotesByUserAndDropoff = async (userID, dropoffID) => {
   const votes = {};
-  const findVotesByUserResult = await models.Vote.findAll({
+  const findVotesByUserAndDropoffResult = await models.Vote.findAll({
     where: {
       userID,
+      dropoffID,
     },
   });
-  if (findVotesByUserResult.length > 0) {
-    for (let i = 0; i < findVotesByUserResult.length; i++) {
-      const foodName = findVotesByUserResult[i].dataValues.foodName;
-      const isCurrent = findVotesByUserResult[i].dataValues.isCurrent
+  if (findVotesByUserAndDropoffResult.length > 0) {
+    for (let i = 0; i < findVotesByUserAndDropoffResult.length; i++) {
+      const foodName = findVotesByUserAndDropoffResult[i].dataValues.foodName;
+      const isCurrent = findVotesByUserAndDropoffResult[i].dataValues.isCurrent;
       votes[foodName] = isCurrent;
     }
   }
