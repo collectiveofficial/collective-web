@@ -11,6 +11,7 @@ module.exports = function(sequelize, DataTypes) {
     fullAddress: DataTypes.STRING,
     descriptor: DataTypes.STRING,
     currentDropoffID: DataTypes.INTEGER,
+    currentVotingDropoffID: DataTypes.INTEGER,
   }, {
     classMethods: {
       associate: function(models) {
