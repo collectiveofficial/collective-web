@@ -7,21 +7,26 @@ import { Image, Modal } from 'semantic-ui-react';
 import s from './Home.css';
 import Voting from './Voting.js';
 import { Card, CardMedia, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
-import {Button} from 'react-toolbox/lib/button';
+import { Message } from 'semantic-ui-react'
+
 
 class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      date: "26 August 2017 from 9am to Noon",
-      vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
+      // date: "26 August 2017 from 9am to Noon",
+      // vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
+      // remainingCalendar: [
+      //   ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
+      pastDropoffDate: '26 August 2017 from 9am to Noon',
+      date: '9 September 2017 from 9 AM to Noon',
+      vote: "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM",
       remainingCalendar: [
-        ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
-      ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
-      ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
-      ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
-      ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
-      ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
+        ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
+        ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
+        ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
+        ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
+        ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
       ],
       items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
       provider: "DNO Produce",
@@ -43,6 +48,7 @@ class Home extends React.Component {
               </div>
               <h1 className={s.banner}>Upcoming Bulk Buys</h1>
             </div>
+            <Message color='blue'>Next pickup: {this.state.pastDropoffDate} at Scott House</Message>
             <Card style={{width: "800px", margin: "0 0 30px 0"}}>
               <CardTitle
                 title={this.state.date}

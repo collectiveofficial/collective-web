@@ -1,13 +1,13 @@
 const models = require('../../database/models/index');
 
-module.exports.doesFirstDropoffExist = () => {
+module.exports.doesDropoffExist = (id) => {
   return models.Dropoff.findOne({
     where: {
-      id: 1,
+      id,
     }
   })
-  .then((doesFirstDropoffExistResult) => {
-    if (doesFirstDropoffExistResult !== null) {
+  .then((doesDropoffExistResult) => {
+    if (doesDropoffExistResult !== null) {
       return true;
     } else {
       return false;
@@ -35,6 +35,16 @@ module.exports.populateDropoff = async (dropoff) => {
     groupID: dropoff.groupID,
   })
   .catch(err => console.log(err));
+};
+
+module.exports.updateFirstDropoffVoteTimeEnd = async (id, voteDateTimeEnd) => {
+  await models.Dropoff.update({
+    voteDateTimeEnd,
+  }, {
+    where: {
+      id,
+    },
+  });
 };
 
 module.exports.updateGroupIDonDropoffs = async (id, groupID) => {

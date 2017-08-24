@@ -53,17 +53,24 @@ module.exports.findGroupIDbyName = async (name) => {
 };
 
 module.exports.updateCurrentDropoffID = async (currentDropoffID, groupID) => {
-  const dateNowInEST = moment.tz(new Date(), 'America/New_York');
-  const intendedPickupTimeEnd = await dropoffUtil.findIntendedPickupTimeEnd(currentDropoffID, groupID);
-  if (dateNowInEST > intendedPickupTimeEnd) {
-    await models.Group.update({
-      currentDropoffID,
-    }, {
-      where: {
-        id: groupID,
-      },
-    });
-  }
+  await models.Group.update({
+    currentDropoffID,
+  }, {
+    where: {
+      id: groupID,
+    },
+  });
+  // const dateNowInEST = moment.tz(new Date(), 'America/New_York');
+  // const intendedPickupTimeEnd = await dropoffUtil.findIntendedPickupTimeEnd(currentDropoffID, groupID);
+  // if (dateNowInEST > intendedPickupTimeEnd) {
+  //   await models.Group.update({
+  //     currentDropoffID,
+  //   }, {
+  //     where: {
+  //       id: groupID,
+  //     },
+  //   });
+  // }
 };
 
 module.exports.updateCurrentVotingDropoffID = async (currentVotingDropoffID, groupID) => {
