@@ -612,6 +612,8 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;
+      // TODO: Implement dynamic dropoffID
+      req.body.dropoffID = 2;
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.saveVotes(req.body);
       res.json({ votesSaved: true });
@@ -665,6 +667,8 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;
+      // TODO: Implement dynamic dropoffID
+      req.body.dropoffID = 2;
       const checkTransactionResult = await transactionUtil.checkTransaction(req.body);
       res.json(checkTransactionResult);
     },
