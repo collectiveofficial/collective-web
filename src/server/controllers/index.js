@@ -263,6 +263,11 @@ const firstGroup = {
   currentDropoffID: 1,
   // TODO: dynamic voting dropoff ID (current datetime)
   currentVotingDropoffID: 1,
+  deliveryStreetAddress: '160 W Woodruff Ave',
+  deliveryAptSuite: 'Building 1108',
+  deliveryCity: 'Columbus',
+  deliveryState: 'OH',
+  deliveryZipCode: '43210',
 };
 
 const initializeData = async () => {
@@ -315,13 +320,6 @@ const initializeData = async () => {
     }
   };
 
-  const updateGroupIDonDropoffs = async () => {
-    const dropoffID = 1;
-    const groupID = 1;
-    await dropoffUtil.updateGroupIDonDropoffs(dropoffID, groupID);
-  };
-
-
   const initializeFirstDropFoodItemsBallots = async () => {
     const ballotID = 1;
     const foodID = 1;
@@ -337,6 +335,19 @@ const initializeData = async () => {
     if (!doesPapayaExist) {
       await foodUtil.populateFoodItemsBallots(secondDropFoodItems, ballotID, secondDropoff);
     }
+  };
+
+  const updateDeliveryAddressForGroup = async () => {
+    // TODO: dynamic groupID
+    const groupID = 1;
+    const deliveryAddress = {
+      deliveryStreetAddress: '160 W Woodruff Ave',
+      deliveryAptSuite: 'Building 1108',
+      deliveryCity: 'Columbus',
+      deliveryState: 'OH',
+      deliveryZipCode: '43210',
+    };
+    await groupUtil.updateDeliveryAddressForGroup(groupID, deliveryAddress)
   };
 
   const sendNightlyCSVupdates = async () => {
@@ -382,8 +393,8 @@ const initializeData = async () => {
   const sendVotingReminderCSVupdates = async () => {
     const fields = ['Last Name', 'First Name', 'Email'];
     // TODO: dynamic groupID
-    const dropoffID = 1;
     const groupID = 1;
+    const dropoffID = 1;
     const usersWhoHaveNotPaid = await transactionUtil.getUsersWhoHaveNotPaid(dropoffID, groupID);
     const csv = json2csv({ data: usersWhoHaveNotPaid, fields });
     const fileName = 'usersWhoHaveNotPaid.csv';
@@ -404,7 +415,7 @@ const initializeData = async () => {
   await updateFirstDropoffVoteTimeEnd();
   await initializeSecondDropoff();
   await initializeSecondDropFoodItemsBallots();
-  await updateGroupIDonDropoffs();
+  await updateDeliveryAddressForGroup();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
 };
@@ -611,6 +622,7 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;
+      req.body.dropoffID = 2;
       const isUserQualifiedForDelivery = await userUtil.checkIfUserQualifiedForDelivery(req.body);
       res.json({ isUserQualifiedForDelivery });
     },

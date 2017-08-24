@@ -47,16 +47,6 @@ module.exports.updateFirstDropoffVoteTimeEnd = async (id, voteDateTimeEnd) => {
   });
 };
 
-module.exports.updateGroupIDonDropoffs = async (id, groupID) => {
-  await models.Dropoff.update({
-    groupID,
-  }, {
-    where: {
-      id,
-    },
-  });
-};
-
 module.exports.findPctFeePerPackageForDrop = async (dropoffID) => {
   const findDropoffByIDResult = await models.Dropoff.findOne({
     where: {

@@ -4,6 +4,7 @@ const googleMapsClient = require('@google/maps').createClient({
 });
 const models = require('../../database/models/index');
 const groupUtil = require('./group');
+const dropoffUtil = require('./dropoff');
 
 module.exports.checkIfUserIsFacebookAuth = function (email) {
   return models.User.findOne({
@@ -210,13 +211,15 @@ module.exports.getUniqueUsersByGroupID = async (userGroupId) => {
 
 module.exports.checkIfUserQualifiedForDelivery = async (requestBody) => {
   try {
-    const user = await models.User.findOne({
-      where: {
-        id: requestBody.uid,
-      },
-    });
-    const userAddress = user.dataValues.fullAddress;
-    const deliveryOrigin = '500 SW Jefferson Way, Corvallis, OR 97331';
+    // const user = await models.User.findOne({
+    //   where: {
+    //     id: requestBody.uid,
+    //   },
+    // });
+    // const userAddress = user.dataValues.fullAddress;
+    const userAddress = '281 W. Lane Ave., Columbus, OH 43210';
+    // TODO: dynamic deliveryOrigin
+    const deliveryOrigin = await dropoffUtil.findAddressFromDropoffID(requestBody.dropoffID);
     const unitSystem = 'imperial';
     const distanceLimit = 5;
     const googleMapsResult = await googleMapsClient.distanceMatrix({
