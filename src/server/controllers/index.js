@@ -606,6 +606,15 @@ module.exports = {
       await res.json(responseObject);
     },
   },
+  qualifyDelivery: {
+    async post(req, res) {
+      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+      let uid = decodedToken.uid;
+      req.body.uid = uid;
+      const isUserQualifiedForDelivery = await userUtil.checkIfUserQualifiedForDelivery(req.body);
+      res.json({ isUserQualifiedForDelivery });
+    },
+  },
   saveVotes: {
     async post(req, res) {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);

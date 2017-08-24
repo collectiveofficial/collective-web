@@ -1,4 +1,7 @@
-const Promise = require('bluebird');
+const dotenv = require('dotenv').config();
+const googleMapsClient = require('@google/maps').createClient({
+  key: process.env.GOOGLE_MAPS_API_KEY,
+});
 const models = require('../../database/models/index');
 const groupUtil = require('./group');
 
@@ -203,4 +206,31 @@ module.exports.getUniqueUsersByGroupID = async (userGroupId) => {
     };
   }
   return usersObjByIds;
+};
+
+module.exports.checkIfUserQualifiedForDelivery = async (requestBody) => {
+  try {
+    const user = await models.User.findOne({
+      where: {
+        id: requestBody.uid,
+      },
+    });
+    const userAddress = user.dataValues.fullAddress;
+    const deliveryOrigin = '500 SW Jefferson Way, Corvallis, OR 97331';
+    const unitSystem = 'imperial';
+    const distanceLimit = 5;
+    const googleMapsResult = await googleMapsClient.distanceMatrix({
+      origins: [deliveryOrigin],
+      destinations: [userAddress],
+      unitSystem,
+    });
+    const distanceFromUserAddressInMiles = googleMapsResult.rows[0].elements.value;
+    if (distanceFromUserAddressInMiles <= distanceLimit) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+  }
 };
