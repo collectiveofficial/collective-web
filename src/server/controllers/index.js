@@ -324,10 +324,9 @@ const initializeData = async () => {
 
   const initializeFirstDropFoodItemsBallots = async () => {
     const ballotID = 1;
-    const dropoffID = 1;
-    const doesFirstDropoffExist = await dropoffUtil.doesDropoffExist(dropoffID);
-    const doesSecondDropoffExist = await dropoffUtil.doesDropoffExist(2);
-    if (doesFirstDropoffExist && !doesSecondDropoffExist) {
+    const foodID = 1;
+    const doesFoodItemExist = await foodUtil.doesFoodItemExist(foodID);
+    if (!doesFoodItemExist) {
       await foodUtil.populateFoodItemsBallots(firstDropFoodItems, ballotID, firstDropoff);
     }
   };
@@ -336,7 +335,7 @@ const initializeData = async () => {
     const ballotID = 2;
     const doesPapayaExist = await foodUtil.doesPapayaExist();
     if (!doesPapayaExist) {
-      await foodUtil.populateFoodItemsBallots(secondDropFoodItems, ballotID, secondDropoff)
+      await foodUtil.populateFoodItemsBallots(secondDropFoodItems, ballotID, secondDropoff);
     }
   };
 
