@@ -196,15 +196,13 @@ class Payment extends React.Component {
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
-                  {/* <Segment raised>
-                    <Label as='a' color='red' ribbon>Overview</Label>
-                    <span>Account Details</span>
-                  </Segment>
                   <Segment compact>
-                    <Label as='div' color='red' ribbon>New<Icon name="exclamation" /></Label>
-                    <br />
-                    <Checkbox label="Delivery" checked={this.state.userWantsDelivery} onClick={() => { this.setState({ userWantsDelivery: !this.state.userWantsDelivery }); }} />
-                  </Segment> */}
+                    {/* <Label as='div' color='red' ribbon>New!</Label> */}
+                    <Label color='red' floating>New!</Label>
+                    <Checkbox label="Delivery ($3)" checked={this.state.userWantsDelivery} onClick={() => { this.setState({ userWantsDelivery: !this.state.userWantsDelivery }); }} />
+                    <p>Limit 50 participants.</p>
+                    <p>Available deliveries left: 50</p>
+                  </Segment>
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
@@ -237,7 +235,7 @@ class Payment extends React.Component {
                           // panelLabel="Give Money" prepended to the amount in the bottom pay button
                           amount={this.state.price * 100} // cents
                           currency="USD"
-                          stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
+                          stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
                           email={this.state.email}
                           // Note: Enabling either address option will give the user the ability to
                           // fill out both. Addresses are sent as a second parameter in the token callback.
