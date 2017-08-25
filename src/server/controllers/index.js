@@ -577,10 +577,9 @@ module.exports = {
       console.log('req.body', req.body);
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken)
       let uid = decodedToken.uid;
-      const doesUserExist = await userUtil.checkIfUserExists(uid);
       req.body.uid = uid;
-      await userUtil.saveSubmittedUserInfo(req.body);
-      await res.json({ userSignedUp: true });
+      const userSignedUp = await userUtil.saveSubmittedUserInfo(req.body);
+      await res.json({ userSignedUp });
     },
   },
   facebookLogin: {
@@ -592,7 +591,6 @@ module.exports = {
       req.body.uid = uid;
       if (doesUserExist) {
         const hasUserFinishedSignUp = await userUtil.checkIfFacebookUserFinishedSignUp(uid);
-        await console.log('hasUserFinishedSignUp: ', hasUserFinishedSignUp);
         if (hasUserFinishedSignUp) {
           await res.json({
             saveUserOnFacebookSignUpExecuted: false,
@@ -625,7 +623,6 @@ module.exports = {
       req.body.dropoffID = 2;
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
       const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
-      console.log('------> userTransactionHistory: ', userTransactionHistory);
       const responseObject = {
         ballotsAndVotes,
         userTransactionHistory,
