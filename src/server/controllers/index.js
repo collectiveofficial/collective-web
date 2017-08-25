@@ -356,7 +356,11 @@ const initializeData = async () => {
       deliveryState: 'OH',
       deliveryZipCode: '43210',
     };
-    await groupUtil.updateDeliveryAddressForGroup(groupID, deliveryAddress)
+    await groupUtil.updateDeliveryAddressForGroup(groupID, deliveryAddress);
+  };
+
+  const updateIsQualifiedForDelivery = async () => {
+    await userUtil.updateIsQualifiedForDelivery();
   };
 
   const sendNightlyCSVupdates = async () => {

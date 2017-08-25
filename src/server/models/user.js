@@ -219,9 +219,7 @@ module.exports.checkIfUserQualifiedForDelivery = async (requestBody) => {
       },
     });
     // const userAddress = user.dataValues.fullAddress;
-    // const userAddress = '281 W. Lane Ave., Columbus, OH 43210';
-    const userAddress = '1046 Corvette Dr., San Jose, CA 95129';
-    // TODO: dynamic deliveryOrigin
+    const userAddress = '281 W. Lane Ave., Columbus, OH 43210';
     // const groupID = user.dataValues.userGroupId;
     const groupID = 1;
     const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(groupID);
@@ -234,13 +232,10 @@ module.exports.checkIfUserQualifiedForDelivery = async (requestBody) => {
     })
     .asPromise();
     const googleMapsDistanceMatrixResult = googleMapsDistanceMatrix.json;
-    // ([\d.]+)\s+(\S+)
     const regex = /(?:^|\s)(\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/;
     const distanceFromUserAddressText = googleMapsDistanceMatrixResult.rows[0].elements[0].distance.text;
-    console.log('\n\n\ngoogleMapsDistanceMatrixResult.rows[0].elements[0]', googleMapsDistanceMatrixResult.rows[0].elements[0]);
     let distanceFromUserAddressInMiles = regex.exec(distanceFromUserAddressText)[1];
-    // distanceFromUserAddressInMiles = distanceFromUserAddressInMiles.replace()
-    console.log('\n\n\n\ndistanceFromUserAddressInMiles: ', distanceFromUserAddressInMiles);
+    distanceFromUserAddressInMiles = distanceFromUserAddressInMiles.replace(',', '');
     if (distanceFromUserAddressInMiles <= distanceLimit) {
       return true;
     } else {
