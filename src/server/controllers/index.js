@@ -603,9 +603,11 @@ module.exports = {
       req.body.dropoffID = 2;
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
       const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
+      const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
       const responseObject = {
         ballotsAndVotes,
         userTransactionHistory,
+        deliveriesOrderedCount,
       };
       await res.json(responseObject);
     },
