@@ -237,7 +237,7 @@ module.exports.updateIsQualifiedForDelivery = async (groupID) => {
   try {
     const findUsersResult = await models.User.findAll({
       where: {
-        // userGroupId: groupID,
+        userGroupId: groupID,
       },
     });
     let isQualifiedForDelivery;
