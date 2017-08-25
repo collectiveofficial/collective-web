@@ -185,7 +185,7 @@ module.exports.saveSubmittedUserInfo = async (user) => {
     fullAddress: userFullAddress,
     hasUserFinishedSignUp: true,
     userGroupId,
-    isQualifiedForDelivery,
+    isQualifiedForDelivery
   }, {
     where: {
       firebaseUID: user.uid,
