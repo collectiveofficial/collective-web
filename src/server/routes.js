@@ -15,6 +15,7 @@ router.post('/auth/signup/check-email', controller.checkUserEmail.post);
 router.post('/auth/facebook/check', controller.saveUserOnFacebookSignUp.post);
 router.post('/auth/signup/email-signup/save', controller.saveUserOnEmailSignUp.post);
 router.post('/vote-ballot/get-ballot-votes', controller.getBallotUserVotes.post);
+router.post('/delivery/qualify', controller.qualifyDelivery.post);
 router.post('/vote/save', controller.saveVotes.post);
 router.post('/vote/update', controller.updateVotes.post);
 router.post('/transaction/check', controller.checkTransaction.post);

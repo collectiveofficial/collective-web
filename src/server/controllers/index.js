@@ -38,8 +38,8 @@ const firebaseAdminApp = admin.initializeApp({
 const firstDropoff = {
   id: 1,
   intendedShipDate: '2017-08-26',
-  intendedPickupTimeStart: moment.tz('2017-08-26 09:00:00', 'America/New_York'),
-  intendedPickupTimeEnd: moment.tz('2017-08-26 12:00:00', 'America/New_York'),
+  intendedPickupTimeStart: moment.tz('2017-08-26 10:00:00', 'America/New_York'),
+  intendedPickupTimeEnd: moment.tz('2017-08-26 13:00:00', 'America/New_York'),
   shipDate: null,
   voteDateTimeBeg: moment.tz('2017-08-11 00:00:00', 'America/New_York'),
   voteDateTimeEnd: moment.tz('2017-08-23 23:59:59', 'America/New_York'),
@@ -263,6 +263,11 @@ const firstGroup = {
   currentDropoffID: 1,
   // TODO: dynamic voting dropoff ID (current datetime)
   currentVotingDropoffID: 1,
+  deliveryStreetAddress: '160 W Woodruff Ave',
+  deliveryAptSuite: 'Building 1108',
+  deliveryCity: 'Columbus',
+  deliveryState: 'OH',
+  deliveryZipCode: '43210',
 };
 
 const initializeData = async () => {
@@ -315,13 +320,6 @@ const initializeData = async () => {
     }
   };
 
-  const updateGroupIDonDropoffs = async () => {
-    const dropoffID = 1;
-    const groupID = 1;
-    await dropoffUtil.updateGroupIDonDropoffs(dropoffID, groupID);
-  };
-
-
   const initializeFirstDropFoodItemsBallots = async () => {
     const ballotID = 1;
     const foodID = 1;
@@ -331,12 +329,34 @@ const initializeData = async () => {
     }
   };
 
+  const updatePickupTimeOnDropoff = async () => {
+    const dropoffID = 1;
+    const pickupTimes = {
+      intendedPickupTimeStart: moment.tz('2017-08-26 10:00:00', 'America/New_York'),
+      intendedPickupTimeEnd: moment.tz('2017-08-26 13:00:00', 'America/New_York'),
+    };
+    await dropoffUtil.updatePickupTimeOnDropoff(dropoffID, pickupTimes);
+  };
+
   const initializeSecondDropFoodItemsBallots = async () => {
     const ballotID = 2;
     const doesPapayaExist = await foodUtil.doesPapayaExist();
     if (!doesPapayaExist) {
       await foodUtil.populateFoodItemsBallots(secondDropFoodItems, ballotID, secondDropoff);
     }
+  };
+
+  const updateDeliveryAddressForGroup = async () => {
+    // TODO: dynamic groupID
+    const groupID = 1;
+    const deliveryAddress = {
+      deliveryStreetAddress: '160 W Woodruff Ave',
+      deliveryAptSuite: 'Building 1108',
+      deliveryCity: 'Columbus',
+      deliveryState: 'OH',
+      deliveryZipCode: '43210',
+    };
+    await groupUtil.updateDeliveryAddressForGroup(groupID, deliveryAddress)
   };
 
   const sendNightlyCSVupdates = async () => {
@@ -362,10 +382,10 @@ const initializeData = async () => {
     };
 
     const sendUserNamesAndPackagesOrdered = async () => {
-      fields = ['Last Name', 'First Name', 'Email', 'Dorm Packages Ordered', 'Cooking Packages Ordered'];
+      fields = ['Last Name', 'First Name', 'Email', 'Phone Number', 'Dorm Packages Ordered', 'Cooking Packages Ordered'];
       // csv in ascending alphabetical order
-      const userNamesEmailsAndPackagesOrdered = await transactionUtil.getUserNamesEmailsAndPackagesOrdered(dropoffID);
-      csv = json2csv({ data: userNamesEmailsAndPackagesOrdered, fields });
+      const userInfoAndPackagesOrdered = await transactionUtil.getUserInfoAndPackagesOrdered(dropoffID);
+      csv = json2csv({ data: userInfoAndPackagesOrdered, fields });
       fileName = 'userNamesAndPackagesOrdered.csv';
       await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
         if (err) {
@@ -382,8 +402,8 @@ const initializeData = async () => {
   const sendVotingReminderCSVupdates = async () => {
     const fields = ['Last Name', 'First Name', 'Email'];
     // TODO: dynamic groupID
-    const dropoffID = 1;
     const groupID = 1;
+    const dropoffID = 1;
     const usersWhoHaveNotPaid = await transactionUtil.getUsersWhoHaveNotPaid(dropoffID, groupID);
     const csv = json2csv({ data: usersWhoHaveNotPaid, fields });
     const fileName = 'usersWhoHaveNotPaid.csv';
@@ -404,7 +424,8 @@ const initializeData = async () => {
   await updateFirstDropoffVoteTimeEnd();
   await initializeSecondDropoff();
   await initializeSecondDropFoodItemsBallots();
-  await updateGroupIDonDropoffs();
+  await updateDeliveryAddressForGroup();
+  await updatePickupTimeOnDropoff();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
 };
@@ -604,6 +625,15 @@ module.exports = {
         userTransactionHistory,
       };
       await res.json(responseObject);
+    },
+  },
+  qualifyDelivery: {
+    async post(req, res) {
+      // const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+      // let uid = decodedToken.uid;
+      // req.body.uid = uid;
+      const isUserQualifiedForDelivery = await userUtil.checkIfUserQualifiedForDelivery(req.body);
+      res.json({ isUserQualifiedForDelivery });
     },
   },
   saveVotes: {

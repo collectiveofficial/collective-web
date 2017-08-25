@@ -18,7 +18,7 @@ class Home extends React.Component {
       // vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
       // remainingCalendar: [
       //   ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
-      pastDropoffDate: '26 August 2017 from 9am to Noon',
+      pastDropoffDate: '26 August 2017 from 10 AM to 1 PM',
       date: '9 September 2017 from 9 AM to Noon',
       vote: "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM",
       remainingCalendar: [
