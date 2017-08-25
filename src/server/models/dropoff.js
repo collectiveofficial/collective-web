@@ -47,16 +47,6 @@ module.exports.updateFirstDropoffVoteTimeEnd = async (id, voteDateTimeEnd) => {
   });
 };
 
-module.exports.updateGroupIDonDropoffs = async (id, groupID) => {
-  await models.Dropoff.update({
-    groupID,
-  }, {
-    where: {
-      id,
-    },
-  });
-};
-
 module.exports.findPctFeePerPackageForDrop = async (dropoffID) => {
   const findDropoffByIDResult = await models.Dropoff.findOne({
     where: {
@@ -76,4 +66,15 @@ module.exports.findIntendedPickupTimeEnd = async (id, groupID) => {
   });
   const intendedPickupTimeEnd = findIntendedPickupTimeEndResult.dataValues.intendedPickupTimeEnd;
   return intendedPickupTimeEnd;
+};
+
+module.exports.updatePickupTimeOnDropoff = async (id, pickupTimes) => {
+  await models.Dropoff.update({
+    intendedPickupTimeStart: pickupTimes.intendedPickupTimeStart,
+    intendedPickupTimeEnd: pickupTimes.intendedPickupTimeEnd,
+  }, {
+    where: {
+      id,
+    },
+  });
 };

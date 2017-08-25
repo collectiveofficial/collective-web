@@ -32,10 +32,31 @@ module.exports.populateGroup = async (group) => {
       fullAddress: group.aptSuite.length > 0 ? `${group.streetAddress}, ${group.aptSuite}, ${group.city}, ${group.state} ${group.zipCode}` : `${group.streetAddress}, ${group.city}, ${group.state} ${group.zipCode}`,
       descriptor: group.descriptor,
       currentDropoffID: group.currentDropoffID,
+      deliveryStreetAddress: group.deliveryStreetAddress,
+      deliveryAptSuite: group.deliveryAptSuite,
+      deliveryCity: group.deliveryCity,
+      deliveryState: group.deliveryState,
+      deliveryZipCode: group.deliveryZipCode,
+      deliveryFullAddress: group.deliveryAptSuite.length > 0 ? `${group.deliveryStreetAddress}, ${group.deliveryAptSuite}, ${group.deliveryCity}, ${group.deliveryState} ${group.deliveryZipCode}` : `${group.deliveryStreetAddress}, ${group.deliveryCity}, ${group.deliveryState} ${group.deliveryZipCode}`,
     });
   } catch (err) {
     console.log(err);
   }
+};
+
+module.exports.updateDeliveryAddressForGroup = async (id, deliveryAddress) => {
+  await models.Group.update({
+    deliveryStreetAddress: deliveryAddress.deliveryStreetAddress,
+    deliveryAptSuite: deliveryAddress.deliveryAptSuite,
+    deliveryCity: deliveryAddress.deliveryCity,
+    deliveryState: deliveryAddress.deliveryState,
+    deliveryZipCode: deliveryAddress.deliveryZipCode,
+    deliveryFullAddress: deliveryAddress.deliveryAptSuite.length > 0 ? `${deliveryAddress.deliveryStreetAddress}, ${deliveryAddress.deliveryAptSuite}, ${deliveryAddress.deliveryCity}, ${deliveryAddress.deliveryState} ${deliveryAddress.deliveryZipCode}` : `${deliveryAddress.deliveryStreetAddress}, ${deliveryAddress.deliveryCity}, ${deliveryAddress.deliveryState} ${deliveryAddress.deliveryZipCode}`,
+  }, {
+    where: {
+      id,
+    },
+  });
 };
 
 module.exports.findGroupIDbyName = async (name) => {
@@ -81,4 +102,13 @@ module.exports.updateCurrentVotingDropoffID = async (currentVotingDropoffID, gro
       id: groupID,
     },
   });
+};
+
+module.exports.findDeliveryAddressFromGroupID = async (id) => {
+  const group = await models.Group.findOne({
+    where: {
+      id,
+    },
+  });
+  return group.dataValues.deliveryFullAddress;
 };
