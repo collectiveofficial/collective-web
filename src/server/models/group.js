@@ -103,3 +103,12 @@ module.exports.updateCurrentVotingDropoffID = async (currentVotingDropoffID, gro
     },
   });
 };
+
+module.exports.findDeliveryAddressFromGroupID = async (id) => {
+  const group = await models.Group.findOne({
+    where: {
+      id,
+    },
+  });
+  return group.dataValues.deliveryFullAddress;
+};

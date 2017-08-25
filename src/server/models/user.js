@@ -1,6 +1,7 @@
 const dotenv = require('dotenv').config();
 const googleMapsClient = require('@google/maps').createClient({
   key: process.env.GOOGLE_MAPS_API_KEY,
+  Promise, // 'Promise' is the native constructor.
 });
 const models = require('../../database/models/index');
 const groupUtil = require('./group');
@@ -179,7 +180,7 @@ module.exports.findUserID = async (firebaseUID) => {
   return findUserIDResult.dataValues.id;
 };
 
-module.exports.findUserNameAndEmailByID = async (id) => {
+module.exports.findUserInfoByID = async (id) => {
   const user = await models.User.findOne({
     where: {
       id,
@@ -189,6 +190,7 @@ module.exports.findUserNameAndEmailByID = async (id) => {
     firstName: user.dataValues.firstName,
     lastName: user.dataValues.lastName,
     email: user.dataValues.email,
+    phoneNumber: user.dataValues.phoneNumber,
   };
 };
 
@@ -211,23 +213,34 @@ module.exports.getUniqueUsersByGroupID = async (userGroupId) => {
 
 module.exports.checkIfUserQualifiedForDelivery = async (requestBody) => {
   try {
-    // const user = await models.User.findOne({
-    //   where: {
-    //     id: requestBody.uid,
-    //   },
-    // });
+    const user = await models.User.findOne({
+      where: {
+        id: requestBody.uid,
+      },
+    });
     // const userAddress = user.dataValues.fullAddress;
-    const userAddress = '281 W. Lane Ave., Columbus, OH 43210';
+    // const userAddress = '281 W. Lane Ave., Columbus, OH 43210';
+    const userAddress = '1046 Corvette Dr., San Jose, CA 95129';
     // TODO: dynamic deliveryOrigin
-    const deliveryOrigin = await dropoffUtil.findAddressFromDropoffID(requestBody.dropoffID);
-    const unitSystem = 'imperial';
+    // const groupID = user.dataValues.userGroupId;
+    const groupID = 1;
+    const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(groupID);
+    const units = 'imperial';
     const distanceLimit = 5;
-    const googleMapsResult = await googleMapsClient.distanceMatrix({
+    const googleMapsDistanceMatrix = await googleMapsClient.distanceMatrix({
       origins: [deliveryOrigin],
       destinations: [userAddress],
-      unitSystem,
-    });
-    const distanceFromUserAddressInMiles = googleMapsResult.rows[0].elements.value;
+      units,
+    })
+    .asPromise();
+    const googleMapsDistanceMatrixResult = googleMapsDistanceMatrix.json;
+    // ([\d.]+)\s+(\S+)
+    const regex = /(?:^|\s)(\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/;
+    const distanceFromUserAddressText = googleMapsDistanceMatrixResult.rows[0].elements[0].distance.text;
+    console.log('\n\n\ngoogleMapsDistanceMatrixResult.rows[0].elements[0]', googleMapsDistanceMatrixResult.rows[0].elements[0]);
+    let distanceFromUserAddressInMiles = regex.exec(distanceFromUserAddressText)[1];
+    // distanceFromUserAddressInMiles = distanceFromUserAddressInMiles.replace()
+    console.log('\n\n\n\ndistanceFromUserAddressInMiles: ', distanceFromUserAddressInMiles);
     if (distanceFromUserAddressInMiles <= distanceLimit) {
       return true;
     } else {

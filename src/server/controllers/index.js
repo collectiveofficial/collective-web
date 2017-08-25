@@ -373,10 +373,10 @@ const initializeData = async () => {
     };
 
     const sendUserNamesAndPackagesOrdered = async () => {
-      fields = ['Last Name', 'First Name', 'Email', 'Dorm Packages Ordered', 'Cooking Packages Ordered'];
+      fields = ['Last Name', 'First Name', 'Email', 'Phone Number', 'Dorm Packages Ordered', 'Cooking Packages Ordered'];
       // csv in ascending alphabetical order
-      const userNamesEmailsAndPackagesOrdered = await transactionUtil.getUserNamesEmailsAndPackagesOrdered(dropoffID);
-      csv = json2csv({ data: userNamesEmailsAndPackagesOrdered, fields });
+      const userInfoAndPackagesOrdered = await transactionUtil.getUserInfoAndPackagesOrdered(dropoffID);
+      csv = json2csv({ data: userInfoAndPackagesOrdered, fields });
       fileName = 'userNamesAndPackagesOrdered.csv';
       await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
         if (err) {
@@ -619,10 +619,9 @@ module.exports = {
   },
   qualifyDelivery: {
     async post(req, res) {
-      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
-      let uid = decodedToken.uid;
-      req.body.uid = uid;
-      req.body.dropoffID = 2;
+      // const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+      // let uid = decodedToken.uid;
+      // req.body.uid = uid;
       const isUserQualifiedForDelivery = await userUtil.checkIfUserQualifiedForDelivery(req.body);
       res.json({ isUserQualifiedForDelivery });
     },
