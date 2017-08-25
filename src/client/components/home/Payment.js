@@ -5,7 +5,7 @@ import {
   Redirect,
 } from 'react-router-dom';
 import s from './Home.css';
-import { Card, Icon, Popup, Dropdown, Feed, Modal } from 'semantic-ui-react';
+import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
 import RaisedButton from 'material-ui/RaisedButton';
 import { ref, firebaseAuth } from '../../config';
@@ -34,6 +34,7 @@ class Payment extends React.Component {
       hasPaymentCompleted: false,
       votesSaved: false,
       email: '',
+      userWantsDelivery: false,
     };
     this.handleDorm = this.handleDorm.bind(this);
     this.handleCook = this.handleCook.bind(this);
@@ -195,7 +196,15 @@ class Payment extends React.Component {
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
-                  <br />
+                  {/* <Segment raised>
+                    <Label as='a' color='red' ribbon>Overview</Label>
+                    <span>Account Details</span>
+                  </Segment>
+                  <Segment compact>
+                    <Label as='div' color='red' ribbon>New<Icon name="exclamation" /></Label>
+                    <br />
+                    <Checkbox label="Delivery" checked={this.state.userWantsDelivery} onClick={() => { this.setState({ userWantsDelivery: !this.state.userWantsDelivery }); }} />
+                  </Segment> */}
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>

@@ -356,7 +356,12 @@ const initializeData = async () => {
       deliveryState: 'OH',
       deliveryZipCode: '43210',
     };
-    await groupUtil.updateDeliveryAddressForGroup(groupID, deliveryAddress)
+    await groupUtil.updateDeliveryAddressForGroup(groupID, deliveryAddress);
+  };
+
+  const updateIsQualifiedForDelivery = async () => {
+    const groupID = 1;
+    await userUtil.updateIsQualifiedForDelivery(groupID);
   };
 
   const sendNightlyCSVupdates = async () => {
@@ -426,6 +431,7 @@ const initializeData = async () => {
   await initializeSecondDropFoodItemsBallots();
   await updateDeliveryAddressForGroup();
   await updatePickupTimeOnDropoff();
+  await updateIsQualifiedForDelivery();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
 };
@@ -625,15 +631,6 @@ module.exports = {
         userTransactionHistory,
       };
       await res.json(responseObject);
-    },
-  },
-  qualifyDelivery: {
-    async post(req, res) {
-      // const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
-      // let uid = decodedToken.uid;
-      // req.body.uid = uid;
-      const isUserQualifiedForDelivery = await userUtil.checkIfUserQualifiedForDelivery(req.body);
-      res.json({ isUserQualifiedForDelivery });
     },
   },
   saveVotes: {
