@@ -359,11 +359,6 @@ const initializeData = async () => {
     await groupUtil.updateDeliveryAddressForGroup(groupID, deliveryAddress);
   };
 
-  const updateIsQualifiedForDelivery = async () => {
-    const groupID = 1;
-    await userUtil.updateIsQualifiedForDelivery(groupID);
-  };
-
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
     const dropoffID = 1;
@@ -431,7 +426,6 @@ const initializeData = async () => {
   await initializeSecondDropFoodItemsBallots();
   await updateDeliveryAddressForGroup();
   await updatePickupTimeOnDropoff();
-  await updateIsQualifiedForDelivery();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
 };
