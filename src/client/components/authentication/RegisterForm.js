@@ -9,7 +9,7 @@ import s from './Register.css';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
-import { Modal } from 'semantic-ui-react';
+import { Modal, Message } from 'semantic-ui-react';
 import schools from './universities_list.js';
 
 injectTapEventPlugin();
@@ -45,6 +45,7 @@ class RegisterForm extends React.Component {
       areThereEmptyFields: '',
       isInvalidState: false,
       isInvalidSchool: false,
+      isFakeAddress: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -91,6 +92,7 @@ class RegisterForm extends React.Component {
     await this.setState({ isSchoolEmpty: false });
     await this.setState({ isInvalidState: false });
     await this.setState({ isInvalidSchool: false });
+    await this.setState({ isFakeAddress: false });
 
     if (this.state.firstName.length === 0) {
       await this.setState({ isFirstNameEmpty: true });
@@ -116,7 +118,7 @@ class RegisterForm extends React.Component {
     if (this.state.state.length === 0) {
       await this.setState({ isStateEmpty: true });
     }
-    if (this.state.state.length === 0) {
+    if (this.state.school.length === 0) {
       await this.setState({ isSchoolEmpty: true });
     }
     if (usStates.indexOf(this.state.state) < 0) {
@@ -158,7 +160,11 @@ class RegisterForm extends React.Component {
         }),
       })
       const responseData = await response.json();
-      await this.props.authorizeUser();
+      if (responseData.userSignedUp) {
+        await this.props.authorizeUser();
+      } else {
+        this.setState({ isFakeAddress: true });
+      }
     }
   }
 
@@ -262,6 +268,14 @@ class RegisterForm extends React.Component {
          <Modal open={this.state.areThereEmptyFields === false}>
            <Modal.Content>
              <p>By clicking continue I have read and agreed to Collective's <Link to="terms">terms of use</Link> and <Link to="privacy">privacy policy</Link> as well as Best Food Forward's <Link to="bff">terms of use</Link>, and I agree to not hold any involved individuals or entities liable for anything related to the use, consumption, storage, or purchasing of food within this site.</p>
+             {this.state.isFakeAddress ?
+               <Message
+                 error
+                 header="Please enter a valid address"
+               />
+               :
+               <div></div>
+             }
            </Modal.Content>
            <Modal.Actions>
              <RaisedButton label="Cancel" secondary={true} onTouchTap={() => { this.setState({ areThereEmptyFields: '' }); }} />

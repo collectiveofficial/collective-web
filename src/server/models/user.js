@@ -150,47 +150,56 @@ module.exports.checkIfFacebookUserFinishedSignUp = function (uid) {
 };
 
 module.exports.saveSubmittedUserInfo = async (user) => {
-  const userGroupId = await groupUtil.findGroupIDbyName(user.school);
-  let isQualifiedForDelivery;
-  const userFullAddress = user.aptSuite.length > 0 ? `${user.streetAddress}, ${user.aptSuite}, ${user.city}, ${user.state} ${user.zipCode}` : `${user.streetAddress}, ${user.city}, ${user.state} ${user.zipCode}`;
-  const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(userGroupId);
-  const units = 'imperial';
-  const distanceLimit = 5;
-  const googleMapsDistanceMatrix = await googleMapsClient.distanceMatrix({
-    origins: [deliveryOrigin],
-    destinations: [userFullAddress],
-    units,
-  })
-  .asPromise();
-  const googleMapsDistanceMatrixResult = googleMapsDistanceMatrix.json;
-  const regex = /(?:^|\s)(\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/;
-  const distanceFromUserAddressText = googleMapsDistanceMatrixResult.rows[0].elements[0].distance.text;
-  let distanceFromUserAddressInMiles = regex.exec(distanceFromUserAddressText)[1];
-  distanceFromUserAddressInMiles = distanceFromUserAddressInMiles.replace(',', '');
-  if (distanceFromUserAddressInMiles <= distanceLimit) {
-    isQualifiedForDelivery = true;
-  } else {
-    isQualifiedForDelivery = false;
+  try {
+    const userGroupId = await groupUtil.findGroupIDbyName(user.school);
+    let isQualifiedForDelivery;
+    const userFullAddress = user.aptSuite.length > 0 ? `${user.streetAddress}, ${user.aptSuite}, ${user.city}, ${user.state} ${user.zipCode}` : `${user.streetAddress}, ${user.city}, ${user.state} ${user.zipCode}`;
+    const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(userGroupId);
+    const units = 'imperial';
+    const distanceLimit = 5;
+    const googleMapsDistanceMatrix = await googleMapsClient.distanceMatrix({
+      origins: [deliveryOrigin],
+      destinations: [userFullAddress],
+      units,
+    })
+    .asPromise();
+    const googleMapsDistanceMatrixResult = googleMapsDistanceMatrix.json;
+    if (googleMapsDistanceMatrixResult.destination_addresses[0] !== '') {
+      const regex = /(?:^|\s)(\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/;
+      const distanceFromUserAddressText = googleMapsDistanceMatrixResult.rows[0].elements[0].distance.text;
+      let distanceFromUserAddressInMiles = regex.exec(distanceFromUserAddressText)[1];
+      distanceFromUserAddressInMiles = distanceFromUserAddressInMiles.replace(',', '');
+      if (distanceFromUserAddressInMiles <= distanceLimit) {
+        isQualifiedForDelivery = true;
+      } else {
+        isQualifiedForDelivery = false;
+      }
+      await models.User.update({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phoneNumber: user.phoneNumber,
+        birthday: user.birthday,
+        streetAddress: user.streetAddress,
+        aptSuite: user.aptSuite,
+        city: user.city,
+        state: user.state,
+        zipCode: user.zipCode,
+        fullAddress: userFullAddress,
+        hasUserFinishedSignUp: true,
+        userGroupId,
+        isQualifiedForDelivery,
+      }, {
+        where: {
+          firebaseUID: user.uid,
+        },
+      });
+      return true;
+    } else {
+      return false;
+    }
+  } catch(err) {
+    console.log(err);
   }
-  await models.User.update({
-    firstName: user.firstName,
-    lastName: user.lastName,
-    phoneNumber: user.phoneNumber,
-    birthday: user.birthday,
-    streetAddress: user.streetAddress,
-    aptSuite: user.aptSuite,
-    city: user.city,
-    state: user.state,
-    zipCode: user.zipCode,
-    fullAddress: userFullAddress,
-    hasUserFinishedSignUp: true,
-    userGroupId,
-    isQualifiedForDelivery,
-  }, {
-    where: {
-      firebaseUID: user.uid,
-    },
-  });
 };
 
 module.exports.findUserID = async (firebaseUID) => {
@@ -254,22 +263,24 @@ module.exports.updateIsQualifiedForDelivery = async (groupID) => {
         })
         .asPromise();
         const googleMapsDistanceMatrixResult = googleMapsDistanceMatrix.json;
-        const regex = /(?:^|\s)(\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/;
-        const distanceFromUserAddressText = googleMapsDistanceMatrixResult.rows[0].elements[0].distance.text;
-        let distanceFromUserAddressInMiles = regex.exec(distanceFromUserAddressText)[1];
-        distanceFromUserAddressInMiles = distanceFromUserAddressInMiles.replace(',', '');
-        if (distanceFromUserAddressInMiles <= distanceLimit) {
-          isQualifiedForDelivery = true;
-        } else {
-          isQualifiedForDelivery = false;
+        if (googleMapsDistanceMatrixResult.destination_addresses[0] !== '') {
+          const regex = /(?:^|\s)(\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/;
+          const distanceFromUserAddressText = googleMapsDistanceMatrixResult.rows[0].elements[0].distance.text;
+          let distanceFromUserAddressInMiles = regex.exec(distanceFromUserAddressText)[1];
+          distanceFromUserAddressInMiles = distanceFromUserAddressInMiles.replace(',', '');
+          if (distanceFromUserAddressInMiles <= distanceLimit) {
+            isQualifiedForDelivery = true;
+          } else {
+            isQualifiedForDelivery = false;
+          }
+          await models.User.update({
+            isQualifiedForDelivery,
+          }, {
+            where: {
+              id: findUsersResult[i].dataValues.id,
+            },
+          });
         }
-        await models.User.update({
-          isQualifiedForDelivery,
-        }, {
-          where: {
-            id: findUsersResult[i].dataValues.id,
-          },
-        });
       }
     }
   } catch (err) {
