@@ -44,21 +44,6 @@ module.exports.populateGroup = async (group) => {
   }
 };
 
-module.exports.updateDeliveryAddressForGroup = async (id, deliveryAddress) => {
-  await models.Group.update({
-    deliveryStreetAddress: deliveryAddress.deliveryStreetAddress,
-    deliveryAptSuite: deliveryAddress.deliveryAptSuite,
-    deliveryCity: deliveryAddress.deliveryCity,
-    deliveryState: deliveryAddress.deliveryState,
-    deliveryZipCode: deliveryAddress.deliveryZipCode,
-    deliveryFullAddress: deliveryAddress.deliveryAptSuite.length > 0 ? `${deliveryAddress.deliveryStreetAddress}, ${deliveryAddress.deliveryAptSuite}, ${deliveryAddress.deliveryCity}, ${deliveryAddress.deliveryState} ${deliveryAddress.deliveryZipCode}` : `${deliveryAddress.deliveryStreetAddress}, ${deliveryAddress.deliveryCity}, ${deliveryAddress.deliveryState} ${deliveryAddress.deliveryZipCode}`,
-  }, {
-    where: {
-      id,
-    },
-  });
-};
-
 module.exports.findGroupIDbyName = async (name) => {
   let findGroupResult;
   try {

@@ -346,19 +346,6 @@ const initializeData = async () => {
     }
   };
 
-  const updateDeliveryAddressForGroup = async () => {
-    // TODO: dynamic groupID
-    const groupID = 1;
-    const deliveryAddress = {
-      deliveryStreetAddress: '160 W Woodruff Ave',
-      deliveryAptSuite: 'Building 1108',
-      deliveryCity: 'Columbus',
-      deliveryState: 'OH',
-      deliveryZipCode: '43210',
-    };
-    await groupUtil.updateDeliveryAddressForGroup(groupID, deliveryAddress);
-  };
-
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
     const dropoffID = 1;
@@ -424,7 +411,6 @@ const initializeData = async () => {
   await updateFirstDropoffVoteTimeEnd();
   await initializeSecondDropoff();
   await initializeSecondDropFoodItemsBallots();
-  await updateDeliveryAddressForGroup();
   await updatePickupTimeOnDropoff();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
