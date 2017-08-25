@@ -106,7 +106,26 @@ module.exports.findDeliveriesOrderedCount = async (id) => {
         id,
       },
     });
-    return dropoffResult.dataValues.deliveriesOrderedCount;
+    const deliveriesOrderedCount = dropoffResult.dataValues.deliveriesOrderedCount;
+    if (deliveriesOrderedCount !== null) {
+      return dropoffResult.dataValues.deliveriesOrderedCount;
+    } else {
+      return 0;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports.changeDeliveriesOrderedCount = async (id, deliveriesOrderedCount) => {
+  try {
+    await models.Dropoff.update({
+      deliveriesOrderedCount,
+    }, {
+      where: {
+        id,
+      },
+    });
   } catch (err) {
     console.log(err);
   }

@@ -640,16 +640,44 @@ module.exports = {
       req.body.uid = uid;
       // TODO: dynamic dropoffID
       const dropoffID = 2;
+      // declare variable called errorMessage
+      let errorMessage;
+      const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(dropoffID);
+      // TODO: dynamic delivery limit
+      // declare variable to keep track of avaiable deliveries left
+      const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
+      // if user wants delivery and cooking packages ordered is greater than 0
+      if (req.body.userWantsDelivery && req.body.cookingPackagesOrdered > 0) {
+        // if available deliveries left is equal to 0
+        if (availableDeliveriesLeft === 0) {
+          // assign error message that tells client there are no more available deliveries
+          errorMessage = 'There are no more available deliveries left for this round of bulk buy. We apologize for any inconvenience. We promise we\'ll be back with more deliveries in the future.';
+          // respond back with the error message and avaiable deliveries left
+          res.json({ errorMessage, availableDeliveriesLeft });
+        }
+      }
+
+      // if user wants delivery and cooking packages ordered is 0
+      if (req.body.userWantsDelivery && req.body.cookingPackagesOrdered === 0) {
+        errorMessage = 'You would need to purchase at least 1 cooking package for delivery';
+        res.json({ errorMessage, availableDeliveriesLeft });
+      }
+
+      const dormPackagesTotalDollarAmount = req.body.dormPackagesOrdered * 6;
+      const cookingPackagesTotalDollarAmount = req.body.cookingPackagesOrdered * 10;
       req.body.pctFeePerPackage = await dropoffUtil.findPctFeePerPackageForDrop(dropoffID);
-      req.body.cookingPackageFees = (req.body.cookingPackagesOrdered * 10) * req.body.pctFeePerPackage;
+      req.body.cookingPackageFees = cookingPackagesTotalDollarAmount * req.body.pctFeePerPackage;
       req.body.transactionFee = req.body.cookingPackagesOrdered > 0 ? 0.5 : 0;
-      const totalDollarAmount = (req.body.dormPackagesOrdered * 6) + ((req.body.cookingPackagesOrdered * 10) + req.body.cookingPackageFees) + req.body.transactionFee;
+      req.body.deliveryFee = req.body.userWantsDelivery ? 3 : 0;
+      const totalDollarAmount = dormPackagesTotalDollarAmount + (cookingPackagesTotalDollarAmount + req.body.cookingPackageFees) + req.body.transactionFee + req.body.deliveryFee;
       req.body.totalDollarAmount = totalDollarAmount;
-      const dormPackageEmailDescription = req.body.dormPackagesOrdered > 0 ? `${req.body.dormPackagesOrdered} x Dorm Package${req.body.dormPackagesOrdered < 2 ? '' : 's'}` : '';
-      const cookingPackageEmailDescription = req.body.cookingPackagesOrdered > 0 ? `${req.body.cookingPackagesOrdered} x Cooking Package${req.body.cookingPackagesOrdered < 2 ? '' : 's'}` : '';
-      const conditionalNextLine = req.body.dormPackagesOrdered > 0 && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
-      const description = `${dormPackageEmailDescription}${conditionalNextLine}${cookingPackageEmailDescription}`;
-      let charge = await stripe.charges.create({
+      const dormPackageEmailDescription = req.body.dormPackagesOrdered > 0 ? `${req.body.dormPackagesOrdered} x Dorm Package${req.body.dormPackagesOrdered < 2 ? '' : 's'} $${dormPackagesTotalDollarAmount}` : '';
+      const cookingPackageEmailDescription = req.body.cookingPackagesOrdered > 0 ? `${req.body.cookingPackagesOrdered} x Cooking Package${req.body.cookingPackagesOrdered < 2 ? '' : 's'} $${cookingPackagesTotalDollarAmount}` : '';
+      const deliveryEmailDescription = req.body.userWantsDelivery ? `Delivery $${req.body.deliveryFee}` : '';
+      const packageConditionalNextLine = req.body.dormPackagesOrdered > 0 && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
+      const deliveryConditionalNextLine = req.body.userWantsDelivery && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
+      const description = `${dormPackageEmailDescription}${packageConditionalNextLine}${cookingPackageEmailDescription}${deliveryConditionalNextLine}${deliveryEmailDescription}`;
+      await stripe.charges.create({
         amount: Math.round(totalDollarAmount * 100),
         currency: 'usd',
         card: req.body.token.id,
