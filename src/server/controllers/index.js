@@ -360,7 +360,8 @@ const initializeData = async () => {
   };
 
   const updateIsQualifiedForDelivery = async () => {
-    await userUtil.updateIsQualifiedForDelivery();
+    const groupID = 1;
+    await userUtil.updateIsQualifiedForDelivery(groupID);
   };
 
   const sendNightlyCSVupdates = async () => {
@@ -430,6 +431,7 @@ const initializeData = async () => {
   await initializeSecondDropFoodItemsBallots();
   await updateDeliveryAddressForGroup();
   await updatePickupTimeOnDropoff();
+  await updateIsQualifiedForDelivery();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
 };
