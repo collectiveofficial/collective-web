@@ -5,7 +5,7 @@ import {
   Redirect,
 } from 'react-router-dom';
 import s from './Home.css';
-import { Card, Icon, Popup, Dropdown, Feed, Modal } from 'semantic-ui-react';
+import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
 import RaisedButton from 'material-ui/RaisedButton';
 import { ref, firebaseAuth } from '../../config';
@@ -34,6 +34,7 @@ class Payment extends React.Component {
       hasPaymentCompleted: false,
       votesSaved: false,
       email: '',
+      userWantsDelivery: false,
     };
     this.handleDorm = this.handleDorm.bind(this);
     this.handleCook = this.handleCook.bind(this);
@@ -195,7 +196,15 @@ class Payment extends React.Component {
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
-                  <br />
+                  {/* <Segment raised>
+                    <Label as='a' color='red' ribbon>Overview</Label>
+                    <span>Account Details</span>
+                  </Segment>
+                  <Segment compact>
+                    <Label as='div' color='red' ribbon>New<Icon name="exclamation" /></Label>
+                    <br />
+                    <Checkbox label="Delivery" checked={this.state.userWantsDelivery} onClick={() => { this.setState({ userWantsDelivery: !this.state.userWantsDelivery }); }} />
+                  </Segment> */}
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
@@ -228,7 +237,7 @@ class Payment extends React.Component {
                           // panelLabel="Give Money" prepended to the amount in the bottom pay button
                           amount={this.state.price * 100} // cents
                           currency="USD"
-                          stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
+                          stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
                           email={this.state.email}
                           // Note: Enabling either address option will give the user the ability to
                           // fill out both. Addresses are sent as a second parameter in the token callback.
