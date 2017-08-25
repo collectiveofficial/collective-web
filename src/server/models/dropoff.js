@@ -67,3 +67,14 @@ module.exports.findIntendedPickupTimeEnd = async (id, groupID) => {
   const intendedPickupTimeEnd = findIntendedPickupTimeEndResult.dataValues.intendedPickupTimeEnd;
   return intendedPickupTimeEnd;
 };
+
+module.exports.updatePickupTimeOnDropoff = async (id, pickupTimes) => {
+  await models.Dropoff.update({
+    intendedPickupTimeStart: pickupTimes.intendedPickupTimeStart,
+    intendedPickupTimeEnd: pickupTimes.intendedPickupTimeEnd,
+  }, {
+    where: {
+      id,
+    },
+  });
+};

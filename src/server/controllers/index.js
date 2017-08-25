@@ -38,8 +38,8 @@ const firebaseAdminApp = admin.initializeApp({
 const firstDropoff = {
   id: 1,
   intendedShipDate: '2017-08-26',
-  intendedPickupTimeStart: moment.tz('2017-08-26 09:00:00', 'America/New_York'),
-  intendedPickupTimeEnd: moment.tz('2017-08-26 12:00:00', 'America/New_York'),
+  intendedPickupTimeStart: moment.tz('2017-08-26 10:00:00', 'America/New_York'),
+  intendedPickupTimeEnd: moment.tz('2017-08-26 13:00:00', 'America/New_York'),
   shipDate: null,
   voteDateTimeBeg: moment.tz('2017-08-11 00:00:00', 'America/New_York'),
   voteDateTimeEnd: moment.tz('2017-08-23 23:59:59', 'America/New_York'),
@@ -329,6 +329,15 @@ const initializeData = async () => {
     }
   };
 
+  const updatePickupTimeOnDropoff = async () => {
+    const dropoffID = 1;
+    const pickupTimes = {
+      intendedPickupTimeStart: moment.tz('2017-08-26 10:00:00', 'America/New_York'),
+      intendedPickupTimeEnd: moment.tz('2017-08-26 13:00:00', 'America/New_York'),
+    };
+    await dropoffUtil.updatePickupTimeOnDropoff(dropoffID, pickupTimes);
+  };
+
   const initializeSecondDropFoodItemsBallots = async () => {
     const ballotID = 2;
     const doesPapayaExist = await foodUtil.doesPapayaExist();
@@ -416,6 +425,7 @@ const initializeData = async () => {
   await initializeSecondDropoff();
   await initializeSecondDropFoodItemsBallots();
   await updateDeliveryAddressForGroup();
+  await updatePickupTimeOnDropoff();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
 };
