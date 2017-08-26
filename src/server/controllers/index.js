@@ -346,6 +346,11 @@ const initializeData = async () => {
     }
   };
 
+  const updateIsQualifiedForDelivery = async () => {
+     const groupID = 1;
+     await userUtil.updateIsQualifiedForDelivery(groupID);
+   };
+
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
     const dropoffID = 1;
@@ -412,6 +417,7 @@ const initializeData = async () => {
   await initializeSecondDropoff();
   await initializeSecondDropFoodItemsBallots();
   await updatePickupTimeOnDropoff();
+  await updateIsQualifiedForDelivery();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
 };
@@ -604,10 +610,11 @@ module.exports = {
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
       const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
       const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
+      const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
       const responseObject = {
         ballotsAndVotes,
         userTransactionHistory,
-        deliveriesOrderedCount,
+        availableDeliveriesLeft,
       };
       await res.json(responseObject);
     },

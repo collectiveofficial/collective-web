@@ -40,6 +40,7 @@ class Payment extends React.Component {
     this.handleCook = this.handleCook.bind(this);
     this.onToken = this.onToken.bind(this);
     this.handlePayment = this.handlePayment.bind(this);
+    this.handleDelivery = this.handleDelivery.bind(this);
   }
 
   async componentWillMount() {
@@ -59,6 +60,21 @@ class Payment extends React.Component {
     let newPrice = this.state.price;
     newPrice = ((this.state.dorm * 6) + (value * 11));
     this.setState({ price: newPrice });
+  }
+
+  async handleDelivery() {
+    await this.setState({ userWantsDelivery: !this.state.userWantsDelivery });
+    if (this.state.userWantsDelivery) {
+      console.log('this.state.userWantsDelivery: ', this.state.userWantsDelivery);
+      console.log('before this.state.price: ', this.state.price);
+      this.setState({ price: this.state.price + 3 });
+      console.log('after this.state.price: ', this.state.price);
+    } else {
+      console.log('this.state.userWantsDelivery: ', this.state.userWantsDelivery);
+      console.log('before this.state.price: ', this.state.price);
+      this.setState({ price: this.state.price - 3 });
+      console.log('after this.state.price: ', this.state.price);
+    }
   }
 
   async submitInitialVotes() {
@@ -107,9 +123,11 @@ class Payment extends React.Component {
         email: this.state.email,
         dormPackagesOrdered: this.state.dorm,
         cookingPackagesOrdered: this.state.cook,
+        userWantsDelivery: this.state.userWantsDelivery,
       }),
     });
     const submitPaymentResultData = await submitPaymentResult.json();
+    // handle for delivery error message from server (must order at least 1 cooking package and make sure count <= 50)
     if (submitPaymentResultData.paymentCompleted) {
       await this.submitInitialVotes();
       if (this.state.votesSaved) {
@@ -199,9 +217,9 @@ class Payment extends React.Component {
                   <Segment compact>
                     {/* <Label as='div' color='red' ribbon>New!</Label> */}
                     <Label color='red' floating>New!</Label>
-                    <Checkbox label="Delivery ($3)" checked={this.state.userWantsDelivery} onClick={() => { this.setState({ userWantsDelivery: !this.state.userWantsDelivery }); }} />
+                    <Checkbox label="Delivery ($3)" checked={this.state.userWantsDelivery} onClick={this.handleDelivery} />
                     <p>Limit 50 participants.</p>
-                    <p>Available deliveries left: 50</p>
+                    <p>Available deliveries left: {this.props.availableDeliveriesLeft}</p>
                   </Segment>
                   <Feed.Event>
                     <Feed.Content>
