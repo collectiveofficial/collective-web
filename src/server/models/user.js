@@ -176,10 +176,12 @@ module.exports.saveSubmittedUserInfo = async (user) => {
         city: user.city,
         state: user.state,
         zipCode: user.zipCode,
-        fullAddress: userFullAddress,
+        fullAddress: googleMapsObj.formattedAddress,
         hasUserFinishedSignUp: true,
         userGroupId,
         isQualifiedForDelivery,
+        latitude: googleMapsObj.latitude,
+        longitude: googleMapsObj.longitude,
       }, {
         where: {
           firebaseUID: user.uid,
