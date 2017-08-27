@@ -24,3 +24,20 @@ module.exports.findFormattedAddressLatLong = async (unformattedFullAddressWithou
   }
   return googleMapsObj;
 };
+
+
+module.exports.findDistance = async (origin, destination) => {
+  const units = 'imperial';
+  const googleMapsDistanceMatrix = await googleMapsClient.distanceMatrix({
+    origins: [origin],
+    destinations: [destination],
+    units,
+  })
+  .asPromise();
+  const googleMapsDistanceMatrixResult = googleMapsDistanceMatrix.json;
+  const regex = /(?:^|\s)(\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/;
+  const distanceFromUserAddressText = googleMapsDistanceMatrixResult.rows[0].elements[0].distance.text;
+  let distanceFromUserAddressInMiles = regex.exec(distanceFromUserAddressText)[1];
+  distanceFromUserAddressInMiles = distanceFromUserAddressInMiles.replace(',', '');
+  return distanceFromUserAddressInMiles;
+};
