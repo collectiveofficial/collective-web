@@ -11,6 +11,7 @@ const ballotUtil = require('../models/ballot');
 const voteUtil = require('../models/vote');
 const transactionUtil = require('../models/transaction');
 const groupUtil = require('../models/group');
+const restrictedAddressUtil = require('../models/restricted-address');
 const admin = require('firebase-admin');
 const json2csv = require('json2csv');
 const moment = require('moment-timezone');
@@ -270,6 +271,337 @@ const firstGroup = {
   deliveryZipCode: '43210',
 };
 
+const restrictedAddresses = {
+  'Archer House': {
+    streetAddress: '2130 Neil Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Baker Hall East': {
+    streetAddress: '93 West 12th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Baker Hall West': {
+    streetAddress: '129 West 12th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Barrett House': {
+    streetAddress: '88 W. Woodruff Ave',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Blackburn House': {
+    streetAddress: '136 W. Woodruff Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Bowen House': {
+    streetAddress: '2125 N. High Street',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Bradley Hall': {
+    streetAddress: '221 West 12th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Busch House': {
+    streetAddress: '2115 N. High Street',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Canfield Hall': {
+    streetAddress: '236 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Drackett Tower': {
+    streetAddress: '191 W. Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Fechko House': {
+    streetAddress: '220 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'German House': {
+    streetAddress: '141 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Hanley House': {
+    streetAddress: '225 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Haverfield House': {
+    streetAddress: '112 West Woodruff Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Houck House': {
+    streetAddress: '61 West Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Houston House': {
+    streetAddress: '97 W. Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Jones Tower': {
+    streetAddress: '123 W. Lane Ave',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Lawrence Tower': {
+    streetAddress: '328 West Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Lincoln House': {
+    streetAddress: '1810 Cannon Drive West',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Mack Hall': {
+    streetAddress: '1698 Neil Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Mendoza House': {
+    streetAddress: '194 West Woodruff Ave.',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Morrill Tower': {
+    streetAddress: '1900 Cannon Drive West',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Morrison Tower': {
+    streetAddress: '196 West 11th Ave.',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Neil Avenue': {
+    streetAddress: '1578 Neil Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Norton House': {
+    streetAddress: '2114 Neil Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Nosker House': {
+    streetAddress: '124 West Woodruff Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Park-Stradley Hall': {
+    streetAddress: '120 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Paterson Hall': {
+    streetAddress: '191 West 12th Ave.',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Pennsylvania Place': {
+    streetAddress: '1478 Pennsylvania Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Pomerene House': {
+    streetAddress: '231 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Raney House': {
+    streetAddress: '33 W. Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Scholars East': {
+    streetAddress: '221 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Scholars West': {
+    streetAddress: '239 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Scott House': {
+    streetAddress: '160 W. Woodruff Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Siebert Hall': {
+    streetAddress: '184 West 11th Ave.',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Smith-Steeb Hall': {
+    streetAddress: '80 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Taylor Tower': {
+    streetAddress: '55 W. Lane Ave',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'The Residence on Tenth': {
+    streetAddress: '230 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Torres House': {
+    streetAddress: '187 W. Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Veteran\'s House': {
+    streetAddress: '237 E 17th Ave',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Worthington Building': {
+    streetAddress: '203 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+};
+
 const initializeData = async () => {
   const initializeFirstGroup = async () => {
     // initialize group
@@ -346,6 +678,12 @@ const initializeData = async () => {
     }
   };
 
+  const initializeRestrictedAddresses = async () => {
+    const groupID = 1;
+    const dropoffID = 2;
+    await restrictedAddressUtil.initializeRestrictedAddresses(restrictedAddresses, groupID, dropoffID);
+  };
+
   const updateIsQualifiedForDelivery = async () => {
      const groupID = 1;
      await userUtil.updateIsQualifiedForDelivery(groupID);
@@ -417,7 +755,8 @@ const initializeData = async () => {
   await initializeSecondDropoff();
   await initializeSecondDropFoodItemsBallots();
   await updatePickupTimeOnDropoff();
-  await updateIsQualifiedForDelivery();
+  await initializeRestrictedAddresses();
+  // await updateIsQualifiedForDelivery();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
 };
