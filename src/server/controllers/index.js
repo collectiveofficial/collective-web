@@ -16,6 +16,7 @@ const admin = require('firebase-admin');
 const json2csv = require('json2csv');
 const moment = require('moment-timezone');
 const configureStripe = require('stripe');
+const googleMapsUtils = require('../models/utils/google-maps-utils');
 let STRIPE_SECRET_KEY;
 
 if (process.env.NODE_ENV === 'production') {
@@ -681,7 +682,15 @@ const initializeData = async () => {
   const initializeRestrictedAddresses = async () => {
     const groupID = 1;
     const dropoffID = 2;
-    await restrictedAddressUtil.initializeRestrictedAddresses(restrictedAddresses, groupID, dropoffID);
+    const restrictedAddressesID = 1;
+    const doesRestrictedAddressExist = await restrictedAddressUtil.checkIfRestrictedAddressExist(restrictedAddressesID);
+    if (!doesRestrictedAddressExist) {
+      await restrictedAddressUtil.initializeRestrictedAddresses(restrictedAddresses, groupID, dropoffID);
+    }
+  };
+
+  const updateAllUsersAddressLatLong = async () => {
+    await userUtil.updateAllUsersAddressLatLong();
   };
 
   const updateIsQualifiedForDelivery = async () => {
@@ -756,6 +765,7 @@ const initializeData = async () => {
   await initializeSecondDropFoodItemsBallots();
   await updatePickupTimeOnDropoff();
   await initializeRestrictedAddresses();
+  await updateAllUsersAddressLatLong();
   // await updateIsQualifiedForDelivery();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();

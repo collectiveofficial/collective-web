@@ -6,6 +6,7 @@ const googleMapsClient = require('@google/maps').createClient({
 const models = require('../../database/models/index');
 const groupUtil = require('./group');
 const dropoffUtil = require('./dropoff');
+const googleMapsUtils = require('./utils/google-maps-utils');
 
 module.exports.checkIfUserIsFacebookAuth = function (email) {
   return models.User.findOne({
@@ -242,6 +243,42 @@ module.exports.getUniqueUsersByGroupID = async (userGroupId) => {
   return usersObjByIds;
 };
 
+module.exports.updateAllUsersAddressLatLong = async () => {
+  try {
+    const firstUser = await models.User.findOne({
+      where: {
+        id: 1,
+      },
+    });
+    if (firstUser.dataValues.latitude === null) {
+      const users = await models.User.findAll({
+        where: {
+        },
+      });
+      for (let i = 0; i < users.length; i++) {
+        if (users[i].dataValues.fullAddress !== null) {
+          const unformattedAddressWithoutAptSuite = `${users[i].dataValues.streetAddress},
+          ${users[i].dataValues.city}, ${users[i].dataValues.state} ${users[i].dataValues.zipCode}`;
+          const googleMapsObj = await googleMapsUtils.findFormattedAddressLatLong(unformattedAddressWithoutAptSuite);
+          if (googleMapsObj.isValidAddress) {
+            await models.User.update({
+              fullAddress: googleMapsObj.formattedAddress,
+              latitude: googleMapsObj.latitude,
+              longitude: googleMapsObj.longitude,
+            }, {
+              where: {
+                id: users[i].dataValues.id,
+              },
+            });
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports.updateIsQualifiedForDelivery = async (groupID) => {
   try {
     const findUsersResult = await models.User.findAll({
@@ -306,7 +343,7 @@ module.exports.updateIsQualifiedForDelivery = async (groupID) => {
         '1478 Pennsylvania Avenue', '231 West 10th Avenue', '33 W. Lane Avenue', '221 West 10th Avenue',
         '239 West 10th Avenue', '160 W. Woodruff Avenue', '184 West 11th Ave.', '80 West 11th Avenue',
         '55 W. Lane Ave', '230 West 10th Avenue', '187 W. Lane Avenue', '237 E 17th Ave', '203 West 10th Avenue'];
-      
+
         const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(groupID);
         const units = 'imperial';
         const distanceLimit = 5;
