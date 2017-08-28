@@ -1,3 +1,4 @@
+const moment = require('moment-timezone');
 const models = require('../../database/models/index');
 const userUtil = require('./user');
 const foodUtil = require('./food');
@@ -101,7 +102,8 @@ module.exports.getUserTransactionHistory = async (uid) => {
       },
     });
     for (let i = 0; i < getUserTransactionHistoryResults.length; i++) {
-      const dropoffDate = await dropoffUtil.findDropoffDateByID(getUserTransactionHistoryResults[i].dataValues.dropoffID);
+      let dropoffDate = await dropoffUtil.findDropoffDateByID(getUserTransactionHistoryResults[i].dataValues.dropoffID);
+      dropoffDate = moment.tz(dropoffDate, 'America/New_York');
       let deliveryAddress = '';
       if (getUserTransactionHistoryResults[i].dataValues.isDelivery) {
         deliveryAddress = await userUtil.findFormattedAddress(uid);

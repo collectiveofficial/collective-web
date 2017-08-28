@@ -94,7 +94,6 @@ class App extends Component {
         await console.log('Logged in');
         const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
         await this.setState({ firebaseAccessToken });
-        // await console.log('user firebaseAccessToken in App.js componentDidMount: ', user.ie);
         const response = await fetch('/auth/check', {
           method: 'POST',
           headers: {
@@ -107,7 +106,6 @@ class App extends Component {
         })
         const responseData = await response.json();
         const userAuthorized = responseData.userAuthorized;
-        console.log('userAuthorized: ', userAuthorized)
         if (userAuthorized) {
           this.authorizeUser();
         }
@@ -115,16 +113,12 @@ class App extends Component {
         await this.setState({
           authenticated: true,
           loading: false,
-        }, () => {
-          console.log('this.state.loading: ', this.state.loading);
         });
       } else { // isn't signed in
         await this.setState({
           authenticated: false,
           loading: false,
           userAuthorized: false,
-        }, () => {
-          console.log('this.state.loading: ', this.state.loading);
         });
       }
     });
@@ -137,8 +131,6 @@ class App extends Component {
   async logOut() {
     await nativeLogout();
     await this.setState({ routeToRegisterForm: false });
-    // await this.setState({ userAuthorized: false });
-    await console.log('User after log out', firebaseAuth().currentUser);
   }
 
   async showUser() {
@@ -161,8 +153,6 @@ class App extends Component {
     const provider = await new firebaseAuth.FacebookAuthProvider();
     await provider.addScope('email, public_profile, user_friends');
     const result = await firebaseAuth().signInWithPopup(provider);
-    await console.log('inside handleFacebookAuth');
-    await console.log('firebaseAuth result: ', result);
     // const firebaseAccessToken = result.user.ie;
     const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
     await this.setState({ firebaseAccessToken });
@@ -178,9 +168,7 @@ class App extends Component {
       }),
     });
     const responseData = await response.json();
-    await this.setState({ facebookData: responseData.facebook_payload }, () => {
-      console.log('this.state.facebookData: ', this.state.facebookData);
-    });
+    await this.setState({ facebookData: responseData.facebook_payload });
     const facebookCheckResponse = await fetch('/auth/facebook/check', {
       method: 'POST',
       headers: {
@@ -201,14 +189,12 @@ class App extends Component {
     const hasUserFinishedSignUp = facebookCheckResponseData.hasUserFinishedSignUp;
     const saveUserOnFacebookSignUpExecuted = facebookCheckResponseData.saveUserOnFacebookSignUpExecuted;
     if (userAlreadyExists && hasUserFinishedSignUp) {
-      console.log('authorize user');
       await this.authorizeUser();
     } else if ((userAlreadyExists && !hasUserFinishedSignUp)) {
       await this.setRouteToRegisterFormState(true);
     } else if (saveUserOnFacebookSignUpExecuted) {
       const currentFirebaseUser = await firebaseAuth().currentUser;
       const sendEmailVerification = await currentFirebaseUser.sendEmailVerification();
-      await console.log('sendEmailVerification successful.');
       await this.setRouteToRegisterFormState(true);
     }
   }
@@ -231,9 +217,6 @@ class App extends Component {
     this.setState({ userTransactionHistory: initialDataLoadResults.userTransactionHistory });
     this.setState({ availableDeliveriesLeft: initialDataLoadResults.availableDeliveriesLeft });
     this.setState({ deliveryEligibilityObj: initialDataLoadResults.deliveryEligibilityObj });
-    console.log('-------> this.state.ballotsAndVotes: ', this.state.ballotsAndVotes);
-    console.log('-------> this.state.userTransactionHistory: ', this.state.userTransactionHistory);
-    console.log('-------> this.state.availableDeliveriesLeft: ', this.state.availableDeliveriesLeft)
   }
 
   updateBallotsAndVotes(newBallotsAndVotes) {
