@@ -34,8 +34,8 @@ module.exports.initializeRestrictedAddresses = async (restrictedAddresses, group
           city: restrictedAddresses[restrictedAddressName].city,
           zipCode: restrictedAddresses[restrictedAddressName].zipCode,
           fullAddress: googleMapsObj.formattedAddress,
-          latitude: googleMapsObj.latitude,
-          longitude: googleMapsObj.longitude,
+          latitude: googleMapsObj.latitude.toString(),
+          longitude: googleMapsObj.longitude.toString(),
           groupID,
           dropoffID,
         });
@@ -44,4 +44,18 @@ module.exports.initializeRestrictedAddresses = async (restrictedAddresses, group
   } catch (err) {
     console.log(err);
   }
+};
+
+module.exports.getRestrictedAddressLatLong = async (groupID) => {
+  const latLongs = {};
+  const restrictedAddresses = await models.RestrictedAddress.findAll({
+    where: {
+      groupID,
+    },
+  });
+  for (let i = 0; i < restrictedAddresses.length; i++) {
+    const latLongString = restrictedAddresses[i].dataValues.latitude.toString() + restrictedAddresses[i].dataValues.longitude.toString();
+    latLongs[latLongString] = restrictedAddresses[i].dataValues.restrictionType;
+  }
+  return latLongs;
 };

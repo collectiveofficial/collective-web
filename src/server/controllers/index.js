@@ -695,8 +695,9 @@ const initializeData = async () => {
 
   const updateIsQualifiedForDelivery = async () => {
      const groupID = 1;
-     await userUtil.updateIsQualifiedForDelivery(groupID);
-   };
+     const restrictionType = 'university dorm';
+     await userUtil.updateIsQualifiedForDelivery(groupID, restrictionType);
+  };
 
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
@@ -766,7 +767,7 @@ const initializeData = async () => {
   await updatePickupTimeOnDropoff();
   await initializeRestrictedAddresses();
   await updateAllUsersAddressLatLong();
-  // await updateIsQualifiedForDelivery();
+  await updateIsQualifiedForDelivery();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
 };
@@ -913,7 +914,8 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken)
       let uid = decodedToken.uid;
       req.body.uid = uid;
-      const userSignedUp = await userUtil.saveSubmittedUserInfo(req.body);
+      const restrictionType = 'university dorm';
+      const userSignedUp = await userUtil.saveSubmittedUserInfo(req.body, restrictionType);
       await res.json({ userSignedUp });
     },
   },

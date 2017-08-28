@@ -7,6 +7,7 @@ const models = require('../../database/models/index');
 const groupUtil = require('./group');
 const dropoffUtil = require('./dropoff');
 const googleMapsUtils = require('./utils/google-maps-utils');
+const restrictedAddressUtils = require('./restricted-address');
 
 module.exports.checkIfUserIsFacebookAuth = function (email) {
   return models.User.findOne({
@@ -150,18 +151,21 @@ module.exports.checkIfFacebookUserFinishedSignUp = function (uid) {
   .catch(err => console.log(err));
 };
 
-module.exports.saveSubmittedUserInfo = async (user) => {
+module.exports.saveSubmittedUserInfo = async (user, restrictionType) => {
   try {
     const userGroupId = await groupUtil.findGroupIDbyName(user.school);
     let isQualifiedForDelivery;
     const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(userGroupId);
     const unformattedAddressWithoutAptSuite = `${user.streetAddress}, ${user.city}, ${user.state} ${user.zipCode}`;
     const distanceLimit = 5;
-    const distanceFromUserAddressInMiles = googleMapsUtils.findDistance(deliveryOrigin, unformattedAddressWithoutAptSuite);
     const googleMapsObj = await googleMapsUtils.findFormattedAddressLatLong(unformattedAddressWithoutAptSuite);
     // need to check lat long with 5 mile
     if (googleMapsObj.isValidAddress) {
-      if (distanceFromUserAddressInMiles <= distanceLimit) {
+      const distanceObj = await googleMapsUtils.findDistance(deliveryOrigin, unformattedAddressWithoutAptSuite);
+      const restrictedAddressesLatLong = await restrictedAddressUtils.getRestrictedAddressLatLong(userGroupId);
+      const userLatLongString = googleMapsObj.latitude + googleMapsObj.longitude;
+      // need to check lat long with 5 mile
+      if (distanceObj.distanceFromUserAddressInMiles <= distanceLimit && restrictedAddressesLatLong[userLatLongString] !== restrictionType) {
         isQualifiedForDelivery = true;
       } else {
         isQualifiedForDelivery = false;
@@ -243,26 +247,28 @@ module.exports.updateAllUsersAddressLatLong = async () => {
         id: 1,
       },
     });
-    if (firstUser.dataValues.latitude === null) {
-      const users = await models.User.findAll({
-        where: {
-        },
-      });
-      for (let i = 0; i < users.length; i++) {
-        if (users[i].dataValues.fullAddress !== null) {
-          const unformattedAddressWithoutAptSuite = `${users[i].dataValues.streetAddress},
-          ${users[i].dataValues.city}, ${users[i].dataValues.state} ${users[i].dataValues.zipCode}`;
-          const googleMapsObj = await googleMapsUtils.findFormattedAddressLatLong(unformattedAddressWithoutAptSuite);
-          if (googleMapsObj.isValidAddress) {
-            await models.User.update({
-              fullAddress: googleMapsObj.formattedAddress,
-              latitude: googleMapsObj.latitude,
-              longitude: googleMapsObj.longitude,
-            }, {
-              where: {
-                id: users[i].dataValues.id,
-              },
-            });
+    if (firstUser !== null) {
+      if (firstUser.dataValues.latitude === null) {
+        const users = await models.User.findAll({
+          where: {
+          },
+        });
+        for (let i = 0; i < users.length; i++) {
+          if (users[i].dataValues.fullAddress !== null) {
+            const unformattedAddressWithoutAptSuite = `${users[i].dataValues.streetAddress},
+            ${users[i].dataValues.city}, ${users[i].dataValues.state} ${users[i].dataValues.zipCode}`;
+            const googleMapsObj = await googleMapsUtils.findFormattedAddressLatLong(unformattedAddressWithoutAptSuite);
+            if (googleMapsObj.isValidAddress) {
+              await models.User.update({
+                fullAddress: googleMapsObj.formattedAddress,
+                latitude: googleMapsObj.latitude,
+                longitude: googleMapsObj.longitude,
+              }, {
+                where: {
+                  id: users[i].dataValues.id,
+                },
+              });
+            }
           }
         }
       }
@@ -272,7 +278,7 @@ module.exports.updateAllUsersAddressLatLong = async () => {
   }
 };
 
-module.exports.updateIsQualifiedForDelivery = async (groupID) => {
+module.exports.updateIsQualifiedForDelivery = async (groupID, restrictionType) => {
   try {
     const users = await models.User.findAll({
       where: {
@@ -285,13 +291,12 @@ module.exports.updateIsQualifiedForDelivery = async (groupID) => {
         const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(groupID);
         const userAddress = users[i].dataValues.fullAddress;
         const distanceLimit = 5;
-        const distanceFromUserAddressInMiles = await googleMapsUtils.findDistance(deliveryOrigin, userAddress);
-        const unformattedAddressWithoutAptSuite = `${users[i].dataValues.streetAddress},
-        ${users[i].dataValues.city}, ${users[i].dataValues.state} ${users[i].dataValues.zipCode}`;
-        const googleMapsObj = await googleMapsUtils.findFormattedAddressLatLong(unformattedAddressWithoutAptSuite);
-        if (googleMapsObj.isValidAddress) {
+        const distanceObj = await googleMapsUtils.findDistance(deliveryOrigin, userAddress);
+        const restrictedAddressesLatLong = await restrictedAddressUtils.getRestrictedAddressLatLong(groupID);
+        if (distanceObj.isValidAddress) {
+          const userLatLongString = users[i].dataValues.latitude + users[i].dataValues.longitude;
           // need to check lat long with 5 mile
-          if (distanceFromUserAddressInMiles <= distanceLimit) {
+          if (distanceObj.distanceFromUserAddressInMiles <= distanceLimit && restrictedAddressesLatLong[userLatLongString] !== restrictionType) {
             isQualifiedForDelivery = true;
           } else {
             isQualifiedForDelivery = false;

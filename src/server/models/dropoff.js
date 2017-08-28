@@ -106,9 +106,9 @@ module.exports.findDeliveriesOrderedCount = async (id) => {
         id,
       },
     });
-    const deliveriesOrderedCount = dropoffResult.dataValues.deliveriesOrderedCount;
-    if (deliveriesOrderedCount !== null) {
-      return dropoffResult.dataValues.deliveriesOrderedCount;
+    if (dropoffResult !== null) {
+      const deliveriesOrderedCount = dropoffResult.dataValues.deliveriesOrderedCount;
+      return deliveriesOrderedCount;
     } else {
       return 0;
     }
