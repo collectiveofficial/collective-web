@@ -20,6 +20,8 @@ module.exports = function(sequelize, DataTypes) {
     isFacebookAuth: DataTypes.BOOLEAN,
     cadenceFreq: DataTypes.STRING,
     isQualifiedForDelivery: DataTypes.BOOLEAN,
+    latitude: DataTypes.STRING,
+    longitude: DataTypes.STRING,
   }, {
     classMethods: {
       associate: function(models) {

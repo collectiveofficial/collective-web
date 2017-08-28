@@ -5,22 +5,11 @@ import {
   Redirect,
 } from 'react-router-dom';
 import s from './Home.css';
-import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label } from 'semantic-ui-react';
+import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label, Message } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
 import RaisedButton from 'material-ui/RaisedButton';
 import { ref, firebaseAuth } from '../../config';
 import PaymentConfirmation from './PaymentConfirmation.js';
-
-const numOptions = [
-  {text: "0", value: "0"},
-  {text: "1", value: "1"},
-  {text: "2", value: "2"},
-  {text: "3", value: "3"},
-  {text: "4", value: "4"},
-  {text: "5", value: "5"},
-  {text: "6", value: "6"},
-  {text: "7", value: "7"},
-];
 
 class Payment extends React.Component {
   constructor(props) {
@@ -35,30 +24,61 @@ class Payment extends React.Component {
       votesSaved: false,
       email: '',
       userWantsDelivery: false,
+      errorMessage: '',
+      deliveryPriceImpact: 0,
     };
     this.handleDorm = this.handleDorm.bind(this);
     this.handleCook = this.handleCook.bind(this);
     this.onToken = this.onToken.bind(this);
     this.handlePayment = this.handlePayment.bind(this);
+    this.handleDelivery = this.handleDelivery.bind(this);
   }
 
   async componentWillMount() {
     const email = await firebaseAuth().currentUser.email;
-    this.setState({ email });
+    await this.setState({ email });
   }
 
-  handleDorm(e, { value }) {
-    this.setState({ dorm: value });
-    let newPrice = this.state.price;
-    newPrice = ((value * 6) + (this.state.cook * 11));
-    this.setState({ price: newPrice });
+  async handleDorm(e, { value }) {
+    await this.setState({ errorMessage: '' });
+    await this.setState({ dorm: value });
+    const newPrice = ((value * 6) + (this.state.cook * 11)) + this.state.deliveryPriceImpact;
+    await this.setState({ price: newPrice });
   }
 
-  handleCook(e, { value }) {
-    this.setState({ cook: value });
-    let newPrice = this.state.price;
-    newPrice = ((this.state.dorm * 6) + (value * 11));
-    this.setState({ price: newPrice });
+  async handleCook(e, { value }) {
+    await this.setState({ errorMessage: '' });
+    await this.setState({ cook: value });
+    const newPrice = ((this.state.dorm * 6) + (value * 11)) + this.state.deliveryPriceImpact;
+    await this.setState({ price: newPrice });
+  }
+
+  async handleDelivery() {
+    if (this.props.availableDeliveriesLeft === 0) {
+      await this.setState({ errorMessage: 'There are no more available deliveries left for this round of bulk buy. We apologize for any inconvenience. We promise we\'ll be back with more deliveries in the future.' });
+    } else {
+      if (!this.props.deliveryEligibilityObj.isUserEligibleForDelivery) {
+        if (this.props.deliveryEligibilityObj.isAddressDorm) {
+          await this.setState({ errorMessage: 'It looks like your address is a dorm address. Our pickup location is not far away.' });
+        }
+        if (this.props.deliveryEligibilityObj.isAddressBeyondDeliveryReach) {
+          await this.setState({ errorMessage: 'It looks like your address is beyond our 5 mile delivery boundaries. We will try our best to extend our delivery boundaries in our next bulk buy. Thank you for your patience.' });
+        }
+      } else {
+        if (this.state.cook === 0) {
+          await this.setState({ errorMessage: 'You would need to purchase at least 1 cooking package for delivery' });
+        } else {
+          await this.setState({ userWantsDelivery: !this.state.userWantsDelivery });
+          if (this.state.userWantsDelivery) {
+            await this.setState({ deliveryPriceImpact: 3 });
+            await this.setState({ price: this.state.price + 3 });
+          } else {
+            this.setState({ deliveryPriceImpact: 0 });
+            await this.setState({ price: this.state.price - 3 });
+          }
+        }
+      }
+    }
   }
 
   async submitInitialVotes() {
@@ -88,6 +108,7 @@ class Payment extends React.Component {
 
   async handlePayment() {
     await this.setState({ paymentErrorMessage: '' });
+    await this.setState({ errorMessage: '' });
     if (this.state.price === 0) {
       await this.setState({ paymentErrorMessage: 'Please specify an amount for the packages.' });
     }
@@ -107,19 +128,24 @@ class Payment extends React.Component {
         email: this.state.email,
         dormPackagesOrdered: this.state.dorm,
         cookingPackagesOrdered: this.state.cook,
+        userWantsDelivery: this.state.userWantsDelivery,
       }),
     });
     const submitPaymentResultData = await submitPaymentResult.json();
-    if (submitPaymentResultData.paymentCompleted) {
-      await this.submitInitialVotes();
-      if (this.state.votesSaved) {
-        this.setState({ hasPaymentCompleted: true });
+    await this.setState({ errorMessage: submitPaymentResultData.errorMessage });
+    // handle for delivery error message from server (must order at least 1 cooking package and make sure count <= 50)
+    if (this.state.errorMessage.length === 0) {
+      if (submitPaymentResultData.paymentCompleted) {
+        await this.submitInitialVotes();
+        if (this.state.votesSaved) {
+          this.setState({ hasPaymentCompleted: true });
+        } else {
+          alert('Voting failed. Please contact Collective to resolve this issue. We appreciate your patience.');
+        }
       } else {
-        alert('Voting failed. Please contact Collective to resolve this issue. We appreciate your patience.');
+        alert('Payment failed. Please contact Collective to resolve this issue. We appreciate your patience.');
+        this.setState({ hasPaymentCompleted: false });
       }
-    } else {
-      alert('Payment failed. Please contact Collective to resolve this issue. We appreciate your patience.');
-      this.setState({ hasPaymentCompleted: false });
     }
   }
 
@@ -132,7 +158,31 @@ class Payment extends React.Component {
         display: 'inline',
         float: 'right',
       },
+      deliveryModalImportant: {
+        margin: '0 0 0 0',
+      }
     };
+
+    const dormNumOptions = [
+      {text: 0, value: 0},
+      {text: 1, value: 1},
+      {text: 2, value: 2},
+      {text: 3, value: 3},
+      {text: 4, value: 4},
+      {text: 5, value: 5},
+      {text: 6, value: 6},
+      {text: 7, value: 7},
+    ];
+    const cookNumOptions = [
+      {text: 0, value: 0, disabled: this.state.userWantsDelivery},
+      {text: 1, value: 1},
+      {text: 2, value: 2},
+      {text: 3, value: 3},
+      {text: 4, value: 4},
+      {text: 5, value: 5},
+      {text: 6, value: 6},
+      {text: 7, value: 7},
+    ];
 
     return (
       <div>
@@ -154,9 +204,9 @@ class Payment extends React.Component {
                         <Feed.Summary>
                           <span>
                             I'd like {' '}
-                            <Dropdown inline options={numOptions}
+                            <Dropdown inline options={dormNumOptions}
                               onChange={this.handleDorm}
-                              defaultValue={numOptions[0].value}
+                              defaultValue={dormNumOptions[0].value}
                             /><Modal trigger={<a className={s.mode}>dorm packages ($6)</a>} basic size='small' closeIcon="close">
                             <Modal.Header>Dorm package</Modal.Header>
                             <Modal.Content image>
@@ -178,9 +228,9 @@ class Payment extends React.Component {
                       <Feed.Summary>
                         <span>
                           I'd like {' '}
-                          <Dropdown inline options={numOptions}
+                          <Dropdown inline options={cookNumOptions}
                             onChange={this.handleCook}
-                            defaultValue={numOptions[0].value}
+                            defaultValue={cookNumOptions[0].value}
                           /><Modal trigger={<a className={s.mode}>cooking packages ($11)</a>} basic size='small' closeIcon="close">
                           <Modal.Header>Cooking package</Modal.Header>
                           <Modal.Content image>
@@ -196,15 +246,39 @@ class Payment extends React.Component {
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
-                  {/* <Segment raised>
-                    <Label as='a' color='red' ribbon>Overview</Label>
-                    <span>Account Details</span>
-                  </Segment>
                   <Segment compact>
-                    <Label as='div' color='red' ribbon>New<Icon name="exclamation" /></Label>
-                    <br />
-                    <Checkbox label="Delivery" checked={this.state.userWantsDelivery} onClick={() => { this.setState({ userWantsDelivery: !this.state.userWantsDelivery }); }} />
-                  </Segment> */}
+                    <Label color='red' floating>New!</Label>
+                    <Checkbox inline checked={this.state.userWantsDelivery} onClick={this.handleDelivery} />
+                    <Modal trigger={<a className={s.mode}>Delivery ($3)</a>} basic size='small' closeIcon="close">
+                    <Modal.Header>Introducing Delivery</Modal.Header>
+                    <Modal.Content image>
+                      <Modal.Description>
+                        <h5>How It Works:</h5>
+                        <ol>
+                          <li>BFF drivers start deliveries at 9 AM</li>
+                          <li>You will receive a text to let you know the estimated time of arrival</li>
+                          <li>You will receive another text when the package is 5 minutes away</li>
+                        </ol>
+                        <br />
+                        <Message info>
+                          <Message.Header as="h5">Important:</Message.Header>
+                          {/* <h5>IMPORTANT: </h5> */}
+                          <p style={styles.deliveryModalImportant}>We will only be able to drop packages off at the door to the apartment,</p>
+                          <p style={styles.deliveryModalImportant}>house, etc. Please be ready to pickup the package directly or leave</p>
+                          <p style={styles.deliveryModalImportant}>a cooler out front for the driver to leave the package in.</p>
+                        </Message>
+                        <br />
+                        <h5>Requirements for Addresses:</h5>
+                        <ul>
+                          <li>Address has to be within 5 miles of Scott House</li>
+                          <li>Address cannot be a dorm</li>
+                        </ul>
+                        </Modal.Description>
+                      </Modal.Content>
+                    </Modal>
+                    <p>Limit 50 participants</p>
+                    <p>Available deliveries left: {this.props.availableDeliveriesLeft}</p>
+                  </Segment>
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
@@ -270,6 +344,13 @@ class Payment extends React.Component {
                 offset={20}
                 position="right center"
               />
+              {this.state.errorMessage.length > 0 ?
+                <Message warning>
+                  <p>{this.state.errorMessage}</p>
+                </Message>
+                :
+                <div></div>
+              }
             </Feed>
           </Card.Content>
         </Card>
