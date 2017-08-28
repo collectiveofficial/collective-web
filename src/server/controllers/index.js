@@ -608,7 +608,7 @@ const initializeData = async () => {
     // initialize group
     const doesFirstGroupExist = await groupUtil.doesFirstGroupExist();
     // if group at id 1 does not exist
-    if (!doesFirstGroupExist) {
+    if (doesFirstGroupExist === false) {
       await groupUtil.populateGroup(firstGroup);
     }
   };
@@ -627,18 +627,12 @@ const initializeData = async () => {
   //   await groupUtil.updateCurrentVotingDropoffID(currentVotingDropoffID, groupID);
   // };
 
-  const updateFirstDropoffVoteTimeEnd = async () => {
-    const dropoffID = 1;
-    const newTime = moment.tz('2017-08-23 23:59:59', 'America/New_York');
-    await dropoffUtil.updateFirstDropoffVoteTimeEnd(dropoffID, newTime);
-  };
-
   const initializeFirstDropoff = async () => {
     const dropoffID = 1;
     // initialize dropoff
     const doesFirstDropoffExist = await dropoffUtil.doesDropoffExist(dropoffID);
     // if dropoff at id 1 does not exist
-    if (!doesFirstDropoffExist) {
+    if (doesFirstDropoffExist === false) {
       await dropoffUtil.populateDropoff(firstDropoff);
     }
   };
@@ -648,7 +642,7 @@ const initializeData = async () => {
     // initialize dropoff
     const doesSecondDropoffExist = await dropoffUtil.doesDropoffExist(dropoffID);
     // if dropoff at id 1 does not exist
-    if (!doesSecondDropoffExist) {
+    if (doesSecondDropoffExist === false) {
       await dropoffUtil.populateDropoff(secondDropoff);
     }
   };
@@ -657,24 +651,15 @@ const initializeData = async () => {
     const ballotID = 1;
     const foodID = 1;
     const doesFoodItemExist = await foodUtil.doesFoodItemExist(foodID);
-    if (!doesFoodItemExist) {
+    if (doesFoodItemExist === false) {
       await foodUtil.populateFoodItemsBallots(firstDropFoodItems, ballotID, firstDropoff);
     }
-  };
-
-  const updatePickupTimeOnDropoff = async () => {
-    const dropoffID = 1;
-    const pickupTimes = {
-      intendedPickupTimeStart: moment.tz('2017-08-26 10:00:00', 'America/New_York'),
-      intendedPickupTimeEnd: moment.tz('2017-08-26 13:00:00', 'America/New_York'),
-    };
-    await dropoffUtil.updatePickupTimeOnDropoff(dropoffID, pickupTimes);
   };
 
   const initializeSecondDropFoodItemsBallots = async () => {
     const ballotID = 2;
     const doesPapayaExist = await foodUtil.doesPapayaExist();
-    if (!doesPapayaExist) {
+    if (doesPapayaExist === false) {
       await foodUtil.populateFoodItemsBallots(secondDropFoodItems, ballotID, secondDropoff);
     }
   };
@@ -684,24 +669,14 @@ const initializeData = async () => {
     const dropoffID = 2;
     const restrictedAddressesID = 1;
     const doesRestrictedAddressExist = await restrictedAddressUtil.checkIfRestrictedAddressExist(restrictedAddressesID);
-    if (!doesRestrictedAddressExist) {
+    if (doesRestrictedAddressExist === false) {
       await restrictedAddressUtil.initializeRestrictedAddresses(restrictedAddresses, groupID, dropoffID);
     }
   };
 
-  const updateAllUsersAddressLatLong = async () => {
-    await userUtil.updateAllUsersAddressLatLong();
-  };
-
-  const updateIsQualifiedForDelivery = async () => {
-     const groupID = 1;
-     const restrictionType = 'university dorm';
-     await userUtil.updateIsQualifiedForDelivery(groupID, restrictionType);
-  };
-
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
-    const dropoffID = 1;
+    const dropoffID = 2;
     let fields;
     let csv;
     let fileName;
@@ -743,7 +718,7 @@ const initializeData = async () => {
     const fields = ['Last Name', 'First Name', 'Email'];
     // TODO: dynamic groupID
     const groupID = 1;
-    const dropoffID = 1;
+    const dropoffID = 2;
     const usersWhoHaveNotPaid = await transactionUtil.getUsersWhoHaveNotPaid(dropoffID, groupID);
     const csv = json2csv({ data: usersWhoHaveNotPaid, fields });
     const fileName = 'usersWhoHaveNotPaid.csv';
@@ -761,13 +736,9 @@ const initializeData = async () => {
   // await updateCurrentVotingDropoffID();
   await initializeFirstDropoff();
   await initializeFirstDropFoodItemsBallots();
-  await updateFirstDropoffVoteTimeEnd();
   await initializeSecondDropoff();
   await initializeSecondDropFoodItemsBallots();
-  await updatePickupTimeOnDropoff();
   await initializeRestrictedAddresses();
-  await updateAllUsersAddressLatLong();
-  await updateIsQualifiedForDelivery();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
 };
