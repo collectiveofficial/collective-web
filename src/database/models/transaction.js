@@ -10,6 +10,7 @@ module.exports = function(sequelize, DataTypes) {
     totalDollarAmount: DataTypes.DECIMAL,
     revenueBeforeStripe: DataTypes.DECIMAL,
     revenueAfterStripe: DataTypes.DECIMAL,
+    isDelivery: DataTypes.BOOLEAN,
   }, {
     classMethods: {
       associate: function(models) {

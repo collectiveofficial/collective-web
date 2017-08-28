@@ -11,10 +11,12 @@ const ballotUtil = require('../models/ballot');
 const voteUtil = require('../models/vote');
 const transactionUtil = require('../models/transaction');
 const groupUtil = require('../models/group');
+const restrictedAddressUtil = require('../models/restricted-address');
 const admin = require('firebase-admin');
 const json2csv = require('json2csv');
 const moment = require('moment-timezone');
 const configureStripe = require('stripe');
+const googleMapsUtils = require('../models/utils/google-maps-utils');
 let STRIPE_SECRET_KEY;
 
 if (process.env.NODE_ENV === 'production') {
@@ -270,6 +272,337 @@ const firstGroup = {
   deliveryZipCode: '43210',
 };
 
+const restrictedAddresses = {
+  'Archer House': {
+    streetAddress: '2130 Neil Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Baker Hall East': {
+    streetAddress: '93 West 12th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Baker Hall West': {
+    streetAddress: '129 West 12th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Barrett House': {
+    streetAddress: '88 W. Woodruff Ave',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Blackburn House': {
+    streetAddress: '136 W. Woodruff Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Bowen House': {
+    streetAddress: '2125 N. High Street',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Bradley Hall': {
+    streetAddress: '221 West 12th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Busch House': {
+    streetAddress: '2115 N. High Street',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Canfield Hall': {
+    streetAddress: '236 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Drackett Tower': {
+    streetAddress: '191 W. Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Fechko House': {
+    streetAddress: '220 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'German House': {
+    streetAddress: '141 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Hanley House': {
+    streetAddress: '225 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Haverfield House': {
+    streetAddress: '112 West Woodruff Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Houck House': {
+    streetAddress: '61 West Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Houston House': {
+    streetAddress: '97 W. Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Jones Tower': {
+    streetAddress: '123 W. Lane Ave',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Lawrence Tower': {
+    streetAddress: '328 West Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Lincoln House': {
+    streetAddress: '1810 Cannon Drive West',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Mack Hall': {
+    streetAddress: '1698 Neil Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Mendoza House': {
+    streetAddress: '194 West Woodruff Ave.',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Morrill Tower': {
+    streetAddress: '1900 Cannon Drive West',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Morrison Tower': {
+    streetAddress: '196 West 11th Ave.',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Neil Avenue': {
+    streetAddress: '1578 Neil Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Norton House': {
+    streetAddress: '2114 Neil Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Nosker House': {
+    streetAddress: '124 West Woodruff Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Park-Stradley Hall': {
+    streetAddress: '120 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Paterson Hall': {
+    streetAddress: '191 West 12th Ave.',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Pennsylvania Place': {
+    streetAddress: '1478 Pennsylvania Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Pomerene House': {
+    streetAddress: '231 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Raney House': {
+    streetAddress: '33 W. Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Scholars East': {
+    streetAddress: '221 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Scholars West': {
+    streetAddress: '239 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Scott House': {
+    streetAddress: '160 W. Woodruff Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Siebert Hall': {
+    streetAddress: '184 West 11th Ave.',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Smith-Steeb Hall': {
+    streetAddress: '80 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Taylor Tower': {
+    streetAddress: '55 W. Lane Ave',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'The Residence on Tenth': {
+    streetAddress: '230 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Torres House': {
+    streetAddress: '187 W. Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Veteran\'s House': {
+    streetAddress: '237 E 17th Ave',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Worthington Building': {
+    streetAddress: '203 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+};
+
 const initializeData = async () => {
   const initializeFirstGroup = async () => {
     // initialize group
@@ -346,6 +679,26 @@ const initializeData = async () => {
     }
   };
 
+  const initializeRestrictedAddresses = async () => {
+    const groupID = 1;
+    const dropoffID = 2;
+    const restrictedAddressesID = 1;
+    const doesRestrictedAddressExist = await restrictedAddressUtil.checkIfRestrictedAddressExist(restrictedAddressesID);
+    if (!doesRestrictedAddressExist) {
+      await restrictedAddressUtil.initializeRestrictedAddresses(restrictedAddresses, groupID, dropoffID);
+    }
+  };
+
+  const updateAllUsersAddressLatLong = async () => {
+    await userUtil.updateAllUsersAddressLatLong();
+  };
+
+  const updateIsQualifiedForDelivery = async () => {
+     const groupID = 1;
+     const restrictionType = 'university dorm';
+     await userUtil.updateIsQualifiedForDelivery(groupID, restrictionType);
+  };
+
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
     const dropoffID = 1;
@@ -412,6 +765,9 @@ const initializeData = async () => {
   await initializeSecondDropoff();
   await initializeSecondDropFoodItemsBallots();
   await updatePickupTimeOnDropoff();
+  await initializeRestrictedAddresses();
+  await updateAllUsersAddressLatLong();
+  await updateIsQualifiedForDelivery();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
 };
@@ -558,7 +914,8 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken)
       let uid = decodedToken.uid;
       req.body.uid = uid;
-      const userSignedUp = await userUtil.saveSubmittedUserInfo(req.body);
+      const restrictionType = 'university dorm';
+      const userSignedUp = await userUtil.saveSubmittedUserInfo(req.body, restrictionType);
       await res.json({ userSignedUp });
     },
   },
@@ -603,9 +960,14 @@ module.exports = {
       req.body.dropoffID = 2;
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
       const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
+      const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
+      const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
+      const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(req.body.uid);
       const responseObject = {
         ballotsAndVotes,
         userTransactionHistory,
+        availableDeliveriesLeft,
+        deliveryEligibilityObj,
       };
       await res.json(responseObject);
     },
@@ -627,6 +989,8 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;
+      // TODO: Implement dynamic dropoffID
+      req.body.dropoffID = 2;
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.updateVotes(req.body);
       res.json({ votesSaved: true });
@@ -640,16 +1004,53 @@ module.exports = {
       req.body.uid = uid;
       // TODO: dynamic dropoffID
       const dropoffID = 2;
-      req.body.pctFeePerPackage = await dropoffUtil.findPctFeePerPackageForDrop(dropoffID);
-      req.body.cookingPackageFees = (req.body.cookingPackagesOrdered * 10) * req.body.pctFeePerPackage;
-      req.body.transactionFee = req.body.cookingPackagesOrdered > 0 ? 0.5 : 0;
-      const totalDollarAmount = (req.body.dormPackagesOrdered * 6) + ((req.body.cookingPackagesOrdered * 10) + req.body.cookingPackageFees) + req.body.transactionFee;
+      // declare variable called errorMessage
+      let errorMessage = '';
+      const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(dropoffID);
+      // TODO: dynamic delivery limit
+      // declare variable to keep track of avaiable deliveries left
+      const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
+      const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(req.body.uid);
+      if (req.body.userWantsDelivery && !deliveryEligibilityObj.isUserEligibleForDelivery) {
+        if (deliveryEligibilityObj.isAddressDorm) {
+          errorMessage = 'It looks like your address is a dorm address. Our pickup location is not far away.';
+        }
+        if (deliveryEligibilityObj.isAddressBeyondDeliveryReach) {
+          errorMessage = 'It looks like your address is beyond our 5 mile delivery boundaries. We will try our best to extend our delivery boundaries in our next bulk buy. Thank you for your patience.';
+        }
+        res.json({ errorMessage, availableDeliveriesLeft });
+      }
+      // if user wants delivery and cooking packages ordered is greater than 0
+      if (req.body.userWantsDelivery && req.body.cookingPackagesOrdered > 0) {
+        // if available deliveries left is equal to 0
+        if (availableDeliveriesLeft === 0) {
+          // assign error message that tells client there are no more available deliveries
+          errorMessage = 'There are no more available deliveries left for this round of bulk buy. We apologize for any inconvenience. We promise we\'ll be back with more deliveries in the future.';
+          // respond back with the error message and avaiable deliveries left
+          res.json({ errorMessage, availableDeliveriesLeft });
+        }
+      }
+
+      // if user wants delivery and cooking packages ordered is 0
+      if (req.body.userWantsDelivery && req.body.cookingPackagesOrdered === 0) {
+        errorMessage = 'You would need to purchase at least 1 cooking package for delivery';
+        res.json({ errorMessage, availableDeliveriesLeft });
+      }
+
+      const dormPackagesTotalDollarAmount = req.body.dormPackagesOrdered * 6;
+      const cookingPackagesTotalDollarAmount = req.body.cookingPackagesOrdered * 11;
+      req.body.cookingPackagesTotalDollarAmount = cookingPackagesTotalDollarAmount;
+      req.body.deliveryFee = req.body.userWantsDelivery ? 3 : 0;
+      const totalDollarAmount = dormPackagesTotalDollarAmount + cookingPackagesTotalDollarAmount + req.body.deliveryFee;
       req.body.totalDollarAmount = totalDollarAmount;
-      const dormPackageEmailDescription = req.body.dormPackagesOrdered > 0 ? `${req.body.dormPackagesOrdered} x Dorm Package${req.body.dormPackagesOrdered < 2 ? '' : 's'}` : '';
-      const cookingPackageEmailDescription = req.body.cookingPackagesOrdered > 0 ? `${req.body.cookingPackagesOrdered} x Cooking Package${req.body.cookingPackagesOrdered < 2 ? '' : 's'}` : '';
-      const conditionalNextLine = req.body.dormPackagesOrdered > 0 && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
-      const description = `${dormPackageEmailDescription}${conditionalNextLine}${cookingPackageEmailDescription}`;
-      let charge = await stripe.charges.create({
+      const dormPackageEmailDescription = req.body.dormPackagesOrdered > 0 ? `${req.body.dormPackagesOrdered} x Dorm Package${req.body.dormPackagesOrdered < 2 ? '' : 's'} $${dormPackagesTotalDollarAmount}` : '';
+      const cookingPackageEmailDescription = req.body.cookingPackagesOrdered > 0 ? `${req.body.cookingPackagesOrdered} x Cooking Package${req.body.cookingPackagesOrdered < 2 ? '' : 's'} $${cookingPackagesTotalDollarAmount}` : '';
+      const deliveryAddress = await userUtil.findFormattedAddress(req.body.uid);
+      const deliveryEmailDescription = req.body.userWantsDelivery ? `Delivery $${req.body.deliveryFee}\nDelivery Address:\n${deliveryAddress}\n(Dropoff at door to apartment/house)` : '';
+      const packageConditionalNextLine = req.body.dormPackagesOrdered > 0 && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
+      const deliveryConditionalNextLine = req.body.userWantsDelivery && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
+      const description = `${dormPackageEmailDescription}${packageConditionalNextLine}${cookingPackageEmailDescription}${deliveryConditionalNextLine}${deliveryEmailDescription}`;
+      await stripe.charges.create({
         amount: Math.round(totalDollarAmount * 100),
         currency: 'usd',
         card: req.body.token.id,
@@ -660,7 +1061,11 @@ module.exports = {
           console.log(err);
         } else {
           await transactionUtil.savePaymentInfo(req.body, dropoffID);
-          await res.json({ paymentCompleted: true, emailSentTo: req.body.email });
+          await res.json({
+            paymentCompleted: true,
+            emailSentTo: req.body.email,
+            errorMessage,
+          });
         }
       });
     },
@@ -678,22 +1083,6 @@ module.exports = {
   },
   voteNotification: {
     get(req, res) {
-      // this.state = {
-      //   date: "26 August 2017 from 9am to Noon",
-      //   vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
-      //   remainingCalendar: [
-      //     ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
-      //   ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
-      //   ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
-      //   ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
-      //   ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
-      //   ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
-      //   ],
-      //   items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
-      //   provider: "DNO Produce",
-      //   //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
-      //   location: "https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university",
-      // };
       // '00 56 9 27 7 * *'
       const job1 = new cron.CronJob('00 03 13 * * *', () => {
         /* runs once at the specified date. */

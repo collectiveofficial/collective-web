@@ -119,6 +119,8 @@ class Voting extends React.Component {
           <Payment
             firebaseAccessToken={this.props.firebaseAccessToken}
             ballotsAndVotes={this.props.ballotsAndVotes}
+            availableDeliveriesLeft={this.props.availableDeliveriesLeft}
+            deliveryEligibilityObj={this.props.deliveryEligibilityObj}
           />
           :
           <div className={s.cont}>
