@@ -59,3 +59,25 @@ module.exports.getRestrictedAddressLatLong = async (groupID) => {
   }
   return latLongs;
 };
+
+module.exports.checkIfAddressIsDorm = async (userLatLongString, groupID) => {
+  try {
+    const latLongs = {};
+    const restrictedAddresses = await models.RestrictedAddress.findAll({
+      where: {
+        groupID,
+      },
+    });
+    for (let i = 0; i < restrictedAddresses.length; i++) {
+      const latLongString = restrictedAddresses[i].dataValues.latitude.toString() + restrictedAddresses[i].dataValues.longitude.toString();
+      latLongs[latLongString] = restrictedAddresses[i].dataValues.restrictionType;
+    }
+    if (latLongs[userLatLongString] === 'university dorm') {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};

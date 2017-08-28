@@ -9,7 +9,9 @@ module.exports.savePaymentInfo = async (requestBody, dropoffID) => {
     const stripeFees = Number(((requestBody.totalDollarAmount * 0.029) + 0.3).toFixed(2));
     const feeChargedToBFF = requestBody.dormPackagesOrdered * 0.5;
     const deliveryFeeAttributedToCollective = requestBody.deliveryFee / 3;
-    const revenueBeforeStripe = Number((requestBody.cookingPackageFees + requestBody.transactionFee + feeChargedToBFF + deliveryFeeAttributedToCollective).toFixed(2));
+    // const revenueBeforeStripe = Number((requestBody.cookingPackageFees + requestBody.transactionFee + feeChargedToBFF + deliveryFeeAttributedToCollective).toFixed(2));
+    const earningsOnCookingPackages = Number(requestBody.cookingPackagesTotalDollarAmount - (10 * requestBody.cookingPackagesOrdered))
+    const revenueBeforeStripe = Number((earningsOnCookingPackages + feeChargedToBFF + deliveryFeeAttributedToCollective).toFixed(2));
     const revenueAfterStripe = Number((revenueBeforeStripe - stripeFees).toFixed(2));
     const userID = await userUtil.findUserID(requestBody.uid);
     await models.Transaction.create({
@@ -99,10 +101,18 @@ module.exports.getUserTransactionHistory = async (uid) => {
       },
     });
     for (let i = 0; i < getUserTransactionHistoryResults.length; i++) {
+      const dropoffDate = await dropoffUtil.findDropoffDateByID(getUserTransactionHistoryResults[i].dataValues.dropoffID);
+      let deliveryAddress = '';
+      if (getUserTransactionHistoryResults[i].dataValues.isDelivery) {
+        deliveryAddress = await userUtil.findFormattedAddress(uid);
+      }
       dataObj = {
+        dropoffDate,
         date: getUserTransactionHistoryResults[i].dataValues.createdAt,
         dormPackagesOrdered: getUserTransactionHistoryResults[i].dataValues.dormPackagesOrdered,
         cookingPackagesOrdered: getUserTransactionHistoryResults[i].dataValues.cookingPackagesOrdered,
+        isDelivery: getUserTransactionHistoryResults[i].dataValues.isDelivery,
+        deliveryAddress,
         totalDollarAmount: getUserTransactionHistoryResults[i].dataValues.totalDollarAmount,
       }
       transactions.push(dataObj);

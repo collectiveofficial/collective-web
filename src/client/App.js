@@ -230,6 +230,7 @@ class App extends Component {
     this.setState({ ballotsAndVotes: initialDataLoadResults.ballotsAndVotes });
     this.setState({ userTransactionHistory: initialDataLoadResults.userTransactionHistory });
     this.setState({ availableDeliveriesLeft: initialDataLoadResults.availableDeliveriesLeft });
+    this.setState({ deliveryEligibilityObj: initialDataLoadResults.deliveryEligibilityObj });
     console.log('-------> this.state.ballotsAndVotes: ', this.state.ballotsAndVotes);
     console.log('-------> this.state.userTransactionHistory: ', this.state.userTransactionHistory);
     console.log('-------> this.state.availableDeliveriesLeft: ', this.state.availableDeliveriesLeft)
@@ -281,6 +282,7 @@ class App extends Component {
                 updateBallotsAndVotes={this.updateBallotsAndVotes}
                 firebaseAccessToken={this.state.firebaseAccessToken}
                 availableDeliveriesLeft={this.state.availableDeliveriesLeft}
+                deliveryEligibilityObj={this.state.deliveryEligibilityObj}
               />)}
             />
             <PrivateRoute userAuthorized={this.state.userAuthorized} path="/order-info" component={() =>

@@ -315,3 +315,43 @@ module.exports.updateIsQualifiedForDelivery = async (groupID, restrictionType) =
     console.log(err);
   }
 };
+
+module.exports.checkIfUserEligibleForDelivery = async (firebaseUID) => {
+  let isUserEligibleForDelivery = false;
+  const user = await models.User.findOne({
+    where: {
+      firebaseUID,
+    }
+  });
+  const userFormattedAddress = user.dataValues.fullAddress;
+  const groupID = user.dataValues.userGroupId;
+  const userLatLongString = user.dataValues.latitude + user.dataValues.longitude;
+  const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(groupID);
+  const distanceObj = await googleMapsUtils.findDistance(deliveryOrigin, userFormattedAddress);
+  let isAddressBeyondDeliveryReach;
+  if (distanceObj.distanceFromUserAddressInMiles > 5) {
+    isAddressBeyondDeliveryReach = true;
+  } else {
+    isAddressBeyondDeliveryReach = false;
+  }
+  const isAddressDorm = await restrictedAddressUtils.checkIfAddressIsDorm(userLatLongString, groupID);
+  if (!isAddressBeyondDeliveryReach && !isAddressDorm) {
+    isUserEligibleForDelivery = true;
+  }
+  const eligibilityObj = {
+    isUserEligibleForDelivery,
+    isAddressBeyondDeliveryReach,
+    isAddressDorm,
+  };
+  return eligibilityObj;
+};
+
+module.exports.findFormattedAddress = async (firebaseUID) => {
+  const user = await models.User.findOne({
+    where: {
+      firebaseUID,
+    },
+  });
+  const formattedAddress = user.dataValues.fullAddress;
+  return formattedAddress;
+};

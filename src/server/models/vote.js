@@ -35,29 +35,35 @@ module.exports.saveVotes = async (requestBody) => {
 };
 
 module.exports.updateVotes = async (requestBody) => {
-  for (let foodItem in requestBody.foodObj) {
-    const findFoodInfoResult = await ballotUtil.findFoodInfo(foodItem);
-    await models.Vote.update({
-      isCurrent: requestBody.foodObj[foodItem],
-    }, {
-      where: {
-        firebaseUID: requestBody.uid,
-        foodID: findFoodInfoResult.dataValues.foodID,
-        foodName: findFoodInfoResult.dataValues.foodName,
-        dropoffID: findFoodInfoResult.dataValues.dropoffID,
-        ballotID: findFoodInfoResult.dataValues.id,
-      },
-    });
-    // count all votes where isCurrent is true
-    const findAllTrueVotes = await models.Vote.findAll({
-      where: {
-        isCurrent: true,
-        foodID: findFoodInfoResult.dataValues.foodID,
-        dropoffID: findFoodInfoResult.dataValues.dropoffID,
-      },
-    });
-    // set ballot voteCount where foodID and dropoffID match
-    await ballotUtil.changeVoteCount(findAllTrueVotes.length, findFoodInfoResult.dataValues.foodID, findFoodInfoResult.dataValues.dropoffID);
+  try {
+    for (let foodItem in requestBody.foodObj) {
+      const findFoodInfoResult = await ballotUtil.findFoodInfo(foodItem, requestBody.dropoffID);
+      console.log('\n\nfoodItem: ', foodItem);
+      console.log('\n\nfindFoodInfoResult: ', findFoodInfoResult);
+      await models.Vote.update({
+        isCurrent: requestBody.foodObj[foodItem],
+      }, {
+        where: {
+          firebaseUID: requestBody.uid,
+          foodID: findFoodInfoResult.dataValues.foodID,
+          foodName: findFoodInfoResult.dataValues.foodName,
+          dropoffID: findFoodInfoResult.dataValues.dropoffID,
+          ballotID: findFoodInfoResult.dataValues.id,
+        },
+      });
+      // count all votes where isCurrent is true
+      const findAllTrueVotes = await models.Vote.findAll({
+        where: {
+          isCurrent: true,
+          foodID: findFoodInfoResult.dataValues.foodID,
+          dropoffID: findFoodInfoResult.dataValues.dropoffID,
+        },
+      });
+      // set ballot voteCount where foodID and dropoffID match
+      await ballotUtil.changeVoteCount(findAllTrueVotes.length, findFoodInfoResult.dataValues.foodID, findFoodInfoResult.dataValues.dropoffID);
+    }
+  } catch (err) {
+    console.log(err);
   }
 };
 

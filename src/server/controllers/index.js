@@ -962,10 +962,12 @@ module.exports = {
       const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
       const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
       const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
+      const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(req.body.uid);
       const responseObject = {
         ballotsAndVotes,
         userTransactionHistory,
         availableDeliveriesLeft,
+        deliveryEligibilityObj,
       };
       await res.json(responseObject);
     },
@@ -987,6 +989,8 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;
+      // TODO: Implement dynamic dropoffID
+      req.body.dropoffID = 2;
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.updateVotes(req.body);
       res.json({ votesSaved: true });
@@ -1001,11 +1005,21 @@ module.exports = {
       // TODO: dynamic dropoffID
       const dropoffID = 2;
       // declare variable called errorMessage
-      let errorMessage;
+      let errorMessage = '';
       const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(dropoffID);
       // TODO: dynamic delivery limit
       // declare variable to keep track of avaiable deliveries left
       const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
+      const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(req.body.uid);
+      if (req.body.userWantsDelivery && !deliveryEligibilityObj.isUserEligibleForDelivery) {
+        if (deliveryEligibilityObj.isAddressDorm) {
+          errorMessage = 'It looks like your address is a dorm address. Our pickup location is not far away.';
+        }
+        if (deliveryEligibilityObj.isAddressBeyondDeliveryReach) {
+          errorMessage = 'It looks like your address is beyond our 5 mile delivery boundaries. We will try our best to extend our delivery boundaries in our next bulk buy. Thank you for your patience.';
+        }
+        res.json({ errorMessage, availableDeliveriesLeft });
+      }
       // if user wants delivery and cooking packages ordered is greater than 0
       if (req.body.userWantsDelivery && req.body.cookingPackagesOrdered > 0) {
         // if available deliveries left is equal to 0
@@ -1024,16 +1038,15 @@ module.exports = {
       }
 
       const dormPackagesTotalDollarAmount = req.body.dormPackagesOrdered * 6;
-      const cookingPackagesTotalDollarAmount = req.body.cookingPackagesOrdered * 10;
-      req.body.pctFeePerPackage = await dropoffUtil.findPctFeePerPackageForDrop(dropoffID);
-      req.body.cookingPackageFees = cookingPackagesTotalDollarAmount * req.body.pctFeePerPackage;
-      req.body.transactionFee = req.body.cookingPackagesOrdered > 0 ? 0.5 : 0;
+      const cookingPackagesTotalDollarAmount = req.body.cookingPackagesOrdered * 11;
+      req.body.cookingPackagesTotalDollarAmount = cookingPackagesTotalDollarAmount;
       req.body.deliveryFee = req.body.userWantsDelivery ? 3 : 0;
-      const totalDollarAmount = dormPackagesTotalDollarAmount + (cookingPackagesTotalDollarAmount + req.body.cookingPackageFees) + req.body.transactionFee + req.body.deliveryFee;
+      const totalDollarAmount = dormPackagesTotalDollarAmount + cookingPackagesTotalDollarAmount + req.body.deliveryFee;
       req.body.totalDollarAmount = totalDollarAmount;
       const dormPackageEmailDescription = req.body.dormPackagesOrdered > 0 ? `${req.body.dormPackagesOrdered} x Dorm Package${req.body.dormPackagesOrdered < 2 ? '' : 's'} $${dormPackagesTotalDollarAmount}` : '';
       const cookingPackageEmailDescription = req.body.cookingPackagesOrdered > 0 ? `${req.body.cookingPackagesOrdered} x Cooking Package${req.body.cookingPackagesOrdered < 2 ? '' : 's'} $${cookingPackagesTotalDollarAmount}` : '';
-      const deliveryEmailDescription = req.body.userWantsDelivery ? `Delivery $${req.body.deliveryFee}` : '';
+      const deliveryAddress = await userUtil.findFormattedAddress(req.body.uid);
+      const deliveryEmailDescription = req.body.userWantsDelivery ? `Delivery $${req.body.deliveryFee}\nDelivery Address:\n${deliveryAddress}\n(Dropoff at door to apartment/house)` : '';
       const packageConditionalNextLine = req.body.dormPackagesOrdered > 0 && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
       const deliveryConditionalNextLine = req.body.userWantsDelivery && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
       const description = `${dormPackageEmailDescription}${packageConditionalNextLine}${cookingPackageEmailDescription}${deliveryConditionalNextLine}${deliveryEmailDescription}`;
@@ -1048,7 +1061,11 @@ module.exports = {
           console.log(err);
         } else {
           await transactionUtil.savePaymentInfo(req.body, dropoffID);
-          await res.json({ paymentCompleted: true, emailSentTo: req.body.email });
+          await res.json({
+            paymentCompleted: true,
+            emailSentTo: req.body.email,
+            errorMessage,
+          });
         }
       });
     },
@@ -1066,22 +1083,6 @@ module.exports = {
   },
   voteNotification: {
     get(req, res) {
-      // this.state = {
-      //   date: "26 August 2017 from 9am to Noon",
-      //   vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
-      //   remainingCalendar: [
-      //     ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
-      //   ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
-      //   ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
-      //   ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
-      //   ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
-      //   ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
-      //   ],
-      //   items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
-      //   provider: "DNO Produce",
-      //   //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
-      //   location: "https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university",
-      // };
       // '00 56 9 27 7 * *'
       const job1 = new cron.CronJob('00 03 13 * * *', () => {
         /* runs once at the specified date. */

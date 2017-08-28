@@ -2,7 +2,7 @@ const models = require('../../database/models/index');
 
 module.exports.doesDropoffExist = async (id) => {
   try {
-    const doesDropoffExistResult = models.Dropoff.findOne({
+    const doesDropoffExistResult = await models.Dropoff.findOne({
       where: {
         id,
       },
@@ -126,6 +126,20 @@ module.exports.changeDeliveriesOrderedCount = async (id, deliveriesOrderedCount)
         id,
       },
     });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports.findDropoffDateByID = async (id) => {
+  try {
+    const dropoff = await models.Dropoff.findOne({
+      where: {
+        id,
+      },
+    });
+    const dropoffDate = dropoff.dataValues.intendedShipDate;
+    return dropoffDate;
   } catch (err) {
     console.log(err);
   }
