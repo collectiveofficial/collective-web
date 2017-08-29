@@ -7,6 +7,10 @@ class Orders extends React.Component {
     super(props);
     this.state = {
     };
+    this.parseDateFromTimeZone = this.parseDateFromTimeZone.bind(this);
+  }
+  parseDateFromTimeZone(s) {
+    return new Date(s.substring(0, s.indexOf('T')).split('-').join('/')).toDateString();
   }
 
   render() {
@@ -30,7 +34,7 @@ class Orders extends React.Component {
           <Table.Body>
             {this.props.userTransactionHistory.map((transaction) => {
               console.log('typeof transaction.date', typeof transaction.date);
-              const dropoffDate = new Date(Date.parse(transaction.dropoffDate)).toDateString();
+              const dropoffDate = this.parseDateFromTimeZone(transaction.dropoffDate);
               const date = moment(transaction.date).format('LL');
               return (
                 <Table.Row>
