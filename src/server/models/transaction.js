@@ -103,7 +103,6 @@ module.exports.getUserTransactionHistory = async (uid) => {
     });
     for (let i = 0; i < getUserTransactionHistoryResults.length; i++) {
       let dropoffDate = await dropoffUtil.findDropoffDateByID(getUserTransactionHistoryResults[i].dataValues.dropoffID);
-      dropoffDate = moment.tz(dropoffDate, 'America/New_York');
       let deliveryAddress = '';
       if (getUserTransactionHistoryResults[i].dataValues.isDelivery) {
         deliveryAddress = await userUtil.findFormattedAddress(uid);
