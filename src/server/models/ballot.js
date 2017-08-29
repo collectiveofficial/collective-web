@@ -114,3 +114,18 @@ module.exports.getFoodNamesAndVoteCounts = async (dropoffID) => {
   foodNamesAndVoteCounts = foodNamesAndVoteCounts.sort((a, b) => b['Vote Count'] - a['Vote Count']);
   return foodNamesAndVoteCounts;
 };
+
+module.exports.findFoodID = async (foodName, dropoffID) => {
+  try {
+    const food = models.Food.findOne({
+      where: {
+        foodName,
+        dropoffID,
+      },
+    });
+    const foodID = food.dataValues.id;
+    return foodID;
+  } catch (err) {
+    console.log(err);
+  }
+};

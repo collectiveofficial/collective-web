@@ -3,6 +3,7 @@ const models = require('../../database/models/index');
 const userUtil = require('./user');
 const foodUtil = require('./food');
 const voteUtil = require('./vote');
+const ballotUtil = require('./ballot');
 const dropoffUtil = require('./dropoff');
 
 module.exports.savePaymentInfo = async (requestBody, dropoffID) => {
@@ -38,6 +39,13 @@ module.exports.savePaymentInfo = async (requestBody, dropoffID) => {
         hasAllergies: true,
       },
     });
+    if (requestBody.hasAllergies) {
+      for (let i = 0; i < requestBody.allergiesList.length; i++) {
+        const foodName = requestBody.allergiesList[i];
+        const foodID = await ballotUtil.findFoodID(foodName, dropoffID);
+        await voteUtil.updateAllergies(userID, dropoffID, foodID);
+      }
+    }
     const deliveriesOrderedCount = deliveryTransactions.length;
     const allergiesCount = allergiesTransactions.length;
     // increment the deliveriesOrderedCount on the appropriate dropoffID by 1
@@ -77,7 +85,9 @@ module.exports.getUserInfoAndPackagesOrdered = async (dropoffID) => {
       },
     });
     for (let i = 0; i < transactions.length; i++) {
-      const userObj = await userUtil.findUserInfoByID(transactions[i].dataValues.userID);
+      const userID = transactions[i].dataValues.userID;
+      const userObj = await userUtil.findUserInfoByID(userID);
+      const allergies = await voteUtil.getUserAllergies(userID, dropoffID);
       const dataObj = {
         'Last Name': userObj.lastName,
         'First Name': userObj.firstName,
@@ -85,6 +95,7 @@ module.exports.getUserInfoAndPackagesOrdered = async (dropoffID) => {
         'Phone Number': userObj.phoneNumber,
         'Dorm Packages Ordered': transactions[i].dataValues.dormPackagesOrdered,
         'Cooking Packages Ordered': transactions[i].dataValues.cookingPackagesOrdered,
+        Allergies: allergies,
       };
       userNamesAndPackagesOrdered.push(dataObj);
     }

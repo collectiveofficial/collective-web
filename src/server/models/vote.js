@@ -1,6 +1,7 @@
 const models = require('../../database/models/index');
 const ballotUtil = require('./ballot');
 const userUtil = require('./user');
+const foodUtil = require('./food');
 
 module.exports.saveVotes = async (requestBody) => {
   // iterate through the food object of the request body
@@ -83,4 +84,37 @@ module.exports.findVotesByUserAndDropoff = async (userID, dropoffID) => {
     }
   }
   return votes;
+};
+
+module.exports.updateAllergies = async (userID, dropoffID, foodID) => {
+  await models.Vote.update({
+    isUserAllergic: true,
+  }, {
+    where: {
+      userID,
+      dropoffID,
+      foodID,
+    },
+  });
+};
+
+module.exports.getUserAllergies = async (userID, dropoffID) => {
+  try {
+    const allergicFoodList = [];
+    const allergyVotes = await models.Vote.findAll({
+      where: {
+        userID,
+        dropoffID,
+        isUserAllergic: true,
+      },
+    });
+    for (let i = 0; i < allergyVotes.length; i++) {
+      const allergicFoodID = allergyVotes[i].dataValues.foodID;
+      const allergicFoodName = await foodUtil.findFoodNameByID(allergicFoodID);
+      allergicFoodList.push(allergicFoodName);
+    }
+    return allergicFoodList;
+  } catch (err) {
+    console.log(err);
+  }
 };
