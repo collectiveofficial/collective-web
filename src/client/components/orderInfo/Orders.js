@@ -30,7 +30,7 @@ class Orders extends React.Component {
           <Table.Body>
             {this.props.userTransactionHistory.map((transaction) => {
               console.log('typeof transaction.date', typeof transaction.date);
-              const dropoffDate = moment(transaction.dropoffDate).format('LL');
+              const dropoffDate = new Date(Date.parse(transaction.dropoffDate)).toDateString();
               const date = moment(transaction.date).format('LL');
               return (
                 <Table.Row>
