@@ -5,7 +5,7 @@ import {
   Redirect,
 } from 'react-router-dom';
 import s from './Home.css';
-import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label, Message } from 'semantic-ui-react';
+import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label, Message, Grid } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
 import RaisedButton from 'material-ui/RaisedButton';
 import { ref, firebaseAuth } from '../../config';
@@ -15,6 +15,7 @@ class Payment extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      hasAllergies: false,
       modalIsOpen: false,
       price: 0,
       paymentErrorMessage: '',
@@ -26,17 +27,27 @@ class Payment extends React.Component {
       userWantsDelivery: false,
       errorMessage: '',
       deliveryPriceImpact: 0,
+      allergiesList: [],
     };
+    this.handleAllergies = this.handleAllergies.bind(this);
     this.handleDorm = this.handleDorm.bind(this);
     this.handleCook = this.handleCook.bind(this);
     this.onToken = this.onToken.bind(this);
     this.handlePayment = this.handlePayment.bind(this);
     this.handleDelivery = this.handleDelivery.bind(this);
+    this.handleAllergiesChange = this.handleAllergiesChange.bind(this);
   }
 
   async componentWillMount() {
     const email = await firebaseAuth().currentUser.email;
     await this.setState({ email });
+  }
+
+  async handleAllergies({ checked }) {
+    await this.setState({ hasAllergies: !this.state.hasAllergies });
+    if (this.state.hasAllergies === false) {
+      await this.setState({ allergiesList: [] });
+    }
   }
 
   async handleDorm(e, { value }) {
@@ -129,6 +140,7 @@ class Payment extends React.Component {
         dormPackagesOrdered: this.state.dorm,
         cookingPackagesOrdered: this.state.cook,
         userWantsDelivery: this.state.userWantsDelivery,
+        hasAllergies: this.state.hasAllergies,
       }),
     });
     const submitPaymentResultData = await submitPaymentResult.json();
@@ -149,6 +161,17 @@ class Payment extends React.Component {
     }
   }
 
+  async handleAllergiesChange(e, { value, checked }) {
+    const allergiesList = this.state.allergiesList.slice('');
+    if (checked) {
+      allergiesList.push(value);
+    } else {
+      const allergiesIndex = allergiesList.indexOf(value);
+      allergiesList.splice(allergiesIndex, 1);
+    }
+    await this.setState({ allergiesList });
+  }
+
   render() {
     const styles = {
       stripe: {
@@ -160,7 +183,7 @@ class Payment extends React.Component {
       },
       deliveryModalImportant: {
         margin: '0 0 0 0',
-      }
+      },
     };
 
     const dormNumOptions = [
@@ -262,7 +285,6 @@ class Payment extends React.Component {
                         <br />
                         <Message info>
                           <Message.Header as="h5">Important:</Message.Header>
-                          {/* <h5>IMPORTANT: </h5> */}
                           <p style={styles.deliveryModalImportant}>We will only be able to drop packages off at the door to the apartment,</p>
                           <p style={styles.deliveryModalImportant}>house, etc. Please be ready to pickup the package directly or leave</p>
                           <p style={styles.deliveryModalImportant}>a cooler out front for the driver to leave the package in.</p>
@@ -298,6 +320,29 @@ class Payment extends React.Component {
                     </Feed.Summary>
                   </Feed.Content>
                 </Feed.Event>
+                <Checkbox inline label="I am allergic to one or more of the produces from this bulk buy" checked={this.state.hasAllergies} onClick={this.handleAllergies} />
+                {this.state.hasAllergies ?
+                  <div style={styles.allergiesBox}>
+                    <br />
+                    <p>Which of these produces are you allergic to?</p>
+                    <Grid columns={2}>
+                      {this.props.ballotsAndVotes.map((ballotAndVote) => {
+                        return (
+                          <Grid.Column key={ballotAndVote.name}>
+                            <Checkbox
+                              label={ballotAndVote.name}
+                              value={ballotAndVote.name}
+                              onChange={this.handleAllergiesChange}
+                            />
+                          </Grid.Column>
+                        );
+                      })}
+                    </Grid>
+                    <br />
+                  </div>
+                  :
+                  <div></div>
+                }
                 <Popup
                   trigger={<Feed.Event onClick={this.handlePayment}>
                   <Feed.Content>
@@ -311,7 +356,7 @@ class Payment extends React.Component {
                           // panelLabel="Give Money" prepended to the amount in the bottom pay button
                           amount={this.state.price * 100} // cents
                           currency="USD"
-                          stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
+                          stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
                           email={this.state.email}
                           // Note: Enabling either address option will give the user the ability to
                           // fill out both. Addresses are sent as a second parameter in the token callback.
