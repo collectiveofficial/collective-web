@@ -141,6 +141,7 @@ class Payment extends React.Component {
         cookingPackagesOrdered: this.state.cook,
         userWantsDelivery: this.state.userWantsDelivery,
         hasAllergies: this.state.hasAllergies,
+        allergiesList: this.state.allergiesList,
       }),
     });
     const submitPaymentResultData = await submitPaymentResult.json();
