@@ -95,7 +95,10 @@ class Payment extends React.Component {
   async submitInitialVotes() {
     const foodObj = {};
     for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
-      foodObj[this.props.ballotsAndVotes[i].name] = this.props.ballotsAndVotes[i].isCurrent;
+      foodObj[this.props.ballotsAndVotes[i].name] = {
+        isCurrent: this.props.ballotsAndVotes[i].isCurrent,
+        isAllergic: this.state.allergiesList.indexOf(this.props.ballotsAndVotes[i].name) > -1 ? true : false,
+      };
     }
     // save votes to DB and allow to continue to payment
     const response = await fetch('/vote/save', {
@@ -141,7 +144,6 @@ class Payment extends React.Component {
         cookingPackagesOrdered: this.state.cook,
         userWantsDelivery: this.state.userWantsDelivery,
         hasAllergies: this.state.hasAllergies,
-        allergiesList: this.state.allergiesList,
       }),
     });
     const submitPaymentResultData = await submitPaymentResult.json();

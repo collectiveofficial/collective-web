@@ -117,13 +117,14 @@ module.exports.getFoodNamesAndVoteCounts = async (dropoffID) => {
 
 module.exports.findFoodID = async (foodName, dropoffID) => {
   try {
-    const food = models.Food.findOne({
+    console.log('\n\n\nfoodName: ', foodName);
+    const ballot = await models.Ballot.findOne({
       where: {
         foodName,
         dropoffID,
       },
     });
-    const foodID = food.dataValues.id;
+    const foodID = ballot.dataValues.foodID;
     return foodID;
   } catch (err) {
     console.log(err);

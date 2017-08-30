@@ -39,13 +39,6 @@ module.exports.savePaymentInfo = async (requestBody, dropoffID) => {
         hasAllergies: true,
       },
     });
-    if (requestBody.hasAllergies) {
-      for (let i = 0; i < requestBody.allergiesList.length; i++) {
-        const foodName = requestBody.allergiesList[i];
-        const foodID = await ballotUtil.findFoodID(foodName, dropoffID);
-        await voteUtil.updateAllergies(userID, dropoffID, foodID);
-      }
-    }
     const deliveriesOrderedCount = deliveryTransactions.length;
     const allergiesCount = allergiesTransactions.length;
     // increment the deliveriesOrderedCount on the appropriate dropoffID by 1
