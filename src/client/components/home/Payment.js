@@ -22,7 +22,6 @@ class Payment extends React.Component {
       dorm: 0,
       cook: 0,
       hasPaymentCompleted: false,
-      votesSaved: false,
       email: '',
       userWantsDelivery: false,
       errorMessage: '',
@@ -92,34 +91,6 @@ class Payment extends React.Component {
     }
   }
 
-  async submitInitialVotes() {
-    const foodObj = {};
-    for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
-      foodObj[this.props.ballotsAndVotes[i].name] = {
-        isCurrent: this.props.ballotsAndVotes[i].isCurrent,
-        isAllergic: this.state.allergiesList.indexOf(this.props.ballotsAndVotes[i].name) > -1 ? true : false,
-      };
-    }
-    // save votes to DB and allow to continue to payment
-    const response = await fetch('/vote/save', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      body: JSON.stringify({
-        firebaseAccessToken: this.props.firebaseAccessToken,
-        foodObj,
-      }),
-    });
-    const responseData = await response.json();
-    if (responseData.votesSaved) {
-      this.setState({ votesSaved: true });
-    } else {
-      this.setState({ votesSaved: false });
-    }
-  }
-
   async handlePayment() {
     await this.setState({ paymentErrorMessage: '' });
     await this.setState({ errorMessage: '' });
@@ -130,7 +101,14 @@ class Payment extends React.Component {
 
   async onToken(token) {
     await this.setState({ hasPaymentCompleted: false });
-    const submitPaymentResult = await fetch('/confirm-payment', {
+    const foodObj = {};
+    for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
+      foodObj[this.props.ballotsAndVotes[i].name] = {
+        isCurrent: this.props.ballotsAndVotes[i].isCurrent,
+        isAllergic: this.state.allergiesList.indexOf(this.props.ballotsAndVotes[i].name) > -1 ? true : false,
+      };
+    }
+    const submitPaymentResult = await fetch('/payment-votes/save', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -144,6 +122,7 @@ class Payment extends React.Component {
         cookingPackagesOrdered: this.state.cook,
         userWantsDelivery: this.state.userWantsDelivery,
         hasAllergies: this.state.hasAllergies,
+        foodObj,
       }),
     });
     const submitPaymentResultData = await submitPaymentResult.json();
@@ -151,12 +130,7 @@ class Payment extends React.Component {
     // handle for delivery error message from server (must order at least 1 cooking package and make sure count <= 50)
     if (this.state.errorMessage.length === 0) {
       if (submitPaymentResultData.paymentCompleted) {
-        await this.submitInitialVotes();
-        if (this.state.votesSaved) {
-          this.setState({ hasPaymentCompleted: true });
-        } else {
-          alert('Voting failed. Please contact Collective to resolve this issue. We appreciate your patience.');
-        }
+        this.setState({ hasPaymentCompleted: true });
       } else {
         alert('Payment failed. Please contact Collective to resolve this issue. We appreciate your patience.');
         this.setState({ hasPaymentCompleted: false });
@@ -376,7 +350,7 @@ class Payment extends React.Component {
                           // panelLabel="Give Money" prepended to the amount in the bottom pay button
                           amount={this.state.price * 100} // cents
                           currency="USD"
-                          stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
+                          stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
                           email={this.state.email}
                           // Note: Enabling either address option will give the user the ability to
                           // fill out both. Addresses are sent as a second parameter in the token callback.

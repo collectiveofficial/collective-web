@@ -379,18 +379,6 @@ module.exports = {
       await res.json(responseObject);
     },
   },
-  saveVotes: {
-    async post(req, res) {
-      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
-      let uid = decodedToken.uid;
-      req.body.uid = uid;
-      // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 2;
-      // invoke vote util function that takes in the request body as an argument
-      await voteUtil.saveVotes(req.body);
-      res.json({ votesSaved: true });
-    },
-  },
   updateVotes: {
     async post(req, res) {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
@@ -403,7 +391,7 @@ module.exports = {
       res.json({ votesSaved: true });
     },
   },
-  confirmPayment: {
+  savePaymentVotes: {
     async post(req, res) {
       console.log(req.body);
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
@@ -468,6 +456,8 @@ module.exports = {
           console.log(err);
         } else {
           await transactionUtil.savePaymentInfo(req.body, dropoffID);
+          // invoke vote util function that takes in the request body as an argument
+          await voteUtil.saveVotes(req.body, dropoffID);
           await res.json({
             paymentCompleted: true,
             emailSentTo: req.body.email,
