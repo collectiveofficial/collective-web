@@ -5,7 +5,7 @@ import {
   Redirect,
 } from 'react-router-dom';
 import s from './Home.css';
-import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label, Message } from 'semantic-ui-react';
+import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label, Message, Grid } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
 import RaisedButton from 'material-ui/RaisedButton';
 import { ref, firebaseAuth } from '../../config';
@@ -15,6 +15,7 @@ class Payment extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      hasAllergies: false,
       modalIsOpen: false,
       price: 0,
       paymentErrorMessage: '',
@@ -26,17 +27,27 @@ class Payment extends React.Component {
       userWantsDelivery: false,
       errorMessage: '',
       deliveryPriceImpact: 0,
+      allergiesList: [],
     };
+    this.handleAllergies = this.handleAllergies.bind(this);
     this.handleDorm = this.handleDorm.bind(this);
     this.handleCook = this.handleCook.bind(this);
     this.onToken = this.onToken.bind(this);
     this.handlePayment = this.handlePayment.bind(this);
     this.handleDelivery = this.handleDelivery.bind(this);
+    this.handleAllergiesChange = this.handleAllergiesChange.bind(this);
   }
 
   async componentWillMount() {
     const email = await firebaseAuth().currentUser.email;
     await this.setState({ email });
+  }
+
+  async handleAllergies({ checked }) {
+    await this.setState({ hasAllergies: !this.state.hasAllergies });
+    if (this.state.hasAllergies === false) {
+      await this.setState({ allergiesList: [] });
+    }
   }
 
   async handleDorm(e, { value }) {
@@ -84,7 +95,10 @@ class Payment extends React.Component {
   async submitInitialVotes() {
     const foodObj = {};
     for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
-      foodObj[this.props.ballotsAndVotes[i].name] = this.props.ballotsAndVotes[i].isCurrent;
+      foodObj[this.props.ballotsAndVotes[i].name] = {
+        isCurrent: this.props.ballotsAndVotes[i].isCurrent,
+        isAllergic: this.state.allergiesList.indexOf(this.props.ballotsAndVotes[i].name) > -1 ? true : false,
+      };
     }
     // save votes to DB and allow to continue to payment
     const response = await fetch('/vote/save', {
@@ -129,6 +143,7 @@ class Payment extends React.Component {
         dormPackagesOrdered: this.state.dorm,
         cookingPackagesOrdered: this.state.cook,
         userWantsDelivery: this.state.userWantsDelivery,
+        hasAllergies: this.state.hasAllergies,
       }),
     });
     const submitPaymentResultData = await submitPaymentResult.json();
@@ -149,6 +164,17 @@ class Payment extends React.Component {
     }
   }
 
+  async handleAllergiesChange(e, { value, checked }) {
+    const allergiesList = this.state.allergiesList.slice('');
+    if (checked) {
+      allergiesList.push(value);
+    } else {
+      const allergiesIndex = allergiesList.indexOf(value);
+      allergiesList.splice(allergiesIndex, 1);
+    }
+    await this.setState({ allergiesList });
+  }
+
   render() {
     const styles = {
       stripe: {
@@ -160,28 +186,31 @@ class Payment extends React.Component {
       },
       deliveryModalImportant: {
         margin: '0 0 0 0',
-      }
+      },
+      allergiesModal: {
+        margin: '0 0 0 0',
+      },
     };
 
     const dormNumOptions = [
-      {text: 0, value: 0},
-      {text: 1, value: 1},
-      {text: 2, value: 2},
-      {text: 3, value: 3},
-      {text: 4, value: 4},
-      {text: 5, value: 5},
-      {text: 6, value: 6},
-      {text: 7, value: 7},
+      { text: 0, value: 0 },
+      { text: 1, value: 1 },
+      { text: 2, value: 2 },
+      { text: 3, value: 3 },
+      { text: 4, value: 4 },
+      { text: 5, value: 5 },
+      { text: 6, value: 6 },
+      { text: 7, value: 7 },
     ];
     const cookNumOptions = [
-      {text: 0, value: 0, disabled: this.state.userWantsDelivery},
-      {text: 1, value: 1},
-      {text: 2, value: 2},
-      {text: 3, value: 3},
-      {text: 4, value: 4},
-      {text: 5, value: 5},
-      {text: 6, value: 6},
-      {text: 7, value: 7},
+      { text: 0, value: 0, disabled: this.state.userWantsDelivery },
+      { text: 1, value: 1 },
+      { text: 2, value: 2 },
+      { text: 3, value: 3 },
+      { text: 4, value: 4 },
+      { text: 5, value: 5 },
+      { text: 6, value: 6 },
+      { text: 7, value: 7 },
     ];
 
     return (
@@ -262,7 +291,6 @@ class Payment extends React.Component {
                         <br />
                         <Message info>
                           <Message.Header as="h5">Important:</Message.Header>
-                          {/* <h5>IMPORTANT: </h5> */}
                           <p style={styles.deliveryModalImportant}>We will only be able to drop packages off at the door to the apartment,</p>
                           <p style={styles.deliveryModalImportant}>house, etc. Please be ready to pickup the package directly or leave</p>
                           <p style={styles.deliveryModalImportant}>a cooler out front for the driver to leave the package in.</p>
@@ -298,6 +326,43 @@ class Payment extends React.Component {
                     </Feed.Summary>
                   </Feed.Content>
                 </Feed.Event>
+                <Checkbox inline checked={this.state.hasAllergies} onClick={this.handleAllergies} />
+                <Modal trigger={<a className={s.mode}>I am allergic to one or more of the produces from this bulk buy</a>} basic size='small' closeIcon="close">
+                <Modal.Header>Safety Is Our Top Priority</Modal.Header>
+                <Modal.Content image>
+                  <Modal.Description>
+                    <p>Best Food Forward and Collective are committed to meeting the food safety requirements of all of our members.</p>
+                    <h5>Allergies</h5>
+                    <p style={styles.allergiesModal}>We will accommodate the needs of all of our members with allergies.</p>
+                    <p style={styles.allergiesModal}>All produce will be stored and processed separately with special consideration for cross-contamination.</p>
+                    <p style={styles.allergiesModal}>On the day of the event, we will specially prepare all allergy-affected packages separately.</p>
+                    <p style={styles.allergiesModal}>If you have any suggestions for how we can better meet the needs of those with health considerations,</p>
+                    <p style={styles.allergiesModal}>please provide feedback at the form at the bottom of the page.</p>
+                    </Modal.Description>
+                  </Modal.Content>
+                </Modal>
+                {this.state.hasAllergies ?
+                  <div style={styles.allergiesBox}>
+                    <br />
+                    <p>Which of these produces are you allergic to?</p>
+                    <Grid columns={2}>
+                      {this.props.ballotsAndVotes.map((ballotAndVote) => {
+                        return (
+                          <Grid.Column key={ballotAndVote.name}>
+                            <Checkbox
+                              label={ballotAndVote.name}
+                              value={ballotAndVote.name}
+                              onChange={this.handleAllergiesChange}
+                            />
+                          </Grid.Column>
+                        );
+                      })}
+                    </Grid>
+                    <br />
+                  </div>
+                  :
+                  <div></div>
+                }
                 <Popup
                   trigger={<Feed.Event onClick={this.handlePayment}>
                   <Feed.Content>

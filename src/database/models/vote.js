@@ -9,6 +9,7 @@ module.exports = function(sequelize, DataTypes) {
     voteClass: DataTypes.STRING,
     ballotID: DataTypes.INTEGER,
     isCurrent: DataTypes.BOOLEAN,
+    isUserAllergic: DataTypes.BOOLEAN,
   }, {
     classMethods: {
       associate: function(models) {

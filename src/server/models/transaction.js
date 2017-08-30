@@ -3,6 +3,7 @@ const models = require('../../database/models/index');
 const userUtil = require('./user');
 const foodUtil = require('./food');
 const voteUtil = require('./vote');
+const ballotUtil = require('./ballot');
 const dropoffUtil = require('./dropoff');
 
 module.exports.savePaymentInfo = async (requestBody, dropoffID) => {
@@ -26,15 +27,23 @@ module.exports.savePaymentInfo = async (requestBody, dropoffID) => {
       revenueBeforeStripe,
       revenueAfterStripe,
       isDelivery: requestBody.userWantsDelivery,
+      hasAllergies: requestBody.hasAllergies,
     });
-    const transactions = await models.Transaction.findAll({
+    const deliveryTransactions = await models.Transaction.findAll({
       where: {
         isDelivery: true,
       },
     });
-    const deliveriesOrderedCount = transactions.length;
+    const allergiesTransactions = await models.Transaction.findAll({
+      where: {
+        hasAllergies: true,
+      },
+    });
+    const deliveriesOrderedCount = deliveryTransactions.length;
+    const allergiesCount = allergiesTransactions.length;
     // increment the deliveriesOrderedCount on the appropriate dropoffID by 1
     await dropoffUtil.changeDeliveriesOrderedCount(dropoffID, deliveriesOrderedCount);
+    await dropoffUtil.changeAllergiesCount(dropoffID, allergiesCount);
   } catch(err) {
     console.log(err);
   }
@@ -69,7 +78,9 @@ module.exports.getUserInfoAndPackagesOrdered = async (dropoffID) => {
       },
     });
     for (let i = 0; i < transactions.length; i++) {
-      const userObj = await userUtil.findUserInfoByID(transactions[i].dataValues.userID);
+      const userID = transactions[i].dataValues.userID;
+      const userObj = await userUtil.findUserInfoByID(userID);
+      const allergies = await voteUtil.getUserAllergies(userID, dropoffID);
       const dataObj = {
         'Last Name': userObj.lastName,
         'First Name': userObj.firstName,
@@ -77,6 +88,7 @@ module.exports.getUserInfoAndPackagesOrdered = async (dropoffID) => {
         'Phone Number': userObj.phoneNumber,
         'Dorm Packages Ordered': transactions[i].dataValues.dormPackagesOrdered,
         'Cooking Packages Ordered': transactions[i].dataValues.cookingPackagesOrdered,
+        Allergies: allergies,
       };
       userNamesAndPackagesOrdered.push(dataObj);
     }
