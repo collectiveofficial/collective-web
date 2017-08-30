@@ -187,27 +187,30 @@ class Payment extends React.Component {
       deliveryModalImportant: {
         margin: '0 0 0 0',
       },
+      allergiesModal: {
+        margin: '0 0 0 0',
+      },
     };
 
     const dormNumOptions = [
-      {text: 0, value: 0},
-      {text: 1, value: 1},
-      {text: 2, value: 2},
-      {text: 3, value: 3},
-      {text: 4, value: 4},
-      {text: 5, value: 5},
-      {text: 6, value: 6},
-      {text: 7, value: 7},
+      { text: 0, value: 0 },
+      { text: 1, value: 1 },
+      { text: 2, value: 2 },
+      { text: 3, value: 3 },
+      { text: 4, value: 4 },
+      { text: 5, value: 5 },
+      { text: 6, value: 6 },
+      { text: 7, value: 7 },
     ];
     const cookNumOptions = [
-      {text: 0, value: 0, disabled: this.state.userWantsDelivery},
-      {text: 1, value: 1},
-      {text: 2, value: 2},
-      {text: 3, value: 3},
-      {text: 4, value: 4},
-      {text: 5, value: 5},
-      {text: 6, value: 6},
-      {text: 7, value: 7},
+      { text: 0, value: 0, disabled: this.state.userWantsDelivery },
+      { text: 1, value: 1 },
+      { text: 2, value: 2 },
+      { text: 3, value: 3 },
+      { text: 4, value: 4 },
+      { text: 5, value: 5 },
+      { text: 6, value: 6 },
+      { text: 7, value: 7 },
     ];
 
     return (
@@ -323,7 +326,21 @@ class Payment extends React.Component {
                     </Feed.Summary>
                   </Feed.Content>
                 </Feed.Event>
-                <Checkbox inline label="I am allergic to one or more of the produces from this bulk buy" checked={this.state.hasAllergies} onClick={this.handleAllergies} />
+                <Checkbox inline checked={this.state.hasAllergies} onClick={this.handleAllergies} />
+                <Modal trigger={<a className={s.mode}>I am allergic to one or more of the produces from this bulk buy</a>} basic size='small' closeIcon="close">
+                <Modal.Header>Safety Is Our Top Priority</Modal.Header>
+                <Modal.Content image>
+                  <Modal.Description>
+                    <p>Best Food Forward and Collective are committed to meeting the food safety requirements of all of our members.</p>
+                    <h5>Allergies</h5>
+                    <p style={styles.allergiesModal}>We will accommodate the needs of all of our members with allergies.</p>
+                    <p style={styles.allergiesModal}>All produce will be stored and processed separately with special consideration for cross-contamination.</p>
+                    <p style={styles.allergiesModal}>On the day of the event, we will specially prepare all allergy-affected packages separately.</p>
+                    <p style={styles.allergiesModal}>If you have any suggestions for how we can better meet the needs of those with health considerations,</p>
+                    <p style={styles.allergiesModal}>please provide feedback at the form at the bottom of the page.</p>
+                    </Modal.Description>
+                  </Modal.Content>
+                </Modal>
                 {this.state.hasAllergies ?
                   <div style={styles.allergiesBox}>
                     <br />
@@ -359,7 +376,7 @@ class Payment extends React.Component {
                           // panelLabel="Give Money" prepended to the amount in the bottom pay button
                           amount={this.state.price * 100} // cents
                           currency="USD"
-                          stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
+                          stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
                           email={this.state.email}
                           // Note: Enabling either address option will give the user the ability to
                           // fill out both. Addresses are sent as a second parameter in the token callback.
