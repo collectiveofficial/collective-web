@@ -67,3 +67,17 @@ module.exports.findAllFirstDropFoodItems = () => {
   })
   .catch(err => console.log(err));
 };
+
+module.exports.findFoodNameByID = async (id) => {
+  try {
+    const food = await models.Food.findOne({
+      where: {
+        id,
+      },
+    });
+    const foodName = food.dataValues.name;
+    return foodName;
+  } catch (err) {
+    console.log(err);
+  }
+};

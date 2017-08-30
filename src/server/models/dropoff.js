@@ -131,6 +131,20 @@ module.exports.changeDeliveriesOrderedCount = async (id, deliveriesOrderedCount)
   }
 };
 
+module.exports.changeAllergiesCount = async (id, allergiesCount) => {
+  try {
+    await models.Dropoff.update({
+      allergiesCount,
+    }, {
+      where: {
+        id,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports.findDropoffDateByID = async (id) => {
   try {
     const dropoff = await models.Dropoff.findOne({

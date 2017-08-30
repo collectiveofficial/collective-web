@@ -17,6 +17,7 @@ module.exports = function(sequelize, DataTypes) {
     totalRevenueBeforeStripe: DataTypes.DECIMAL,
     totalRevenueAftereStripe: DataTypes.DECIMAL,
     deliveriesOrderedCount: DataTypes.INTEGER,
+    allergiesCount: DataTypes.INTEGER,
   }, {
     classMethods: {
       associate: function(models) {
