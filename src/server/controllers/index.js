@@ -4,7 +4,7 @@ const dotenv = require('dotenv').config();
 const twilio = require('twilio');
 const cron = require('cron');
 const fs = require('fs');
-var QRCode = require('qrcode');
+const QRCode = require('qrcode');
 const userUtil = require('../models/user');
 const dropoffUtil = require('../models/dropoff');
 const foodUtil = require('../models/food');
@@ -17,6 +17,7 @@ const admin = require('firebase-admin');
 const json2csv = require('json2csv');
 const moment = require('moment-timezone');
 const configureStripe = require('stripe');
+const nodemailer = require('nodemailer');
 const googleMapsUtils = require('../models/utils/google-maps-utils');
 const { restrictedAddresses, firstDropoff, firstDropFoodItems, secondDropoff, secondDropFoodItems, firstGroup } = require('./local-db-initialize-data');
 let STRIPE_SECRET_KEY;
@@ -133,7 +134,7 @@ const initializeData = async () => {
     };
 
     const sendUserNamesAndPackagesOrdered = async () => {
-      fields = ['Last Name', 'First Name', 'Email', 'Phone Number', 'Dorm Packages Ordered', 'Cooking Packages Ordered', 'Allergies'];
+      fields = ['Last Name', 'First Name', 'Date of Birth', 'Email', 'Phone Number', 'Dorm Packages Ordered', 'Cooking Packages Ordered', 'Allergies'];
       // csv in ascending alphabetical order
       const userInfoAndPackagesOrdered = await transactionUtil.getUserInfoAndPackagesOrdered(dropoffID);
       csv = json2csv({ data: userInfoAndPackagesOrdered, fields });
@@ -167,6 +168,16 @@ const initializeData = async () => {
     });
   };
 
+  const testConfirmationEmail = async () => {
+    const dropoffID = 2;
+    // get rid of later
+    const userID = 1;
+    const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, userID);
+    const qrCode = await QRCode.toFile(__dirname + `/../adminData/qr.png`, JSON.stringify(userInfoForPickup), (err) => {
+      console.log(err);
+    });
+  }
+
   await initializeFirstGroup();
   await updateCurrentDropoffID();
   // await updateCurrentVotingDropoffID();
@@ -177,6 +188,7 @@ const initializeData = async () => {
   await initializeRestrictedAddresses();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
+  await testConfirmationEmail();
 };
 
 initializeData();
@@ -438,6 +450,10 @@ module.exports = {
       req.body.deliveryFee = req.body.userWantsDelivery ? 3 : 0;
       const totalDollarAmount = dormPackagesTotalDollarAmount + cookingPackagesTotalDollarAmount + req.body.deliveryFee;
       req.body.totalDollarAmount = totalDollarAmount;
+      const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, req.body.uid);
+      const qrCode = await QRCode.toFile(__dirname + `/../adminData/qr.png`, JSON.stringify(userInfoForPickup), (err) => {
+        console.log(err);
+      });
       const dormPackageEmailDescription = req.body.dormPackagesOrdered > 0 ? `${req.body.dormPackagesOrdered} x Dorm Package${req.body.dormPackagesOrdered < 2 ? '' : 's'} $${dormPackagesTotalDollarAmount}` : '';
       const cookingPackageEmailDescription = req.body.cookingPackagesOrdered > 0 ? `${req.body.cookingPackagesOrdered} x Cooking Package${req.body.cookingPackagesOrdered < 2 ? '' : 's'} $${cookingPackagesTotalDollarAmount}` : '';
       const deliveryAddress = await userUtil.findFormattedAddress(req.body.uid);
@@ -455,6 +471,19 @@ module.exports = {
         if (err) {
           console.log(err);
         } else {
+          let transporter = nodemailer.createTransport({
+              host: 'smtp.gmail.com',
+              port: 465,
+              secure: true,
+              auth: {
+                  type: 'OAuth2',
+                  user: 'johnny.chen54@gmail.com',
+                  serviceClient: process.env.GOOGLE_SERVICE_ACCOUNT_KEY_ID,
+                  privateKey: process.env.NODE_ENV === 'production' ? JSON.parse(process.env.GOOGLE_SERVICE_PRIVATE_KEY) : process.env.GOOGLE_SERVICE_PRIVATE_KEY,
+                  accessToken: 'ya29.Xx_XX0xxxxx-xX0X0XxXXxXxXXXxX0x',
+                  expires: 1484314697598
+              }
+          });
           await transactionUtil.savePaymentInfo(req.body, dropoffID);
           // invoke vote util function that takes in the request body as an argument
           await voteUtil.saveVotes(req.body, dropoffID);

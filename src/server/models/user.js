@@ -220,6 +220,7 @@ module.exports.findUserInfoByID = async (id) => {
     lastName: user.dataValues.lastName,
     email: user.dataValues.email,
     phoneNumber: user.dataValues.phoneNumber,
+    birthday: user.dataValues.birthday,
   };
 };
 

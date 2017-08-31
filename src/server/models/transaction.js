@@ -1,4 +1,5 @@
 const moment = require('moment-timezone');
+const momentOriginal = require('moment');
 const models = require('../../database/models/index');
 const userUtil = require('./user');
 const foodUtil = require('./food');
@@ -81,9 +82,12 @@ module.exports.getUserInfoAndPackagesOrdered = async (dropoffID) => {
       const userID = transactions[i].dataValues.userID;
       const userObj = await userUtil.findUserInfoByID(userID);
       const allergies = await voteUtil.getUserAllergies(userID, dropoffID);
+      // const birthday = await userObj.birthday.toDateString();
+      const birthday = await momentOriginal(userObj.birthday, 'YYYY-MM-DD').format('MM-DD-YYYY');
       const dataObj = {
         'Last Name': userObj.lastName,
         'First Name': userObj.firstName,
+        'Date of Birth': birthday,
         Email: userObj.email,
         'Phone Number': userObj.phoneNumber,
         'Dorm Packages Ordered': transactions[i].dataValues.dormPackagesOrdered,
@@ -168,4 +172,32 @@ module.exports.getUsersWhoHaveNotPaid = async (dropoffID, groupID) => {
   }
   usersWhoHaveNotPaid = usersWhoHaveNotPaid.filter((x, index, self) => self.findIndex(t => t.Email === x.Email) === index)
   return usersWhoHaveNotPaid;
+};
+
+module.exports.getUserInfoForPickup = async (dropoffID, userID) => {
+  try {
+    // const userID = await userUtil.findUserID(firebaseUID);
+    const transaction = await models.Transaction.findOne({
+      where: {
+        dropoffID,
+        userID,
+      },
+    });
+    const userObj = await userUtil.findUserInfoByID(userID);
+    const birthday = await momentOriginal(userObj.birthday, 'YYYY-MM-DD').format('MM-DD-YYYY');
+    console.log('\n\n\nbirthday: ', birthday);
+    const allergies = await voteUtil.getUserAllergies(userID, dropoffID);
+    const userNameAndPackagesOrdered = {
+      'Order ID': transaction.id,
+      'Last Name': userObj.lastName,
+      'First Name': userObj.firstName,
+      'Dorm Packages Ordered': transaction.dormPackagesOrdered,
+      'Cooking Packages Ordered': transaction.cookingPackagesOrdered,
+      'Date of Birth': birthday,
+      Allergies: allergies,
+    };
+    return userNameAndPackagesOrdered;
+  } catch(err) {
+    console.log(err);
+  }
 };
