@@ -7,6 +7,10 @@ export const SET_IS_USER_DISABLED = 'SET_IS_USER_DISABLED';
 export const SET_IS_USER_NOT_FOUND = 'SET_IS_USER_NOT_FOUND';
 export const SET_EMAIL_ERROR_MSG = 'SET_EMAIL_ERROR_MSG';
 export const SET_PASSWORD_ERROR_MSG = 'SET_PASSWORD_ERROR_MSG';
+export const RESET_ERROR_MSG_STATES = 'RESET_ERROR_MSG_STATES';
+export const RESET_LOGIN_ERROR_STATES = 'RESET_LOGIN_ERROR_STATES';
+export const ENTER_LOGIN_PAGE = 'ENTER_LOGIN_PAGE';
+
 
 export function setEmailInput(text) {
   return { type: SET_EMAIL_INPUT, text }
@@ -42,4 +46,17 @@ export function setEmailErrorMessage(text) {
 
 export function setPasswordErrorMessage(text) {
   return { type: SET_PASSWORD_ERROR_MSG, text }
+}
+
+
+export function resetErrorMessageStates() {
+  return { type: RESET_ERROR_MSG_STATES }
+}
+
+export function resetLoginErrorStates() {
+  return { type: RESET_LOGIN_ERROR_STATES }
+}
+
+export function enterLoginPage() {
+  return { type: ENTER_LOGIN_PAGE }
 }

@@ -30,6 +30,7 @@ export default function(data) {
   // In case we want to have middlewares later
   // var finalCreateStore = applyMiddleware(promiseMiddleware)(createStore)
   // var store = finalCreateStore(reducer, data)
-  var store = createStore(reducer, data);
+  var store = createStore(reducer, data,
+   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
   return store;
 }

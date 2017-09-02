@@ -30,7 +30,6 @@ class Voting extends React.Component {
           votes--;
         }
       }
-      // await this.setState({ votes });
       this.props.dispatch(votingActionCreators.setVotes(votes));
       const checkIfUserHasPaidResult = await fetch('/transaction/check', {
         method: 'POST',
@@ -44,8 +43,8 @@ class Voting extends React.Component {
         }),
       });
       const checkIfUserHasPaidResultData = await checkIfUserHasPaidResult.json();
-      // this.setState({ hasUserPaid: checkIfUserHasPaidResultData.hasUserPaid });
-      this.props.dispatch(votingActionCreators.setHasUserPaid(checkIfUserHasPaidResultData.hasUserPaid))
+      this.props.dispatch(votingActionCreators.setHasUserPaid(checkIfUserHasPaidResultData.hasUserPaid));
+      this.props.dispatch(votingActionCreators.enterVotesPage());
     }
   }
 
@@ -60,40 +59,29 @@ class Voting extends React.Component {
         newBallotsAndVotes[i].isCurrent = checked;
       }
     }
-    // this.props.updateBallotsAndVotes(newBallotsAndVotes);
     this.props.dispatch(appActionCreators.setBallotsAndVotes(newBallotsAndVotes));
     let newVote = this.props.votes;
     checked ? newVote-- : newVote++;
-    // this.setState({ votes: newVote });
     this.props.dispatch(votingActionCreators.setVotes(newVote));
   }
 
   async handleContinueToPayment() {
-    // await this.setState({ voteErrorMessage: '' });
-    // await this.setState({ allowContinueToPayment: '' });
     this.props.dispatch(votingActionCreators.setVoteErrorMessage(''));
     this.props.dispatch(votingActionCreators.setAllowContinueToPayment(''));
     if (this.props.votes !== 0) {
-      // await this.setState({ voteErrorMessage: 'Remember to use all your votes! You can change them later.' });
-      // this.setState({ allowContinueToPayment: false });
       this.props.dispatch(votingActionCreators.setVoteErrorMessage('Remember to use all your votes! You can change them later.'));
       this.props.dispatch(votingActionCreators.setAllowContinueToPayment(false));
     }
     if (this.props.votes === 0) {
-      // this.setState({ allowContinueToPayment: true });
       this.props.dispatch(votingActionCreators.setAllowContinueToPayment(true));
     }
   }
 
   async handleSubmitUpdateVotes() {
-    // await this.setState({ voteErrorMessage: '' });
-    // await this.setState({ allowContinueToPayment: '' });
-    // await this.setState({ votesHaveFinishedUpdating: '' });
     this.props.dispatch(votingActionCreators.setVoteErrorMessage(''));
     this.props.dispatch(votingActionCreators.setAllowContinueToPayment(''));
     this.props.dispatch(votingActionCreators.setVotesHaveFinishedUpdating(''));
     if (this.props.votes !== 0) {
-      // await this.setState({ voteErrorMessage: 'Remember to use all your votes! You can change them later.' });
       this.props.dispatch(votingActionCreators.setVoteErrorMessage('Remember to use all your votes! You can change them later.'));
     }
     if (this.props.votes === 0) {
@@ -115,10 +103,8 @@ class Voting extends React.Component {
       });
       const responseData = await response.json();
       alert('Your votes have been updated.');
-      // await this.setState({ votesHaveFinishedUpdating: responseData.votesSaved });
       this.props.dispatch(votingActionCreators.setVotesHaveFinishedUpdating(responseData.votesSaved));
     } else {
-      // this.setState({ votesHaveFinishedUpdating: false });
       this.props.dispatch(votingActionCreators.setVotesHaveFinishedUpdating(false));
     }
   }

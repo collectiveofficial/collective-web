@@ -23,7 +23,10 @@ class Login extends React.Component {
     this.nativeLogin = this.nativeLogin.bind(this);
     this.validateEmail = this.validateEmail.bind(this);
     this.validatePassword = this.validatePassword.bind(this);
-    this.resetErrorStates = this.resetErrorStates.bind(this);
+  }
+  componentWillMount() {
+    console.log('Login is mounting');
+    this.props.dispatch(loginActionCreators.enterLoginPage());
   }
 
   async validateEmail() {
@@ -39,11 +42,8 @@ class Login extends React.Component {
     });
     const responseData = await response.json();
     if (responseData.emailValidated) {
-      // await this.setState({ isEmailValidated: true });
       this.props.dispatch(loginActionCreators.setIsEmailValidated(true));
     } else {
-      // await this.setState({ isEmailValidated: false });
-      // await this.setState({ emailErrorMessage: 'Hmm...that doesn\'t look like an email address.' });
       this.props.dispatch(loginActionCreators.setIsEmailValidated(false));
       this.props.dispatch(loginActionCreators.setEmailErrorMessage('Hmm...that doesn\'t look like an email address.'));
     }
@@ -62,11 +62,8 @@ class Login extends React.Component {
     })
     const responseData = await response.json();
     if (responseData.passwordValidated) {
-      // await this.setState({ isPasswordValidated: true });
       this.props.dispatch(loginActionCreators.setIsPasswordValidated(true));
     } else {
-      // await this.setState({ isPasswordValidated: false });
-      // await this.setState({ passwordErrorMessage: 'Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number.' });
       this.props.dispatch(loginActionCreators.setIsPasswordValidated(false));
       this.props.dispatch(loginActionCreators.setPasswordErrorMessage('Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number.'));
     }
@@ -79,20 +76,14 @@ class Login extends React.Component {
       const errorCode = error.code;
       const errorMessage = error.message;
       if (errorCode === 'auth/wrong-password') {
-        // this.setState({ isWrongPassword: true });
-        // this.setState({ passwordErrorMessage: 'Wrong password.' });
         this.props.dispatch(loginActionCreators.setIsWrongPassword(true));
         this.props.dispatch(loginActionCreators.setPasswordErrorMessage('Wrong password.'));
       }
       if (errorCode === 'auth/user-disabled') {
-        // this.setState({ isUserDisabled: true });
-        // this.setState({ emailErrorMessage: 'User disabled.' });
         this.props.dispatch(loginActionCreators.setIsUserDisabled(true));
         this.props.dispatch(loginActionCreators.setEmailErrorMessage('User disabled.'));
       }
       if (errorCode === 'auth/user-not-found') {
-        // this.setState({ isUserNotFound: true });
-        // this.setState({ emailErrorMessage: 'User not found.' });
         this.props.dispatch(loginActionCreators.setIsUserNotFound(true));
         this.props.dispatch(loginActionCreators.setEmailErrorMessage('User not found.'));
       }
@@ -101,21 +92,9 @@ class Login extends React.Component {
     return user;
   }
 
-  resetErrorStates() {
-    // this.setState({ isPasswordValidated: '' });
-    // this.setState({ isWrongPassword: '' });
-    // this.setState({ isUserDisabled: '' });
-    // this.setState({ isUserNotFound: '' });
-    this.props.dispatch(loginActionCreators.setIsEmailValidated(''));
-    this.props.dispatch(loginActionCreators.setIsPasswordValidated(''));r
-    this.props.dispatch(loginActionCreators.setEmailErrorMessage(''));
-    this.props.dispatch(loginActionCreators.setEmailErrorMessage(''));
-    this.props.dispatch(loginActionCreators.setEmailErrorMessage(''));
-  }
-
   async handleEmailContinue(event) {
     event.preventDefault();
-    await this.resetErrorStates();
+    this.props.dispatch(loginActionCreators.resetLoginErrorStates());
     await this.validateEmail();
     await this.validatePassword();
     if (this.props.isEmailValidated && this.props.isPasswordValidated) {
@@ -141,12 +120,10 @@ class Login extends React.Component {
       const routeToRegisterForm = doesUserEmailExist && !hasUserFinishedSignUp && !isUserFacebookAuth;
       if (routeToRegisterForm) {
         const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
-        // await this.props.setFirebaseAccessTokenState(firebaseAccessToken);
-        // await this.props.setUserWantsEmailSignupState(true);
         this.props.dispatch(appActionCreators.setFirebaseAccessToken(firebaseAccessToken));
         this.props.dispatch(appActionCreators.setUserWantsEmailSignup(true));
       }
-      // await this.props.setRouteToRegisterFormState(routeToRegisterForm);
+      
       this.props.dispatch(appActionCreators.setRouteToRegisterForm(routeToRegisterForm));
     }
   }

@@ -7,7 +7,11 @@ var initialVotesHaveFinishedUpdatingState = '';
 
 
 export function _votes(state=initialVotesState, action) {
+  if (['LOGOUT'].includes(action.type)) {
+      return initialVotesState;
+    }
   switch (action.type) {
+
     case 'SET_VOTES':
       console.log('_votes state called with state: ', state, 'and action: ', action);
       return action.num;
@@ -18,7 +22,11 @@ export function _votes(state=initialVotesState, action) {
 }
 
 export function _price(state=initialPriceState, action) {
+  if (['LOGOUT', 'ENTER_VOTES_PAGE'].includes(action.type)) {
+      return initialPriceState;
+    }
   switch (action.type) {
+
     case 'SET_PRICE':
       console.log('_price state called with state: ', state, 'and action: ', action);
       return action.num;
@@ -29,7 +37,11 @@ export function _price(state=initialPriceState, action) {
 }
 
 export function _voteErrorMessage(state=initialVoteErrorMessageState, action) {
+  if (['LOGOUT', 'ENTER_VOTES_PAGE'].includes(action.type)) {
+      return initialVoteErrorMessageState;
+    }
   switch (action.type) {
+
     case 'SET_VOTE_ERROR_MSG':
       console.log('_voteErrorMessage state called with state: ', state, 'and action: ', action);
       return action.text;
@@ -40,7 +52,11 @@ export function _voteErrorMessage(state=initialVoteErrorMessageState, action) {
 }
 
 export function _allowContinueToPayment(state=initialAllowContinueToPaymentState, action) {
+  if (['LOGOUT', 'ENTER_VOTES_PAGE'].includes(action.type)) {
+      return initialAllowContinueToPaymentState;
+    }
   switch (action.type) {
+
     case 'SET_ALLOW_CONTINUE_TO_PAYMENT':
       console.log('_allowContinueToPayment state called with state: ', state, 'and action: ', action);
       return action.text;
@@ -51,7 +67,11 @@ export function _allowContinueToPayment(state=initialAllowContinueToPaymentState
 }
 
 export function _hasUserPaid(state=initialHasUserPaidState, action) {
+  if (['LOGOUT'].includes(action.type)) {
+      return initialHasUserPaidState;
+    }
   switch (action.type) {
+
     case 'SET_HAS_USER_PAID':
       console.log('_hasUserPaid state called with state: ', state, 'and action: ', action);
       return action.bool;
@@ -62,7 +82,11 @@ export function _hasUserPaid(state=initialHasUserPaidState, action) {
 }
 
 export function _votesHaveFinishedUpdating(state=initialVotesHaveFinishedUpdatingState, action) {
+  if (['LOGOUT', 'ENTER_VOTES_PAGE'].includes(action.type)) {
+      return initialVotesHaveFinishedUpdatingState;
+    }
   switch (action.type) {
+
     case 'SET_VOTES_HAVE_FINISHED_UPDATING':
       console.log('_votesHaveFinishedUpdating state called with state: ', state, 'and action: ', action);
       return action.text;

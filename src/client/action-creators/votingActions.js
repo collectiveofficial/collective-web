@@ -4,6 +4,7 @@ export const SET_VOTE_ERROR_MSG = 'SET_VOTE_ERROR_MSG';
 export const SET_ALLOW_CONTINUE_TO_PAYMENT = 'SET_ALLOW_CONTINUE_TO_PAYMENT';
 export const SET_HAS_USER_PAID = 'SET_HAS_USER_PAID';
 export const SET_VOTES_HAVE_FINISHED_UPDATING = 'SET_VOTES_HAVE_FINISHED_UPDATING';
+export const ENTER_VOTES_PAGE = 'ENTER_VOTES_PAGE';
 
 export function setVotes(num) {
   return { type: SET_VOTES, num }
@@ -27,4 +28,8 @@ export function setHasUserPaid(bool) {
 
 export function setVotesHaveFinishedUpdating(text) {
   return { type: SET_VOTES_HAVE_FINISHED_UPDATING, text }
+}
+
+export function enterVotesPage() {
+  return { type: ENTER_VOTES_PAGE}
 }

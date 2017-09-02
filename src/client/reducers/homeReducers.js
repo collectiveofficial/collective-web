@@ -15,6 +15,9 @@ var initialLocationState = "https://www.google.com/maps/embed/v1/place?key=AIzaS
 
 
 export function _date(state=initialDateState, action) {
+  if (['LOGOUT'].includes(action.type)) {
+      return initialDateState;
+    }
   switch (action.type) {
     case 'SET_DATE':
       console.log('_date state called with state: ', state, 'and action: ', action);
@@ -26,6 +29,9 @@ export function _date(state=initialDateState, action) {
 }
 
 export function _vote(state=initialVoteState, action) {
+  if (['LOGOUT'].includes(action.type)) {
+      return initialVoteState;
+    }
   switch (action.type) {
     case 'SET_VOTE':
       console.log('_vote state called with state: ', state, 'and action: ', action);
@@ -37,6 +43,9 @@ export function _vote(state=initialVoteState, action) {
 }
 
 export function _remainingCalendar(state=initialRemainingCalendarState, action) {
+  if (['LOGOUT'].includes(action.type)) {
+      return initialRemainingCalendarState;
+    }
   switch (action.type) {
     case 'SET_REMAINING_CALENDAR':
       console.log('_remainingCalendar state called with state: ', state, 'and action: ', action);
@@ -48,6 +57,9 @@ export function _remainingCalendar(state=initialRemainingCalendarState, action) 
 }
 
 export function _items(state=initialItemsState, action) {
+  if (['LOGOUT'].includes(action.type)) {
+      return initialItemsState;
+    }
   switch (action.type) {
     case 'SET_ITEMS':
       console.log('_items state called with state: ', state, 'and action: ', action);
@@ -59,6 +71,9 @@ export function _items(state=initialItemsState, action) {
 }
 
 export function _provider(state=initialProviderState, action) {
+  if (['LOGOUT'].includes(action.type)) {
+      return initialProviderState;
+    }
   switch (action.type) {
     case 'SET_PROVIDER':
       console.log('_provider state called with state: ', state, 'and action: ', action);
@@ -70,6 +85,9 @@ export function _provider(state=initialProviderState, action) {
 }
 
 export function _location(state=initialLocationState, action) {
+  if (['LOGOUT'].includes(action.type)) {
+      return initialLocationState;
+    }
   switch (action.type) {
     case 'SET_LOCATION':
       console.log('_location state called with state: ', state, 'and action: ', action);

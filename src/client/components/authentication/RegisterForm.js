@@ -34,19 +34,18 @@ class RegisterForm extends React.Component {
     this.handleUpdateInput = this.handleUpdateInput.bind(this);
   }
 
+  componentWillMount() {
+    this.props.dispatch(registerActionCreators.enterRegisterPage());
+  }
+
   componentDidMount() {
-    console.log('register form is mounted');
     this.transferUserSignup();
   }
 
   async transferUserSignup() {
     if (this.props.userWantsEmailSignup) {
-      // await this.setState({ emailInput: this.props.emailInput });
       this.props.dispatch(loginActionCreators.setEmailInput(this.props.emailInput));
     } else {
-      // await this.setState({ emailInput: this.props.facebookData.email });
-      // await this.setState({ firstName: this.props.facebookData.first_name });
-      // await this.setState({ lastName: this.props.facebookData.last_name });
       this.props.dispatch(loginActionCreators.setEmailInput(this.props.facebookData.email));
       this.props.dispatch(registerActionCreators.setFirstName(this.props.facebookData.first_name ));
       this.props.dispatch(registerActionCreators.setLastName(this.props.facebookData.last_name ));
@@ -55,7 +54,6 @@ class RegisterForm extends React.Component {
 
   handleChange(event) {
     event.preventDefault();
-    // this.setState({ value: event.target.value });
     this.props.dispatch(registerActionCreators.setValue(event.target.value));
   }
 
@@ -65,7 +63,6 @@ class RegisterForm extends React.Component {
   }
 
   handleUpdateInput(state) {
-    // this.setState({ state });
     this.props.dispatch(registerActionCreators.setState(state));
   }
 

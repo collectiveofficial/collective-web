@@ -5,6 +5,7 @@ export const SET_DORM = 'SET_DORM'; // TODO GET MORE SPECIFIC GODAMMIT
 export const SET_COOK = 'SET_COOK'; // TODO GET MORE SPECIFIC GODAMMIT
 export const SET_HAS_PAYMENT_COMPLETED = 'SET_HAS_PAYMENT_COMPLETED';
 export const SET_VOTES_SAVED = 'SET_VOTES_SAVED';
+export const ENTER_PAYMENT_PAGE = 'ENTER_PAYMENT_PAGE';
 
 export function setModalIsOpen(bool) {
   return { type: SET_MODAL_IS_OPEN, bool }
@@ -32,4 +33,8 @@ export function setHasPaymentCompleted(bool) {
 
 export function setVotesSaved(bool) {
   return { type: SET_VOTES_SAVED, bool }
+}
+
+export function enterPaymentPage(bool) {
+  return { type: ENTER_PAYMENT_PAGE, bool }
 }

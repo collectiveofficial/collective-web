@@ -32,21 +32,22 @@ class Payment extends React.Component {
     this.handlePayment = this.handlePayment.bind(this);
   }
 
+  componentWillMount() {
+    console.log('Payment is mounting');
+    this.props.dispatch(paymentActionCreators.enterPaymentPage());
+  }
+
   handleDorm(e, { value }) {
-    // this.setState({ dorm: value });
     this.props.dispatch(paymentActionCreators.setDorm(value));
     let newPrice = this.props.price;
     newPrice = ((value * 6) + (this.props.cook * 11));
-    // this.setState({ price: newPrice });
     this.props.dispatch(paymentActionCreators.setPrice(newPrice));
   }
 
   handleCook(e, { value }) {
-    // this.setState({ cook: value });
     this.props.dispatch(paymentActionCreators.setCook(value));
     let newPrice = this.props.price;
     newPrice = ((this.props.dorm * 6) + (value * 11));
-    // this.setState({ price: newPrice });
     this.props.dispatch(paymentActionCreators.setPrice(newPrice));
   }
 
@@ -69,25 +70,20 @@ class Payment extends React.Component {
     });
     const responseData = await response.json();
     if (responseData.votesSaved) {
-      // this.setState({ votesSaved: true });
       this.props.dispatch(paymentActionCreators.setVotesSaved(true));
     } else {
-      // this.setState({ votesSaved: false });
       this.props.dispatch(paymentActionCreators.setVotesSaved(false));
     }
   }
 
   async handlePayment() {
-    // await this.setState({ paymentErrorMessage: '' });
     this.props.dispatch(paymentActionCreators.setPaymentErrorMessage(''));
     if (this.props.price === 0) {
-      // await this.setState({ paymentErrorMessage: 'Please specify an amount for the packages.' });
       this.props.dispatch(paymentActionCreators.setPaymentErrorMessage('Please specify an amount for the packages.'));
     }
   }
 
   async onToken(token) {
-    // await this.setState({ hasPaymentCompleted: false });
     this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(false));
     const email = await firebaseAuth().currentUser.email;
     console.log('--------> email: ', email);
@@ -100,7 +96,6 @@ class Payment extends React.Component {
       body: JSON.stringify({
         firebaseAccessToken: this.props.firebaseAccessToken,
         token,
-        // price: this.props.price,
         email,
         dormPackagesOrdered: this.props.dorm,
         cookingPackagesOrdered: this.props.cook,
@@ -111,14 +106,12 @@ class Payment extends React.Component {
       await this.submitInitialVotes();
       if (this.props.votesSaved) {
         alert(`Thank you for voting! Your votes are now recorded. Your receipt has been sent to ${submitPaymentResultData.emailSentTo}`);
-        // await this.setState({ hasPaymentCompleted: true });
         this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(true));
       } else {
         alert('Voting failed. Please contact Collective to resolve this issue. We appreciate your patience.');
       }
     } else {
       alert('Payment failed. Please contact Collective to resolve this issue. We appreciate your patience.');
-      // await this.setState({ hasPaymentCompleted: false });
       this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(false));
     }
   }
@@ -290,8 +283,6 @@ const mapStateToProps = (state, props) => {
     votesSaved: state.paymentReducer._votesSaved,
   }
 };
-
-
 
 const ConnectedPayment = connect(mapStateToProps)(Payment);
 

@@ -78,10 +78,6 @@ class App extends Component {
     this.showUser = this.showUser.bind(this);
     this.handleFacebookAuth = this.handleFacebookAuth.bind(this);
     this.authorizeUser = this.authorizeUser.bind(this);
-    // this.setRouteToRegisterFormState = this.setRouteToRegisterFormState.bind(this);
-    // this.setUserWantsEmailSignupState = this.setUserWantsEmailSignupState.bind(this);
-    // this.setFirebaseAccessTokenState = this.setFirebaseAccessTokenState.bind(this);
-    // this.updateBallotsAndVotes = this.updateBallotsAndVotes.bind(this);
   }
 
   componentDidMount() {
@@ -90,7 +86,6 @@ class App extends Component {
         await console.log('Logged in');
         const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
         this.props.dispatch(appActionCreators.setFirebaseAccessToken(firebaseAccessToken));
-        // await console.log('user firebaseAccessToken in App.js componentDidMount: ', user.ie);
         const response = await fetch('/auth/check', {
           method: 'POST',
           headers: {
@@ -107,24 +102,10 @@ class App extends Component {
         if (userAuthorized) {
           this.authorizeUser();
         }
-
-        // await this.setState({
-        //   authenticated: true,
-        //   loading: false,
-        // }, () => {
-        //   console.log('this.state.loading: ', this.state.loading);
-        // });
       this.props.dispatch(appActionCreators.setUserAuthenticated(true));
       this.props.dispatch(appActionCreators.setLoading(false));
 
       } else { // isn't signed in
-        // await this.setState({
-        //   authenticated: false,
-        //   loading: false,
-        //   userAuthorized: false,
-        // }, () => {
-        //   console.log('this.state.loading: ', this.state.loading);
-        // });
         this.props.dispatch(appActionCreators.setUserAuthenticated(false));
         this.props.dispatch(appActionCreators.setLoading(false));
         this.props.dispatch(appActionCreators.setUserAuthorized(false))
@@ -138,8 +119,7 @@ class App extends Component {
 
   async logOut() {
     await nativeLogout();
-    // await this.setState({ routeToRegisterForm: false });
-    this.props.dispatch(appActionCreators.setRouteToRegisterForm(false))
+    this.props.dispatch(appActionCreators.logOut());
     await console.log('User after log out', firebaseAuth().currentUser);
   }
 
@@ -147,18 +127,6 @@ class App extends Component {
     console.log(this.props);
     await console.log(await firebaseAuth().currentUser);
   }
-
-  // async setRouteToRegisterFormState(boolean) {
-  //   this.setState({ routeToRegisterForm: boolean });
-  // }
-
-  // async setUserWantsEmailSignupState(boolean) {
-  //   this.setState({ userWantsEmailSignup: boolean });
-  // }
-
-  // async setFirebaseAccessTokenState(accessToken) {
-  //   this.setState({ firebaseAccessToken: accessToken });
-  // }
 
   async handleFacebookAuth() {
     const provider = await new firebaseAuth.FacebookAuthProvider();
@@ -182,9 +150,6 @@ class App extends Component {
       }),
     });
     const responseData = await response.json();
-    // await this.setState({ facebookData: responseData.facebook_payload }, () => {
-    //   console.log('this.state.facebookData: ', this.state.facebookData);
-    // });
     this.props.dispatch(appActionCreators.setFacebookData(responseData.facebook_payload));
     const facebookCheckResponse = await fetch('/auth/facebook/check', {
       method: 'POST',
@@ -209,19 +174,16 @@ class App extends Component {
       console.log('authorize user');
       await this.authorizeUser();
     } else if ((userAlreadyExists && !hasUserFinishedSignUp)) {
-      // await this.setRouteToRegisterFormState(true);
       this.props.dispatch(appActionCreators.setRouteToRegisterForm(true));
     } else if (saveUserOnFacebookSignUpExecuted) {
       const currentFirebaseUser = await firebaseAuth().currentUser;
       const sendEmailVerification = await currentFirebaseUser.sendEmailVerification();
       await console.log('sendEmailVerification successful.');
-      // await this.setRouteToRegisterFormState(true);
       this.props.dispatch(appActionCreators.setRouteToRegisterForm(true));
     }
   }
 
   async authorizeUser() {
-    // await this.setState({ userAuthorized: true });
     this.props.dispatch(appActionCreators.setUserAuthorized(true));
     // TODO: Change hardcoded dropoff to dynamic
     const initialDataLoad = await fetch('/vote-ballot/get-ballot-votes', {
@@ -235,14 +197,9 @@ class App extends Component {
       }),
     })
     const initialDataLoadResults = await initialDataLoad.json();
-    // await this.setState({ ballotsAndVotes: initialDataLoadResults.ballotsAndVotes });
     this.props.dispatch(appActionCreators.setBallotsAndVotes(initialDataLoadResults.ballotsAndVotes));
     await console.log('-------> this.props.ballotsAndVotes: ', this.props.ballotsAndVotes);
   }
-
-  // updateBallotsAndVotes(newBallotsAndVotes) {
-  //   this.setState({ ballotsAndVotes: newBallotsAndVotes });
-  // }
 
   render() {
     return (

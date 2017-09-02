@@ -6,6 +6,7 @@ export const SET_LOADING = 'SET_LOADING';
 export const SET_ROUTE_TO_REGISTER_FORM = 'SET_ROUTE_TO_REGISTER_FORM';
 export const SET_USER_WANTS_EMAIL_SIGNUP = 'SET_USER_WANTS_EMAIL_SIGNUP'; // TODO: MOVE TO SIGNUP
 export const SET_FACEBOOK_DATA = 'SET_FACEBOOK_DATA';
+export const LOGOUT = 'LOGOUT';
 
 export function setUserAuthenticated(bool) {
   return { type: SET_USER_AUTHENTICATED, bool }
@@ -37,4 +38,8 @@ export function setUserWantsEmailSignup(text) { // TODO: MOVE TO SIGNUP
 
 export function setFacebookData(obj) {
   return { type: SET_FACEBOOK_DATA, obj }
+}
+
+export function logOut() {
+  return { type: LOGOUT }
 }

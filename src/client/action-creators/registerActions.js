@@ -19,6 +19,7 @@ export const SET_IS_ZIPCODE_EMPTY = 'SET_IS_ZIPCODE_EMPTY';
 export const SET_ARE_THERE_EMPTY_FIELDS = 'SET_ARE_THERE_EMPTY_FIELDS';
 export const SET_IS_INVALID_STATE = 'SET_IS_INVALID_STATE';
 export const SET_VALUE = 'SET_VALUE';
+export const ENTER_REGISTRATION_PAGE = 'ENTER_REGISTRATION_PAGE';
 
 export function setFirstName(text) {
   return { type: SET_FIRST_NAME, text }
@@ -98,4 +99,8 @@ export function setIsInvalidState(bool) {
 
 export function setValue(text) {
   return { type: SET_VALUE, text } // TODO RENAME
+}
+
+export function enterRegisterPage() {
+  return { type: ENTER_REGISTRATION_PAGE}
 }

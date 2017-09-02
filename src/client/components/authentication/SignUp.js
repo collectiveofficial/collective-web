@@ -26,12 +26,11 @@ class SignUp extends React.Component {
     this.validateEmail = this.validateEmail.bind(this);
     this.validatePassword = this.validatePassword.bind(this);
     this.createNativeUser = this.createNativeUser.bind(this);
-    this.resetErrorStates = this.resetErrorStates.bind(this);
   }
 
-  componentWillUnmount() {
-    console.log('Signup is unmounted');
-    console.log('this.props.isPasswordValidated', this.props.isPasswordValidated);
+  componentWillMount() {
+    console.log('Signup is mounting');
+    this.props.dispatch(signUpActionCreators.enterSignupPage());
   }
 
   async createNativeUser (email, pw) {
@@ -44,12 +43,9 @@ class SignUp extends React.Component {
       const errorCode = error.code;
       const errorMessage = error.message;
       if (errorCode === 'auth/weak-password') {
-        // this.setState({ isWeakPassword: true });
-        // this.setState({ passwordErrorMessage: 'The password is too weak.' });
         this.props.dispatch(signUpActionCreators.setIsWeakPassword(true));
         this.props.dispatch(loginActionCreators.setPasswordErrorMessage('The password is too weak.'))
       } else {
-        // this.setState({ isWeakPassword: false });
         this.props.dispatch(signUpActionCreators.setIsWeakPassword(false));
       }
       console.log(error);
@@ -69,11 +65,8 @@ class SignUp extends React.Component {
     })
     const responseData = await response.json();
     if (responseData.emailValidated) {
-      // await this.setState({ isEmailValidated: false });
       this.props.dispatch(loginActionCreators.setIsEmailValidated(true));
     } else {
-      // await this.setState({ emailErrorMessage: 'Hmm...that doesn\'t look like an email address.' });
-      // await this.setState({ isEmailValidated: true });
       this.props.dispatch(loginActionCreators.setEmailErrorMessage('Hmm...that doesn\'t look like an email address.'));
       this.props.dispatch(loginActionCreators.setIsEmailValidated(false));
     }
@@ -92,30 +85,16 @@ class SignUp extends React.Component {
     })
     const responseData = await response.json();
     if (responseData.passwordValidated) {
-      // await this.setState({ isPasswordValidated: true });
       this.props.dispatch(loginActionCreators.setIsPasswordValidated(true));
     } else {
-      // await this.setState({ isPasswordValidated: false });
-      // await this.setState({ passwordErrorMessage: 'Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number.' });
       this.props.dispatch(loginActionCreators.setIsPasswordValidated(false));
       this.props.dispatch(loginActionCreators.setPasswordErrorMessage('Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number.'));
     }
   }
 
-  resetErrorStates() {
-    // this.setState({ isPasswordValidated: false });
-    // this.setState({ isEmailValidated: false });
-    // this.setState({ isEmailAlreadyInUse: false });
-    // this.setState({ isExistingUserFBAuth: false });
-    this.props.dispatch(loginActionCreators.setIsPasswordValidated(false));
-    this.props.dispatch(loginActionCreators.setIsEmailValidated(false));
-    this.props.dispatch(signUpActionCreators.setIsEmailAlreadyInUse(false));
-    this.props.dispatch(signUpActionCreators.setIsExistingUserFBAuth(false));
-  }
-
   async handleEmailContinue() {
     await console.log('handleEmailContinue is executing/executed');
-    await this.resetErrorStates();
+    this.props.dispatch(loginActionCreators.resetErrorMessageStates());
     await this.validatePassword();
     let firebaseEmailSignUpUser;
     let firebaseAccessToken;
@@ -139,16 +118,12 @@ class SignUp extends React.Component {
       // if email exists and hasUserFinishedSignUp is false
       if (doesUserEmailExist && !hasUserFinishedSignUp && !isUserFacebookAuth) {
         // tell user to login because email exists
-        // await this.setState({ isEmailAlreadyInUse: true });
-        // await this.setState({ emailErrorMessage: 'This email is already in use. Please log in or register with another email.' });
         this.props.dispatch(signUpActionCreators.setIsEmailAlreadyInUse(true));
-        this.props.dispatch(signUpActionCreators.setEmailErrorMessage('This email is already in use. Please log in or register with another email.'));
+        this.props.dispatch(loginActionCreators.setEmailErrorMessage('This email is already in use. Please log in or register with another email.'));
         // else if email doesn't exist
       } else if (doesUserEmailExist && isUserFacebookAuth) {
-        // await this.setState({ isExistingUserFBAuth: true });
-        // await this.setState({ emailErrorMessage: 'This email is associated with a Facebook account. Please continue with Facebook.' });
         this.props.dispatch(signUpActionCreators.setIsExistingUserFBAuth(true));
-        his.props.dispatch(signUpActionCreators.setEmailErrorMessage('This email is associated with a Facebook account. Please continue with Facebook.'));
+        his.props.dispatch(loginActionCreators.setEmailErrorMessage('This email is associated with a Facebook account. Please continue with Facebook.'));
       } else if (!doesUserEmailExist) {
         // go through logic
         if (this.props.isPasswordValidated) {
@@ -160,7 +135,6 @@ class SignUp extends React.Component {
         const isValidLogin = !(!this.props.isEmailValidated || this.props.isEmailAlreadyInUse); // TODO MAKE BETTER
         if (isValidLogin && this.props.isPasswordValidated) {
           firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
-          // await this.props.setFirebaseAccessTokenState(firebaseAccessToken);
           this.props.dispatch(appActionCreators.setFirebaseAccessToken(firebaseAccessToken));
           const response = await fetch('/auth/signup/email-signup/save', {
             method: 'POST',
@@ -174,8 +148,6 @@ class SignUp extends React.Component {
             }),
           });
           const responseData = await response.json();
-          // await this.props.setUserWantsEmailSignupState(true);
-          // await this.props.setRouteToRegisterFormState(true);
           this.props.dispatch(appActionCreators.setUserWantsEmailSignup(true));
           this.props.dispatch(appActionCreators.setRouteToRegisterForm(true));
         }
@@ -230,12 +202,11 @@ class SignUp extends React.Component {
                         type="email"
                         hintText="Email"
                         style={styles.iconStyles}
-                        /* onChange={(event) => this.setState({ emailInput: event.target.value })} */
                         onChange={(event) => this.props.dispatch(loginActionCreators.setEmailInput(event.target.value))}
                       />
                     }
                     content={this.props.emailErrorMessage}
-                    open={this.props.isEmailAlreadyInUse || this.props.isExistingUserFBAuth || !this.props.isEmailValidated}
+                    open={this.props.isEmailAlreadyInUse || this.props.isExistingUserFBAuth || this.props.isEmailValidated === false}
                     offset={20}
                     position="right center"
                     /><br />
@@ -247,7 +218,6 @@ class SignUp extends React.Component {
                         type="password"
                         hintText="Create New Password"
                         style={styles.iconStyles}
-                        /* onChange={(event) => this.setState({ passwordInput: event.target.value })} */
                         onChange={(event) => this.props.dispatch(loginActionCreators.setPasswordInput(event.target.value))}
                       />
                       }
