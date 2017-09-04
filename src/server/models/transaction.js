@@ -185,7 +185,6 @@ module.exports.getUserInfoForPickup = async (dropoffID, userID) => {
     });
     const userObj = await userUtil.findUserInfoByID(userID);
     const birthday = await momentOriginal(userObj.birthday, 'YYYY-MM-DD').format('MM-DD-YYYY');
-    console.log('\n\n\nbirthday: ', birthday);
     const allergies = await voteUtil.getUserAllergies(userID, dropoffID);
     const userNameAndPackagesOrdered = {
       'Order ID': transaction.id,

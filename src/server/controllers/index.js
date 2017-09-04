@@ -15,10 +15,9 @@ const groupUtil = require('../models/group');
 const restrictedAddressUtil = require('../models/restricted-address');
 const admin = require('firebase-admin');
 const json2csv = require('json2csv');
-const moment = require('moment-timezone');
 const configureStripe = require('stripe');
+const google = require('googleapis');
 const nodemailer = require('nodemailer');
-const googleMapsUtils = require('../models/utils/google-maps-utils');
 const { restrictedAddresses, firstDropoff, firstDropFoodItems, secondDropoff, secondDropFoodItems, firstGroup } = require('./local-db-initialize-data');
 let STRIPE_SECRET_KEY;
 
@@ -169,14 +168,78 @@ const initializeData = async () => {
   };
 
   const testConfirmationEmail = async () => {
-    const dropoffID = 2;
-    // get rid of later
-    const userID = 1;
-    const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, userID);
-    const qrCode = await QRCode.toFile(__dirname + `/../adminData/qr.png`, JSON.stringify(userInfoForPickup), (err) => {
+    try {
+      const dropoffID = 2;
+      // get rid of later
+      const userID = 1;
+      const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, userID);
+      const qrFile = __dirname + `/../adminData/qr.png`;
+      await QRCode.toFile(qrFile, JSON.stringify(userInfoForPickup), (err) => {
+        console.log(err);
+      });
+      const jwtClient = await new google.auth.JWT(
+        process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        null,
+        process.env.NODE_ENV === 'production' ? JSON.parse(process.env.GOOGLE_SERVICE_PRIVATE_KEY) : process.env.GOOGLE_SERVICE_PRIVATE_KEY,
+        ['https://mail.google.com/'], // an array of auth scopes
+        'johnny@collectivefoods.com'
+      );
+      await jwtClient.authorize(async (err, token) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+
+        const emailBody = 'Hi Johnny, here\'s the QR';
+
+        const transporter = await nodemailer.createTransport({
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true,
+          auth: {
+            type: 'OAuth2',
+            // user: 'johnny.chen54@gmail.com',
+            user: 'johnny@collectivefoods.com',
+            serviceClient: process.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_ID,
+            privateKey: process.env.NODE_ENV === 'production' ? JSON.parse(process.env.GOOGLE_SERVICE_PRIVATE_KEY) : process.env.GOOGLE_SERVICE_PRIVATE_KEY,
+            accessToken: token.access_token,
+            expires: token.expiry_date,
+          }
+        });
+        // verify connection configuration
+        await transporter.verify(function(error, success) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Server is ready to take our messages');
+          }
+        });
+        const userEmail = 'johnny.chen54@gmail.com';
+        const message = {
+          from: 'johnny@collectivefoods.com',
+          to: userEmail,
+          subject: 'Your Collective Order Confirmation and Receipt',
+          text: emailBody,
+          // html: `<Grid columns={1}>` +
+          //         `<Grid.Row stretched>` +
+          //         `</Grid.Row>` +
+          //         `<Grid.Row stretched>` +
+          //         `</Grid.Row>` +
+          //         `<Grid.Row stretched>` +
+          //         `</Grid.Row>` +
+          //       `</Grid>`,
+          // html: 'Embedded image: <img src="cid:johnny.chen54@gmail.com"/>',
+          attachments: [{
+            path: qrFile,
+            // cid: 'johnny.chen54@gmail.com', //same cid value as in the html img src
+          }],
+        };
+        await transporter.sendMail(message);
+      });
+    } catch (err) {
       console.log(err);
-    });
-  }
+    }
+  };
 
   await initializeFirstGroup();
   await updateCurrentDropoffID();
@@ -188,7 +251,7 @@ const initializeData = async () => {
   await initializeRestrictedAddresses();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
-  await testConfirmationEmail();
+  // await testConfirmationEmail();
 };
 
 initializeData();
@@ -471,7 +534,7 @@ module.exports = {
         if (err) {
           console.log(err);
         } else {
-          let transporter = nodemailer.createTransport({
+          let transporter = await nodemailer.createTransport({
               host: 'smtp.gmail.com',
               port: 465,
               secure: true,
@@ -505,6 +568,12 @@ module.exports = {
       req.body.dropoffID = 2;
       const checkTransactionResult = await transactionUtil.checkTransaction(req.body);
       res.json(checkTransactionResult);
+    },
+  },
+  checkoffUser: {
+    async post(req, res) {
+      console.log('transactionID: ', req.body.transactionID);
+      res.json({ userCheckedOff: true });
     },
   },
   voteNotification: {
