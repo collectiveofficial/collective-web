@@ -12,6 +12,8 @@ module.exports = function(sequelize, DataTypes) {
     revenueAfterStripe: DataTypes.DECIMAL,
     isDelivery: DataTypes.BOOLEAN,
     hasAllergies: DataTypes.BOOLEAN,
+    hasUserPickedUp: DataTypes.BOOLEAN,
+    pickupTime: DataTypes.DATE,
   }, {
     classMethods: {
       associate: function(models) {

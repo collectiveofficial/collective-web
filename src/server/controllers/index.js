@@ -570,9 +570,9 @@ module.exports = {
       res.json(checkTransactionResult);
     },
   },
-  checkoffUser: {
+  checkOffUser: {
     async post(req, res) {
-      console.log('transactionID: ', req.body.transactionID);
+      await transactionUtil.recordUserPickup(req.body.transactionID);
       res.json({ userCheckedOff: true });
     },
   },

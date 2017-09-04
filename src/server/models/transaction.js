@@ -200,3 +200,14 @@ module.exports.getUserInfoForPickup = async (dropoffID, userID) => {
     console.log(err);
   }
 };
+
+module.exports.recordUserPickup = async (id) => {
+  await models.Transaction.update({
+    hasUserPickedUp: true,
+    pickupTime: moment.tz(new Date(), 'America/New_York').format(),
+  }, {
+    where: {
+      id,
+    },
+  });
+};
