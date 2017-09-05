@@ -27,6 +27,8 @@ class Payment extends React.Component {
 
   async componentWillMount() {
     const email = await firebaseAuth().currentUser.email;
+    console.log('Payment is mounting');
+    await this.props.dispatch(paymentActionCreators.enterPaymentPage());
     this.props.dispatch(paymentActionCreators.setPaymentEmail(email));
   }
 
@@ -35,11 +37,6 @@ class Payment extends React.Component {
     if (this.props.hasAllergies === false) {
       this.props.dispatch(paymentActionCreators.setAllergiesList([]));
     }
-  }
-
-  componentWillMount() {
-    console.log('Payment is mounting');
-    this.props.dispatch(paymentActionCreators.enterPaymentPage());
   }
 
   handleDorm(e, { value }) {
