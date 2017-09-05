@@ -12,7 +12,8 @@ import s from './Register.css';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
-import { Modal } from 'semantic-ui-react';
+import { Modal, Message } from 'semantic-ui-react';
+import schools from './universities_list.js';
 
 injectTapEventPlugin();
 
@@ -31,7 +32,6 @@ class RegisterForm extends React.Component {
     this.transferUserSignup = this.transferUserSignup.bind(this);
     this.submitUserInfo = this.submitUserInfo.bind(this);
     this.areThereEmptyFields = this.areThereEmptyFields.bind(this);
-    this.handleUpdateInput = this.handleUpdateInput.bind(this);
   }
 
   componentWillMount() {
@@ -62,10 +62,6 @@ class RegisterForm extends React.Component {
     alert('A name was submitted: ' + this.props.value);
   }
 
-  handleUpdateInput(state) {
-    this.props.dispatch(registerActionCreators.setState(state));
-  }
-
   async areThereEmptyFields() {
     await this.props.dispatch(registerActionCreators.setIsFirstNameEmpty(this.props.firstName.length === 0));
     await this.props.dispatch(registerActionCreators.setIsLastNameEmpty(this.props.lastName.length === 0));
@@ -76,8 +72,15 @@ class RegisterForm extends React.Component {
     await this.props.dispatch(registerActionCreators.setIsStateEmpty(this.props.state.length === 0));
     await this.props.dispatch(registerActionCreators.setIsZipcodeEmpty(this.props.zipcode.length === 0));
     await this.props.dispatch(registerActionCreators.setIsInvalidState(usStates.indexOf(this.props.state) < 0));
-    await this.props.dispatch(registerActionCreators.setAreThereEmptyFields(this.props.isFirstNameEmpty || this.props.isLastNameEmpty || this.props.isPhoneNumberEmpty || this.props.isBirthdayEmpty ||
-    this.props.isStreetAddressEmpty || this.props.isCityEmpty || this.props.isStateEmpty || this.props.isZipcodeEmpty || this.props.isInvalidState));
+    await this.props.dispatch(registerActionCreators.setIsSchoolEmpty(this.props.school.length === 0));
+    await this.props.dispatch(registerActionCreators.setIsInvalidSchool(schools.universities.indexOf(this.props.school) < 0));
+    await this.props.dispatch(registerActionCreators.setAreThereEmptyFields(
+      this.props.isFirstNameEmpty || this.props.isLastNameEmpty ||
+      this.props.isPhoneNumberEmpty || this.props.isBirthdayEmpty ||
+      this.props.isStreetAddressEmpty || this.props.isCityEmpty ||
+      this.props.isStateEmpty || this.props.isZipcodeEmpty ||
+      this.props.isInvalidState || this.props.isSchoolEmpty ||
+      this.props.isInvalidSchool));
     //TODO REFACTOR ^^
   }
 
@@ -100,12 +103,17 @@ class RegisterForm extends React.Component {
           aptSuite: this.props.aptSuite,
           city: this.props.city,
           state: this.props.state,
-          zipcode: this.props.zipcode,
-          firebaseAccessToken: this.props.firebaseAccessToken,
+          zipCode: this.props.zipcode,
+          school: this.props.school,
+          firebaseAccessToken: this.props.firebaseAccessToken
         }),
       })
       const responseData = await response.json();
-      await this.props.authorizeUser();
+      if (responseData.userSignedUp) {
+        await this.props.authorizeUser();
+      } else {
+        this.props.dispatch(registerActionCreators.setIsFakeAddress(true));
+      }
     }
   }
 
@@ -134,6 +142,17 @@ class RegisterForm extends React.Component {
           style={styles.field}
           onChange={(event) => this.props.dispatch(registerActionCreators.setLastName(event.target.value))}
           errorText={this.props.isLastNameEmpty ? 'Last name is required' : ''}
+        /><br />
+        <AutoComplete
+          searchText={this.props.school}
+          onUpdateInput={school => this.props.dispatch(registerActionCreators.setSchool(school))}
+          floatingLabelText="School"
+          floatingLabelFixed={true}
+          dataSource={schools.universities}
+          filter={AutoComplete.fuzzyFilter}
+          style={styles.field}
+          openOnFocus={true}
+          errorText={this.props.isSchoolEmpty ? 'School is required' : this.props.isInvalidSchool ? 'Please select a school from this list.' : ''}
         /><br />
         <TextField
          type='date'
@@ -176,7 +195,7 @@ class RegisterForm extends React.Component {
         /><br />
         <AutoComplete
           searchText={this.props.state}
-          onUpdateInput={this.handleUpdateInput}
+          onUpdateInput={state => this.props.dispatch(registerActionCreators.setState(state.toUpperCase()))}
           floatingLabelText="State"
           floatingLabelFixed={true}
           dataSource={usStates}
@@ -198,6 +217,14 @@ class RegisterForm extends React.Component {
          <Modal open={this.props.areThereEmptyFields === false}>
            <Modal.Content>
              <p>By clicking continue I have read and agreed to Collective's <Link to="terms">terms of use</Link> and <Link to="privacy">privacy policy</Link> as well as Best Food Forward's <Link to="bff">terms of use</Link>, and I agree to not hold any involved individuals or entities liable for anything related to the use, consumption, storage, or purchasing of food within this site.</p>
+             {this.props.isFakeAddress ?
+               <Message
+                 error
+                 header="Please enter a valid address"
+               />
+               :
+               <div></div>
+             }
            </Modal.Content>
            <Modal.Actions>
              <RaisedButton label="Cancel" secondary={true} onTouchTap={() => { this.props.dispatch(registerActionCreators.setAreThereEmptyFields('')); }} />
@@ -242,6 +269,10 @@ const mapStateToProps = (state, props) => {
     isZipcodeEmpty: state.registerReducer._isZipcodeEmpty,
     areThereEmptyFields: state.registerReducer._areThereEmptyFields,
     isInvalidState: state.registerReducer._isInvalidState,
+    isInvalidSchool: state.registerReducer._isInvalidSchool,
+    isFakeAddress: state.registerReducer._isFakeAddress,
+    school: state.registerReducer._school,
+    isSchoolEmpty: state.registerReducer._isSchoolEmpty
   }
 };
 

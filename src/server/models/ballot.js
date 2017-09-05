@@ -3,10 +3,10 @@ const userUtil = require('./user');
 const foodUtil = require('./food');
 const voteUtil = require('./vote');
 
-module.exports.doesBallotExist = () => {
+module.exports.doesBallotExist = (dropoffID) => {
   return models.Ballot.findOne({
     where: {
-      id: 1,
+      dropoffID,
     }
   })
   .then((doesBallotExistResult) => {
@@ -19,30 +19,28 @@ module.exports.doesBallotExist = () => {
   .catch(err => console.log(err));
 };
 
-module.exports.populateBallots = async (dropoffID, voteDateTimeBeg, voteDateTimeEnd) => {
-  const findAllFirstDropFoodItems = await foodUtil.findAllFirstDropFoodItems();
-  await findAllFirstDropFoodItems.forEach((foodItem) => {
-    models.Ballot.create({
-      dropoffID,
-      foodID: foodItem.dataValues.id,
-      foodName: foodItem.dataValues.name,
-      imageUrl: foodItem.dataValues.imageUrl,
-      voteCount: 0,
-      wasShipped: false,
-      elected: false,
-      notShippedDesc: null,
-      notShippedClass: null,
-      shipDate: null,
-      voteDateTimeBeg,
-      voteDateTimeEnd,
-    });
+module.exports.populateBallot = async (dropoff, food) => {
+  await models.Ballot.create({
+    dropoffID: dropoff.id,
+    foodID: food.id,
+    foodName: food.name,
+    imageUrl: food.imageUrl,
+    voteCount: 0,
+    wasShipped: false,
+    elected: false,
+    notShippedDesc: null,
+    notShippedClass: null,
+    shipDate: null,
+    voteDateTimeBeg: dropoff.voteDateTimeBeg,
+    voteDateTimeEnd: dropoff.voteDateTimeEnd,
   });
 };
 
-module.exports.findFoodInfo = async (foodName) => {
+module.exports.findFoodInfo = async (foodName, dropoffID) => {
   return models.Ballot.findOne({
     where: {
       foodName,
+      dropoffID,
     },
   })
   .then((findFoodInfoResult) => {
@@ -83,7 +81,7 @@ module.exports.getBallotUserVotes = async (requestBody) => {
     ballots.push(foodItem);
   }
   const userID = await userUtil.findUserID(requestBody.uid);
-  const userVotes = await voteUtil.findVotesByUser(userID);
+  const userVotes = await voteUtil.findVotesByUserAndDropoff(userID, requestBody.dropoffID);
   const ballotsAndVotes = await ballots.map((ballot) => {
     const ballotsVotes = {};
     ballotsVotes.name = ballot.name;
@@ -92,4 +90,43 @@ module.exports.getBallotUserVotes = async (requestBody) => {
     return ballotsVotes;
   });
   return ballotsAndVotes;
+};
+
+module.exports.getFoodNamesAndVoteCounts = async (dropoffID) => {
+  let foodNamesAndVoteCounts = [];
+  let foodName;
+  let voteCount;
+  let dataObj;
+  const ballots = await models.Ballot.findAll({
+    where: {
+      dropoffID,
+    },
+  });
+  ballots.forEach((ballot) => {
+    foodName = ballot.dataValues.foodName;
+    voteCount = ballot.dataValues.voteCount;
+    dataObj = {
+      'Food Name': foodName,
+      'Vote Count': voteCount,
+    };
+    foodNamesAndVoteCounts.push(dataObj);
+  });
+  foodNamesAndVoteCounts = foodNamesAndVoteCounts.sort((a, b) => b['Vote Count'] - a['Vote Count']);
+  return foodNamesAndVoteCounts;
+};
+
+module.exports.findFoodID = async (foodName, dropoffID) => {
+  try {
+    console.log('\n\n\nfoodName: ', foodName);
+    const ballot = await models.Ballot.findOne({
+      where: {
+        foodName,
+        dropoffID,
+      },
+    });
+    const foodID = ballot.dataValues.foodID;
+    return foodID;
+  } catch (err) {
+    console.log(err);
+  }
 };

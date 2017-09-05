@@ -1,11 +1,14 @@
 var initialUserAuthenticatedState = false;
 var initialUserAuthorizedState = false;
-var initialBallotsAndVotesState = ''; // Move?
+var initialBallotsAndVotesState = []; // Move?
 var initialLoadingState = true;
 var initialFirebaseAccessTokenState = '';
 var initialRouteToRegisterFormState = false;
 var initialUserWantsEmailSignupState = '';
 var initialFacebookDataState = [];
+var initialTransactionHistoryState = [];
+var initialAvailableDeliveriesLeftState = ''; // Need to do error handling
+var initialDeliveryEligibilityObjState = {};
 
 export function _userAuthenticated(state=initialUserAuthenticatedState, action) {
   if (['LOGOUT'].includes(action.type)) {
@@ -112,6 +115,48 @@ export function _facebookData(state=initialFacebookDataState, action) {
   switch (action.type) {
     case 'SET_FACEBOOK_DATA':
       console.log('_facebookData state called with state: ', state, 'and action: ', action);
+      return {...action.obj};
+
+    default:
+      return state
+  }
+}
+
+export function _transactionHistory(state=initialTransactionHistoryState, action) {
+  if (['LOGOUT'].includes(action.type)) {
+      return initialTransactionHistoryState;
+    }
+  switch (action.type) {
+    case 'SET_USER_TRANSACTION_HISTORY':
+      console.log('_transactionHistory state called with state: ', state, 'and action: ', action);
+      return [...action.arr];
+
+    default:
+      return state
+  }
+}
+
+export function _availableDeliveriesLeft(state=initialAvailableDeliveriesLeftState, action) {
+  if ([].includes(action.type)) {
+      return initialAvailableDeliveriesLeftState;
+    }
+  switch (action.type) {
+    case 'SET_AVAILABLE_DELIVERIES_LEFT':
+      console.log('_availableDeliveriesLeft state called with state: ', state, 'and action: ', action);
+      return action.num;
+
+    default:
+      return state
+  }
+}
+
+export function _deliveryEligibilityObj(state=initialDeliveryEligibilityObjState, action) {
+  if (['LOGOUT'].includes(action.type)) {
+      return initialDeliveryEligibilityObjState;
+    }
+  switch (action.type) {
+    case 'SET_DELIVERY_ELIGIBILITY_OBJ':
+      console.log('_deliveryEligibilityObj state called with state: ', state, 'and action: ', action);
       return {...action.obj};
 
     default:

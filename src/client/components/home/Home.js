@@ -9,7 +9,8 @@ import { Image, Modal } from 'semantic-ui-react';
 import s from './Home.css';
 import Voting from './Voting.js';
 import { Card, CardMedia, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
-import {Button} from 'react-toolbox/lib/button';
+import { Message } from 'semantic-ui-react'
+
 
 class Home extends React.Component {
   constructor(props) {

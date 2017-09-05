@@ -20,6 +20,10 @@ export const SET_ARE_THERE_EMPTY_FIELDS = 'SET_ARE_THERE_EMPTY_FIELDS';
 export const SET_IS_INVALID_STATE = 'SET_IS_INVALID_STATE';
 export const SET_VALUE = 'SET_VALUE';
 export const ENTER_REGISTRATION_PAGE = 'ENTER_REGISTRATION_PAGE';
+export const SET_IS_INVALID_SCHOOL = 'SET_IS_INVALID_SCHOOL';
+export const SET_IS_FAKE_ADDRESS = 'SET_IS_FAKE_ADDRESS';
+export const SET_SCHOOL = 'SET_SCHOOL';
+export const SET_IS_SCHOOL_EMPTY = 'SET_IS_SCHOOL_EMPTY';
 
 export function setFirstName(text) {
   return { type: SET_FIRST_NAME, text }
@@ -103,4 +107,20 @@ export function setValue(text) {
 
 export function enterRegisterPage() {
   return { type: ENTER_REGISTRATION_PAGE}
+}
+
+export function setIsInvalidSchool(bool) {
+  return {type : SET_IS_INVALID_SCHOOL, bool}
+}
+
+export function setIsFakeAddress(bool) {
+  return {type : SET_IS_FAKE_ADDRESS, bool}
+}
+
+export function setSchool(text) {
+  return {type: SET_SCHOOL, text}
+}
+
+export function setIsSchoolEmpty(bool) {
+  return {type : SET_IS_SCHOOL_EMPTY, bool}
 }

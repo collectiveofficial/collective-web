@@ -3,15 +3,20 @@ const request = require('request-promise');
 const dotenv = require('dotenv').config();
 const twilio = require('twilio');
 const cron = require('cron');
+const fs = require('fs');
 const userUtil = require('../models/user');
 const dropoffUtil = require('../models/dropoff');
 const foodUtil = require('../models/food');
 const ballotUtil = require('../models/ballot');
 const voteUtil = require('../models/vote');
 const transactionUtil = require('../models/transaction');
+const groupUtil = require('../models/group');
+const restrictedAddressUtil = require('../models/restricted-address');
 const admin = require('firebase-admin');
+const json2csv = require('json2csv');
 const moment = require('moment-timezone');
 const configureStripe = require('stripe');
+const googleMapsUtils = require('../models/utils/google-maps-utils');
 let STRIPE_SECRET_KEY;
 
 if (process.env.NODE_ENV === 'production') {
@@ -32,18 +37,14 @@ const firebaseAdminApp = admin.initializeApp({
   databaseURL: process.env.FIREBASE_DATABASE_URL,
 });
 
-const intendedPickupTimeStart = moment.tz('2017-08-26 09:00:00', 'America/New_York');
-const intendedPickupTimeEnd = moment.tz('2017-08-26 12:00:00', 'America/New_York');
-const voteDateTimeBeg = moment.tz('2017-08-11 09:00:00', 'America/New_York');
-const voteDateTimeEnd = moment.tz('2017-08-23 12:00:00', 'America/New_York');
-
 const firstDropoff = {
+  id: 1,
   intendedShipDate: '2017-08-26',
-  intendedPickupTimeStart,
-  intendedPickupTimeEnd,
+  intendedPickupTimeStart: moment.tz('2017-08-26 10:00:00', 'America/New_York'),
+  intendedPickupTimeEnd: moment.tz('2017-08-26 13:00:00', 'America/New_York'),
   shipDate: null,
-  voteDateTimeBeg,
-  voteDateTimeEnd,
+  voteDateTimeBeg: moment.tz('2017-08-11 00:00:00', 'America/New_York'),
+  voteDateTimeEnd: moment.tz('2017-08-23 23:59:59', 'America/New_York'),
   pricePerDormPackage: 6,
   pricePerCookingPackage: 10,
   totalDormPackagesOrdered: 0,
@@ -52,6 +53,8 @@ const firstDropoff = {
   pctFeePerPackage: 0.05,
   totalRevenueBeforeStripe: 0,
   totalRevenueAftereStripe: 0,
+  // TODO: dynamic groupID
+  groupID: 1,
 };
 
 const firstDropFoodItems = [{
@@ -111,33 +114,633 @@ const firstDropFoodItems = [{
   imageUrl: 'http://palmaworld.com/wp-content/uploads/2017/01/green-pepper.jpg',
 }];
 
+// this.state = {
+//   date: "26 August 2017 from 9am to Noon",
+//   vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
+//   remainingCalendar: [
+//     ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
+//   ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
+//   ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
+//   ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
+//   ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
+//   ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
+//   ],
+//   items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
+//   provider: "DNO Produce",
+//   //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
+//   location: "https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university",
+// };
+
+const secondDropoff = {
+  id: 2,
+  intendedShipDate: '2017-09-09',
+  intendedPickupTimeStart: moment.tz('2017-09-09 09:00:00', 'America/New_York'),
+  intendedPickupTimeEnd: moment.tz('2017-09-09 12:00:00', 'America/New_York'),
+  shipDate: null,
+  voteDateTimeBeg: moment.tz('2017-08-24 00:00:00', 'America/New_York'),
+  voteDateTimeEnd: moment.tz('2017-09-06 23:59:59', 'America/New_York'),
+  pricePerDormPackage: 6,
+  pricePerCookingPackage: 10,
+  totalDormPackagesOrdered: 0,
+  totalCookingPackagesOrdered: 0,
+  totalDollarAmount: 0,
+  pctFeePerPackage: 0.05,
+  totalRevenueBeforeStripe: 0,
+  totalRevenueAftereStripe: 0,
+  // TODO: dynamic groupID
+  groupID: 1,
+};
+
+
+['Green Peppers', 'Honeydews', 'Papayas', 'Pears', 'Raspberries', 'Watermelon', 'Asparagus', 'Kiwi', 'Cabbage', 'Kale', 'Collards', 'Cucumbers', 'Tomato', 'Corn', 'Lettuce', 'Apples', 'Sweet Potatoes', 'Oranges', 'Bananas'];
+
+const secondDropFoodItems = [
+  {
+    name: 'Green Peppers',
+    imageUrl: 'https://goo.gl/fyjxBH',
+    // imageUrl: 'https://i.warosu.org/data/ck/img/0054/27/1399844907702.jpg',
+  },
+  {
+    name: 'Honeydews',
+    imageUrl: 'https://goo.gl/yBWwRM',
+    // imageUrl: 'http://servingjoy.com/wp-content/uploads/2014/12/Slice-of-Honeydew-Melon.jpg',
+  },
+  {
+    name: 'Papaya',
+    imageUrl: 'https://goo.gl/UFxCQJ',
+    // imageUrl: 'http://juicing-for-health.com/wp-content/uploads/2012/06/papaya1.jpg',
+  },
+  {
+    name: 'Pears',
+    imageUrl: 'https://goo.gl/KwwJ81',
+    // imageUrl: 'http://www.liversupport.com/wp-content/uploads/2015/09/pears-can-assist-your-liver-999x576.jpg',
+  },
+  {
+    name: 'Raspberries',
+    imageUrl: 'https://goo.gl/FS3KJR',
+    // imageUrl: 'http://wtop.com/wp-content/uploads/2017/06/raspberries-1880x1254.jpg',
+  },
+  {
+    name: 'Watermelon',
+    imageUrl: 'https://goo.gl/cSPZwi',
+    // imageUrl: 'http://www.well-beingsecrets.com/wp-content/uploads/How-to-Buy-and-Store-Watermelon.jpg',
+  },
+  {
+    name: 'Asparagus',
+    imageUrl: 'https://goo.gl/GdYJ1D',
+    // imageUrl: 'http://www.oahufresh.com/wp-content/uploads/2016/08/asparagus.jpg',
+  },
+  {
+    name: 'Kiwi',
+    imageUrl: 'https://goo.gl/bzMN3v',
+    // imageUrl: 'https://aos.iacpublishinglabs.com/question/aq/1400px-788px/kiwi-citrus-fruit_2411b9e870d212a5.jpg?domain=cx.aos.ask.com',
+  },
+  {
+    name: 'Cabbage',
+    imageUrl: 'https://goo.gl/zYk9MV',
+    // imageUrl: 'https://fthmb.tqn.com/_T98MEySnrgcOOK879GS7PvJBg0=/2000x1500/filters:no_upscale()/about/Cabbage-GettyImages-683732681-586599443df78ce2c32dd4c3.jpg',
+  },
+  {
+    name: 'Kale',
+    imageUrl: 'https://goo.gl/5QJdLK',
+    // imageUrl: 'http://www.vegkitchen.com/wp-content/uploads/2012/12/Kale-in-a-basket.jpg',
+  },
+  {
+    name: 'Collards',
+    imageUrl: 'https://goo.gl/PaUpGv',
+    // imageUrl: 'https://ronemyhoustonmajic.files.wordpress.com/2015/04/171305080.jpg',
+  },
+  {
+    name: 'Cucumbers',
+    imageUrl: 'https://goo.gl/UDqsdB',
+    // imageUrl: 'http://www.movenoticias.com/wp-content/uploads/2017/06/pepino-fatiado.jpg',
+  },
+  {
+    name: 'Tomato',
+    imageUrl: 'https://goo.gl/XL4rzh',
+    // imageUrl: 'http://ichef.bbci.co.uk/wwfeatures/wm/live/1280_640/images/live/p0/4w/46/p04w46sp.jpg',
+  },
+  {
+    name: 'Corn',
+    imageUrl: 'https://goo.gl/8SqA6z',
+    // imageUrl: 'https://thumbs.mic.com/ODU4ODMwNjZlMiMvd2w1NjJaZFk4RnFkZDk3cW12bzFLejVoaUwwPS82MXgzNTY6NDIyN3gyNDkyLzE2MDB4OTAwL2ZpbHRlcnM6Zm9ybWF0KGpwZWcpOnF1YWxpdHkoODApL2h0dHBzOi8vczMuYW1hem9uYXdzLmNvbS9wb2xpY3ltaWMtaW1hZ2VzL3g3dzZtb2d2aHRnb21qYnNyZWhoc2x3YWY0OGgxY2UzOHdxcGRnZ254em12OXBxNnZnZGt4eDdvb2llZGxuNXUuanBn.jpg',
+  },
+  {
+    name: 'Lettuce',
+    imageUrl: 'https://goo.gl/7G9jB9',
+    // imageUrl: 'http://s.eatthis-cdn.com/media/images/ext/724422176/napacabbage-healthier-than-kale.jpg',
+  },
+  {
+    name: 'Apples',
+    imageUrl: 'https://goo.gl/W6YmQZ',
+    // imageUrl: 'http://www.ultrahdfreewallpapers.com/uploads/large/fruits/apple-fruit-hd-wallpaper-0041.jpg',
+  },
+  {
+    name: 'Sweet Potatoes',
+    imageUrl: 'https://goo.gl/jEiem5',
+    // imageUrl: 'http://nutritionstudies.org/wp-content/uploads/2015/05/recipe-oh-so-sweet-potatoes.jpg',
+  },
+  {
+    name: 'Oranges',
+    imageUrl: 'https://goo.gl/ZAeoZD',
+    // imageUrl: 'https://img.maximummedia.ie/her_ie/eyJkYXRhIjoie1widXJsXCI6XCJodHRwOlxcXC9cXFwvbWVkaWEtaGVyLm1heGltdW1tZWRpYS5pZS5zMy5hbWF6b25hd3MuY29tXFxcL3dwLWNvbnRlbnRcXFwvdXBsb2Fkc1xcXC8yMDE3XFxcLzAyXFxcLzIxMTUzOTI2XFxcL29yYW5nZXMuanBnXCIsXCJ3aWR0aFwiOjY0NyxcImhlaWdodFwiOjM0MCxcImRlZmF1bHRcIjpcImh0dHBzOlxcXC9cXFwvd3d3Lmhlci5pZVxcXC9hc3NldHNcXFwvaW1hZ2VzXFxcL2hlclxcXC9uby1pbWFnZS5wbmc_dj0zXCJ9IiwiaGFzaCI6ImZiMzYzNTI2YzhmYTI4OWI4YjY0MWFkODI5OGZjNzRkNjI1NTAwMzEifQ==/oranges.jpg',
+  },
+  {
+    name: 'Bananas',
+    imageUrl: 'https://goo.gl/VvMUcM',
+    // imageUrl: 'https://timedotcom.files.wordpress.com/2017/05/amazonfreebananas-em-86304874.jpg?quality=85',
+  },
+];
+
+const firstGroup = {
+  name: 'Ohio State University, Columbus',
+  type: 'university',
+  streetAddress: '160 W Woodruff Ave',
+  aptSuite: 'Building 1108',
+  city: 'Columbus',
+  state: 'OH',
+  zipCode: '43210',
+  descriptor: 'Best Food Forward is made for students by students, utilizing a democratic, cooperative framework to make it easier for people to eat healthy.',
+  // TODO: dynamic dropoff ID (current datetime)
+  currentDropoffID: 1,
+  // TODO: dynamic voting dropoff ID (current datetime)
+  currentVotingDropoffID: 1,
+  deliveryStreetAddress: '160 W Woodruff Ave',
+  deliveryAptSuite: 'Building 1108',
+  deliveryCity: 'Columbus',
+  deliveryState: 'OH',
+  deliveryZipCode: '43210',
+};
+
+const restrictedAddresses = {
+  'Archer House': {
+    streetAddress: '2130 Neil Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Baker Hall East': {
+    streetAddress: '93 West 12th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Baker Hall West': {
+    streetAddress: '129 West 12th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Barrett House': {
+    streetAddress: '88 W. Woodruff Ave',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Blackburn House': {
+    streetAddress: '136 W. Woodruff Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Bowen House': {
+    streetAddress: '2125 N. High Street',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Bradley Hall': {
+    streetAddress: '221 West 12th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Busch House': {
+    streetAddress: '2115 N. High Street',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Canfield Hall': {
+    streetAddress: '236 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Drackett Tower': {
+    streetAddress: '191 W. Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Fechko House': {
+    streetAddress: '220 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'German House': {
+    streetAddress: '141 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Hanley House': {
+    streetAddress: '225 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Haverfield House': {
+    streetAddress: '112 West Woodruff Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Houck House': {
+    streetAddress: '61 West Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Houston House': {
+    streetAddress: '97 W. Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Jones Tower': {
+    streetAddress: '123 W. Lane Ave',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Lawrence Tower': {
+    streetAddress: '328 West Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Lincoln House': {
+    streetAddress: '1810 Cannon Drive West',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Mack Hall': {
+    streetAddress: '1698 Neil Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Mendoza House': {
+    streetAddress: '194 West Woodruff Ave.',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Morrill Tower': {
+    streetAddress: '1900 Cannon Drive West',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Morrison Tower': {
+    streetAddress: '196 West 11th Ave.',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Neil Avenue': {
+    streetAddress: '1578 Neil Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Norton House': {
+    streetAddress: '2114 Neil Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Nosker House': {
+    streetAddress: '124 West Woodruff Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Park-Stradley Hall': {
+    streetAddress: '120 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Paterson Hall': {
+    streetAddress: '191 West 12th Ave.',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Pennsylvania Place': {
+    streetAddress: '1478 Pennsylvania Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Pomerene House': {
+    streetAddress: '231 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Raney House': {
+    streetAddress: '33 W. Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Scholars East': {
+    streetAddress: '221 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Scholars West': {
+    streetAddress: '239 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Scott House': {
+    streetAddress: '160 W. Woodruff Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Siebert Hall': {
+    streetAddress: '184 West 11th Ave.',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Smith-Steeb Hall': {
+    streetAddress: '80 West 11th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Taylor Tower': {
+    streetAddress: '55 W. Lane Ave',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'The Residence on Tenth': {
+    streetAddress: '230 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Torres House': {
+    streetAddress: '187 W. Lane Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43210',
+    restrictionType: 'university dorm',
+  },
+  'Veteran\'s House': {
+    streetAddress: '237 E 17th Ave',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+  'Worthington Building': {
+    streetAddress: '203 West 10th Avenue',
+    aptSuite: '',
+    city: 'Columbus',
+    state: 'OH',
+    zipCode: '43201',
+    restrictionType: 'university dorm',
+  },
+};
+
 const initializeData = async () => {
+  const initializeFirstGroup = async () => {
+    // initialize group
+    const doesFirstGroupExist = await groupUtil.doesFirstGroupExist();
+    // if group at id 1 does not exist
+    if (doesFirstGroupExist === false) {
+      await groupUtil.populateGroup(firstGroup);
+    }
+  };
+
+  const updateCurrentDropoffID = async () => {
+    // TODO: dynamic voting dropoff ID (current datetime)
+    const currentDropoffID = 2;
+    const groupID = 1;
+    await groupUtil.updateCurrentDropoffID(currentDropoffID, groupID);
+  };
+  //
+  // const updateCurrentVotingDropoffID = async () => {
+  //   // TODO: dynamic voting dropoff ID (current datetime)
+  //   const currentVotingDropoffID = 1;
+  //   const groupID = 1;
+  //   await groupUtil.updateCurrentVotingDropoffID(currentVotingDropoffID, groupID);
+  // };
+
   const initializeFirstDropoff = async () => {
+    const dropoffID = 1;
     // initialize dropoff
-    const doesFirstDropoffExist = await dropoffUtil.doesFirstDropoffExist();
+    const doesFirstDropoffExist = await dropoffUtil.doesDropoffExist(dropoffID);
     // if dropoff at id 1 does not exist
-    if (!doesFirstDropoffExist) {
+    if (doesFirstDropoffExist === false) {
       await dropoffUtil.populateDropoff(firstDropoff);
     }
   };
 
-  const initializeFirstDropFoodItems = async () => {
-    const doesFoodItemExist = await foodUtil.doesFoodItemExist();
-    if (!doesFoodItemExist) {
-      await foodUtil.populateFoodItems(firstDropFoodItems);
+  const initializeSecondDropoff = async () => {
+    const dropoffID = 2;
+    // initialize dropoff
+    const doesSecondDropoffExist = await dropoffUtil.doesDropoffExist(dropoffID);
+    // if dropoff at id 1 does not exist
+    if (doesSecondDropoffExist === false) {
+      await dropoffUtil.populateDropoff(secondDropoff);
     }
   };
 
-  const initializeFirstDropBallots = async () => {
-    const doesBallotExist = await ballotUtil.doesBallotExist();
-    if (!doesBallotExist) {
-      // populate ballots first drop's food items for first dropoff
-      await ballotUtil.populateBallots(1, voteDateTimeBeg, voteDateTimeEnd);
+  const initializeFirstDropFoodItemsBallots = async () => {
+    const ballotID = 1;
+    const foodID = 1;
+    const doesFoodItemExist = await foodUtil.doesFoodItemExist(foodID);
+    if (doesFoodItemExist === false) {
+      await foodUtil.populateFoodItemsBallots(firstDropFoodItems, ballotID, firstDropoff);
     }
   };
+
+  const initializeSecondDropFoodItemsBallots = async () => {
+    const ballotID = 2;
+    const doesPapayaExist = await foodUtil.doesPapayaExist();
+    if (doesPapayaExist === false) {
+      await foodUtil.populateFoodItemsBallots(secondDropFoodItems, ballotID, secondDropoff);
+    }
+  };
+
+  const initializeRestrictedAddresses = async () => {
+    const groupID = 1;
+    const dropoffID = 2;
+    const restrictedAddressesID = 1;
+    const doesRestrictedAddressExist = await restrictedAddressUtil.checkIfRestrictedAddressExist(restrictedAddressesID);
+    if (doesRestrictedAddressExist === false) {
+      await restrictedAddressUtil.initializeRestrictedAddresses(restrictedAddresses, groupID, dropoffID);
+    }
+  };
+
+  const sendNightlyCSVupdates = async () => {
+    // TODO: dynamic dropoffID
+    const dropoffID = 2;
+    let fields;
+    let csv;
+    let fileName;
+
+    const sendFoodNamesAndVoteCounts = async () => {
+      // just food name and vote count for now
+      fields = ['Food Name', 'Vote Count'];
+      const foodNamesAndVoteCounts = await ballotUtil.getFoodNamesAndVoteCounts(dropoffID);
+      csv = json2csv({ data: foodNamesAndVoteCounts, fields });
+      fileName = 'foodNamesAndVoteCounts.csv';
+      await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
+        if (err) {
+          console.log('file failed to create');
+          throw err;
+        }
+        console.log('file created');
+      });
+    };
+
+    const sendUserNamesAndPackagesOrdered = async () => {
+      fields = ['Last Name', 'First Name', 'Email', 'Phone Number', 'Dorm Packages Ordered', 'Cooking Packages Ordered', 'Allergies'];
+      // csv in ascending alphabetical order
+      const userInfoAndPackagesOrdered = await transactionUtil.getUserInfoAndPackagesOrdered(dropoffID);
+      csv = json2csv({ data: userInfoAndPackagesOrdered, fields });
+      fileName = 'userNamesAndPackagesOrdered.csv';
+      await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
+        if (err) {
+          console.log('file failed to create');
+          throw err;
+        }
+        console.log('file created');
+      });
+    };
+    await sendFoodNamesAndVoteCounts();
+    await sendUserNamesAndPackagesOrdered();
+  };
+
+  const sendVotingReminderCSVupdates = async () => {
+    const fields = ['Last Name', 'First Name', 'Email'];
+    // TODO: dynamic groupID
+    const groupID = 1;
+    const dropoffID = 2;
+    const usersWhoHaveNotPaid = await transactionUtil.getUsersWhoHaveNotPaid(dropoffID, groupID);
+    const csv = json2csv({ data: usersWhoHaveNotPaid, fields });
+    const fileName = 'usersWhoHaveNotPaid.csv';
+    await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
+      if (err) {
+        console.log('file failed to create');
+        throw err;
+      }
+      console.log('file created');
+    });
+  };
+
+  await initializeFirstGroup();
+  await updateCurrentDropoffID();
+  // await updateCurrentVotingDropoffID();
   await initializeFirstDropoff();
-  await initializeFirstDropFoodItems();
-  await initializeFirstDropBallots();
+  await initializeFirstDropFoodItemsBallots();
+  await initializeSecondDropoff();
+  await initializeSecondDropFoodItemsBallots();
+  await initializeRestrictedAddresses();
+  await sendNightlyCSVupdates();
+  await sendVotingReminderCSVupdates();
 };
 
 initializeData();
@@ -281,10 +884,10 @@ module.exports = {
       console.log('req.body', req.body);
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken)
       let uid = decodedToken.uid;
-      const doesUserExist = await userUtil.checkIfUserExists(uid);
       req.body.uid = uid;
-      await userUtil.saveSubmittedUserInfo(req.body);
-      await res.json({ userSignedUp: true });
+      const restrictionType = 'university dorm';
+      const userSignedUp = await userUtil.saveSubmittedUserInfo(req.body, restrictionType);
+      await res.json({ userSignedUp });
     },
   },
   facebookLogin: {
@@ -296,7 +899,6 @@ module.exports = {
       req.body.uid = uid;
       if (doesUserExist) {
         const hasUserFinishedSignUp = await userUtil.checkIfFacebookUserFinishedSignUp(uid);
-        await console.log('hasUserFinishedSignUp: ', hasUserFinishedSignUp);
         if (hasUserFinishedSignUp) {
           await res.json({
             saveUserOnFacebookSignUpExecuted: false,
@@ -326,10 +928,17 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 1;
+      req.body.dropoffID = 2;
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
+      const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
+      const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
+      const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
+      const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(req.body.uid);
       const responseObject = {
         ballotsAndVotes,
+        userTransactionHistory,
+        availableDeliveriesLeft,
+        deliveryEligibilityObj,
       };
       await res.json(responseObject);
     },
@@ -339,6 +948,8 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;
+      // TODO: Implement dynamic dropoffID
+      req.body.dropoffID = 2;
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.saveVotes(req.body);
       res.json({ votesSaved: true });
@@ -349,6 +960,8 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;
+      // TODO: Implement dynamic dropoffID
+      req.body.dropoffID = 2;
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.updateVotes(req.body);
       res.json({ votesSaved: true });
@@ -361,17 +974,54 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: dynamic dropoffID
-      const dropoffID = 1;
-      req.body.pctFeePerPackage = await dropoffUtil.findPctFeePerPackageForDrop(dropoffID);
-      req.body.cookingPackageFees = (req.body.cookingPackagesOrdered * 10) * req.body.pctFeePerPackage;
-      req.body.transactionFee = req.body.cookingPackagesOrdered > 0 ? 0.5 : 0;
-      const totalDollarAmount = (req.body.dormPackagesOrdered * 6) + ((req.body.cookingPackagesOrdered * 10) + req.body.cookingPackageFees) + req.body.transactionFee;
+      const dropoffID = 2;
+      // declare variable called errorMessage
+      let errorMessage = '';
+      const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(dropoffID);
+      // TODO: dynamic delivery limit
+      // declare variable to keep track of avaiable deliveries left
+      const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
+      const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(req.body.uid);
+      if (req.body.userWantsDelivery && !deliveryEligibilityObj.isUserEligibleForDelivery) {
+        if (deliveryEligibilityObj.isAddressDorm) {
+          errorMessage = 'It looks like your address is a dorm address. Our pickup location is not far away.';
+        }
+        if (deliveryEligibilityObj.isAddressBeyondDeliveryReach) {
+          errorMessage = 'It looks like your address is beyond our 5 mile delivery boundaries. We will try our best to extend our delivery boundaries in our next bulk buy. Thank you for your patience.';
+        }
+        res.json({ errorMessage, availableDeliveriesLeft });
+      }
+      // if user wants delivery and cooking packages ordered is greater than 0
+      if (req.body.userWantsDelivery && req.body.cookingPackagesOrdered > 0) {
+        // if available deliveries left is equal to 0
+        if (availableDeliveriesLeft === 0) {
+          // assign error message that tells client there are no more available deliveries
+          errorMessage = 'There are no more available deliveries left for this round of bulk buy. We apologize for any inconvenience. We promise we\'ll be back with more deliveries in the future.';
+          // respond back with the error message and avaiable deliveries left
+          res.json({ errorMessage, availableDeliveriesLeft });
+        }
+      }
+
+      // if user wants delivery and cooking packages ordered is 0
+      if (req.body.userWantsDelivery && req.body.cookingPackagesOrdered === 0) {
+        errorMessage = 'You would need to purchase at least 1 cooking package for delivery';
+        res.json({ errorMessage, availableDeliveriesLeft });
+      }
+
+      const dormPackagesTotalDollarAmount = req.body.dormPackagesOrdered * 6;
+      const cookingPackagesTotalDollarAmount = req.body.cookingPackagesOrdered * 11;
+      req.body.cookingPackagesTotalDollarAmount = cookingPackagesTotalDollarAmount;
+      req.body.deliveryFee = req.body.userWantsDelivery ? 3 : 0;
+      const totalDollarAmount = dormPackagesTotalDollarAmount + cookingPackagesTotalDollarAmount + req.body.deliveryFee;
       req.body.totalDollarAmount = totalDollarAmount;
-      const dormPackageEmailDescription = req.body.dormPackagesOrdered > 0 ? `${req.body.dormPackagesOrdered} x Dorm Package${req.body.dormPackagesOrdered < 2 ? '' : 's'}` : '';
-      const cookingPackageEmailDescription = req.body.cookingPackagesOrdered > 0 ? `${req.body.cookingPackagesOrdered} x Cooking Package${req.body.cookingPackagesOrdered < 2 ? '' : 's'}` : '';
-      const conditionalNextLine = req.body.dormPackagesOrdered > 0 && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
-      const description = `${dormPackageEmailDescription}${conditionalNextLine}${cookingPackageEmailDescription}`;
-      let charge = await stripe.charges.create({
+      const dormPackageEmailDescription = req.body.dormPackagesOrdered > 0 ? `${req.body.dormPackagesOrdered} x Dorm Package${req.body.dormPackagesOrdered < 2 ? '' : 's'} $${dormPackagesTotalDollarAmount}` : '';
+      const cookingPackageEmailDescription = req.body.cookingPackagesOrdered > 0 ? `${req.body.cookingPackagesOrdered} x Cooking Package${req.body.cookingPackagesOrdered < 2 ? '' : 's'} $${cookingPackagesTotalDollarAmount}` : '';
+      const deliveryAddress = await userUtil.findFormattedAddress(req.body.uid);
+      const deliveryEmailDescription = req.body.userWantsDelivery ? `Delivery $${req.body.deliveryFee}\nDelivery Address:\n${deliveryAddress}\n(Dropoff at door to apartment/house)` : '';
+      const packageConditionalNextLine = req.body.dormPackagesOrdered > 0 && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
+      const deliveryConditionalNextLine = req.body.userWantsDelivery && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
+      const description = `${dormPackageEmailDescription}${packageConditionalNextLine}${cookingPackageEmailDescription}${deliveryConditionalNextLine}${deliveryEmailDescription}`;
+      await stripe.charges.create({
         amount: Math.round(totalDollarAmount * 100),
         currency: 'usd',
         card: req.body.token.id,
@@ -382,7 +1032,11 @@ module.exports = {
           console.log(err);
         } else {
           await transactionUtil.savePaymentInfo(req.body, dropoffID);
-          await res.json({ paymentCompleted: true, emailSentTo: req.body.email });
+          await res.json({
+            paymentCompleted: true,
+            emailSentTo: req.body.email,
+            errorMessage,
+          });
         }
       });
     },
@@ -392,27 +1046,14 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
       let uid = decodedToken.uid;
       req.body.uid = uid;
+      // TODO: Implement dynamic dropoffID
+      req.body.dropoffID = 2;
       const checkTransactionResult = await transactionUtil.checkTransaction(req.body);
       res.json(checkTransactionResult);
     },
   },
   voteNotification: {
     get(req, res) {
-      // date: "26 August 2017 from 9am to Noon",
-      // vote: "Voting window is from 21 August to 25 August",
-      // remainingCalendar: [
-      //   ['9 September 2017',  "Voting window is from 27 August to 7 September"],
-      // ['23 September 2017',  "Voting window is from 10 September to 21 September"],
-      // ['7 October 2017',  "Voting window is from 24 September to 5 October"],
-      // ['28 October 2017',  "Voting window is from 8 October to 26 October"],
-      // ['10 November 2017', "Voting window is from 29 October to 8 November"],
-      // ['2 December 2017',  "Voting window is from 11 November to 30 November"]
-      // ]
-      // const dropDates = {
-      //   '26 August 2017': {
-      //     time: '9 AM to Noon',
-      //   }
-      // };
       // '00 56 9 27 7 * *'
       const job1 = new cron.CronJob('00 03 13 * * *', () => {
         /* runs once at the specified date. */

@@ -39,7 +39,6 @@ class Voting extends React.Component {
         },
         body: JSON.stringify({
           firebaseAccessToken: this.props.firebaseAccessToken,
-          dropoffID: 1, //TODO: implement dynamic dropoffID
         }),
       });
       const checkIfUserHasPaidResultData = await checkIfUserHasPaidResult.json();
@@ -48,7 +47,7 @@ class Voting extends React.Component {
     }
   }
 
-  handleChange(e, { value, checked }) {
+  async handleChange(e, { value, checked }) {
     if (this.props.votes === 0 && checked === true) {
       checked = false;
       return;
@@ -59,10 +58,10 @@ class Voting extends React.Component {
         newBallotsAndVotes[i].isCurrent = checked;
       }
     }
-    this.props.dispatch(appActionCreators.setBallotsAndVotes(newBallotsAndVotes));
+    await this.props.dispatch(appActionCreators.setBallotsAndVotes(newBallotsAndVotes));
     let newVote = this.props.votes;
     checked ? newVote-- : newVote++;
-    this.props.dispatch(votingActionCreators.setVotes(newVote));
+    await this.props.dispatch(votingActionCreators.setVotes(newVote));
   }
 
   async handleContinueToPayment() {
@@ -155,11 +154,12 @@ class Voting extends React.Component {
                 :
                 <Popup
                   trigger={
-                    <RaisedButton
-                      label="Continue to Payment"
-                      primary={true}
+                    <Button
+                      positive
                       onTouchTap={this.handleContinueToPayment}
-                    />
+                    >
+                      Continue to Payment
+                    </Button>
                   }
                   content={this.props.voteErrorMessage}
                   open={this.props.allowContinueToPayment === false}

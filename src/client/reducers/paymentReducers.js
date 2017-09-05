@@ -6,6 +6,13 @@ var initialCookState = 0; // TODO GET MORE SPECIFIC GODAMMIT
 var initialHasPaymentCompletedState = false;
 var initialVotesSavedState = false;
 
+var intialHasAllergiesState = false;
+var intialPaymentEmailState = '';
+var intialUserWantsDeliveryState = false;
+var intialServerPaymentErrorMessageState = '';
+var intialDeliveryPriceImpactState = 0;
+var intialAllergiesListState = [];
+
 
 export function _modalIsOpenState(state=initialModalIsOpenState, action) {
   if (['LOGOUT','ENTER_PAYMENT_PAGE'].includes(action.type)) {
@@ -99,6 +106,90 @@ export function _votesSaved(state=initialVotesSavedState, action) {
     case 'SET_VOTES_SAVED':
       console.log('_votesSaved state called with state: ', state, 'and action: ', action);
       return action.bool;
+
+    default:
+      return state
+  }
+}
+
+export function _hasAllergies(state=intialHasAllergiesState, action) {
+  if (['LOGOUT','ENTER_PAYMENT_PAGE'].includes(action.type)) {
+      return intialHasAllergiesState;
+    }
+  switch (action.type) {
+    case 'SET_HAS_ALLERGIES':
+      console.log('_hasAllergies state called with state: ', state, 'and action: ', action);
+      return action.bool;
+
+    default:
+      return state
+  }
+}
+
+export function _paymentEmail(state=intialPaymentEmailState, action) {
+  if (['LOGOUT','ENTER_PAYMENT_PAGE'].includes(action.type)) {
+      return intialPaymentEmailState;
+    }
+  switch (action.type) {
+    case 'SET_PAYMENT_EMAIL':
+      console.log('_paymentEmail state called with state: ', state, 'and action: ', action);
+      return action.text;
+
+    default:
+      return state
+  }
+}
+
+export function _userWantsDelivery(state=intialUserWantsDeliveryState, action) {
+  if (['LOGOUT','ENTER_PAYMENT_PAGE'].includes(action.type)) {
+      return intialUserWantsDeliveryState;
+    }
+  switch (action.type) {
+    case 'SET_USER_WANTS_DELIVERY':
+      console.log('_userWantsDelivery state called with state: ', state, 'and action: ', action);
+      return action.bool;
+
+    default:
+      return state
+  }
+}
+
+export function _serverPaymentErrorMessage(state=intialServerPaymentErrorMessageState, action) {
+  if (['LOGOUT','ENTER_PAYMENT_PAGE'].includes(action.type)) {
+      return intialServerPaymentErrorMessageState;
+    }
+  switch (action.type) {
+    case 'SET_SERVER_PAYMENT_ERROR_MSG':
+      console.log('_serverPaymentErrorMessage state called with state: ', state, 'and action: ', action);
+      return action.text;
+
+    default:
+      return state
+  }
+}
+
+export function _deliveryPriceImpact(state=intialDeliveryPriceImpactState, action) {
+  if (['LOGOUT','ENTER_PAYMENT_PAGE'].includes(action.type)) {
+      return intialDeliveryPriceImpactState;
+    }
+  switch (action.type) {
+    case 'SET_DELIVERY_PRICE_IMPACT':
+      console.log('_deliveryPriceImpact state called with state: ', state, 'and action: ', action);
+      return action.num;
+
+    default:
+      return state
+  }
+}
+
+export function _allergiesList(state=intialAllergiesListState, action) {
+  if (['LOGOUT','ENTER_PAYMENT_PAGE'].includes(action.type)) {
+      return intialAllergiesListState;
+    }
+  switch (action.type) {
+    case 'SET_ALLERGIES_LIST':
+      console.log('_allergiesList state called with state: ', state, 'and action: ', action);
+      return [...action.arr];
 
     default:
       return state

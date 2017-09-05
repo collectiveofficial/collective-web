@@ -32,6 +32,7 @@ import Footer from './components/footer/Footer.js';
 import Terms from './components/legal/collectiveterms.js';
 import BFFTerms from './components/legal/BFFterms.js';
 import Privacy from './components/legal/privacypolicy.js';
+import OrderInfo from './components/orderInfo/OrderInfo.js';
 
 
 initReactFastclick();
@@ -98,7 +99,6 @@ class App extends Component {
         })
         const responseData = await response.json();
         const userAuthorized = responseData.userAuthorized;
-        console.log('userAuthorized: ', userAuthorized)
         if (userAuthorized) {
           this.authorizeUser();
         }
@@ -132,8 +132,6 @@ class App extends Component {
     const provider = await new firebaseAuth.FacebookAuthProvider();
     await provider.addScope('email, public_profile, user_friends');
     const result = await firebaseAuth().signInWithPopup(provider);
-    await console.log('inside handleFacebookAuth');
-    await console.log('firebaseAuth result: ', result);
     // const firebaseAccessToken = result.user.ie;
     const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
     // await this.setState({ firebaseAccessToken });
@@ -166,19 +164,16 @@ class App extends Component {
       }),
     });
     const facebookCheckResponseData = await facebookCheckResponse.json();
-    console.log('responseData: ', facebookCheckResponseData);
     const userAlreadyExists = facebookCheckResponseData.userAlreadyExists;
     const hasUserFinishedSignUp = facebookCheckResponseData.hasUserFinishedSignUp;
     const saveUserOnFacebookSignUpExecuted = facebookCheckResponseData.saveUserOnFacebookSignUpExecuted;
     if (userAlreadyExists && hasUserFinishedSignUp) {
-      console.log('authorize user');
       await this.authorizeUser();
     } else if ((userAlreadyExists && !hasUserFinishedSignUp)) {
       this.props.dispatch(appActionCreators.setRouteToRegisterForm(true));
     } else if (saveUserOnFacebookSignUpExecuted) {
       const currentFirebaseUser = await firebaseAuth().currentUser;
       const sendEmailVerification = await currentFirebaseUser.sendEmailVerification();
-      await console.log('sendEmailVerification successful.');
       this.props.dispatch(appActionCreators.setRouteToRegisterForm(true));
     }
   }
@@ -197,8 +192,11 @@ class App extends Component {
       }),
     })
     const initialDataLoadResults = await initialDataLoad.json();
-    this.props.dispatch(appActionCreators.setBallotsAndVotes(initialDataLoadResults.ballotsAndVotes));
-    await console.log('-------> this.props.ballotsAndVotes: ', this.props.ballotsAndVotes);
+    await this.props.dispatch(appActionCreators.setBallotsAndVotes(initialDataLoadResults.ballotsAndVotes));
+    await this.props.dispatch(appActionCreators.setUserTransactionHistory(initialDataLoadResults.userTransactionHistory));
+    await this.props.dispatch(appActionCreators.setAvailableDeliveriesLeft(initialDataLoadResults.availableDeliveriesLeft));
+    await this.props.dispatch(appActionCreators.setDeliveryEligibilityObj(initialDataLoadResults.deliveryEligibilityObj));
+
   }
 
   render() {
@@ -221,8 +219,8 @@ class App extends Component {
                 />)}
               />
               <PrivateRoute userAuthorized={this.props.userAuthorized} path="/home" component={Home} />
-              <PrivateRoute userAuthorized={this.props.userAuthorized} path="/voting" component={Voting}
-              />
+              <PrivateRoute userAuthorized={this.props.userAuthorized} path="/voting" component={Voting}/>
+              <PrivateRoute userAuthorized={this.props.userAuthorized} path="/order-info" component={OrderInfo} />
               <PublicRoute userAuthorized={this.props.userAuthorized} path="/foodwiki" component={foodwiki} />
               <DenyAuthorizedRoute userAuthorized={this.props.userAuthorized} path="/signup" component={() =>
                 (<SignUp

@@ -17,6 +17,10 @@ var initialIsStateEmptyState = false;
 var initialIsZipcodeEmptyState = false;
 var initialAreThereEmptyFieldsState = '';
 var initialIsInvalidStateState = false;
+var initialIsInvalidSchoolState = false;
+var initialIsFakeAddressState = false;
+var initialSchoolState = '';
+var initialIsSchoolEmptyState = false;
 
 export function _firstName(state=initialFirstNameState, action) {
   if (['LOGOUT','ENTER_REGISTRATION_PAGE'].includes(action.type)) {
@@ -296,6 +300,66 @@ export function _isInvalidState(state=initialIsInvalidStateState, action) {
 
     case 'SET_IS_INVALID_STATE':
       console.log('_isInvalidState state called with state: ', state, 'and action: ', action);
+      return action.bool;
+
+    default:
+      return state
+  }
+}
+
+export function _isInvalidSchool(state=initialIsInvalidSchoolState, action) {
+  if (['LOGOUT','ENTER_REGISTRATION_PAGE'].includes(action.type)) {
+      return initialIsInvalidSchoolState;
+    }
+  switch (action.type) {
+
+    case 'SET_IS_INVALID_SCHOOL':
+      console.log('_isInvalidSchool state called with state: ', state, 'and action: ', action);
+      return action.bool;
+
+    default:
+      return state
+  }
+}
+
+export function _isFakeAddress(state=initialIsFakeAddressState, action) {
+  if (['LOGOUT','ENTER_REGISTRATION_PAGE'].includes(action.type)) {
+      return initialIsFakeAddressState;
+    }
+  switch (action.type) {
+
+    case 'SET_IS_FAKE_ADDRESS':
+      console.log('__isFakeAddress state called with state: ', state, 'and action: ', action);
+      return action.bool;
+
+    default:
+      return state
+  }
+}
+
+export function _school(state=initialSchoolState, action) {
+  if (['LOGOUT','ENTER_REGISTRATION_PAGE'].includes(action.type)) {
+      return initialSchoolState;
+    }
+  switch (action.type) {
+
+    case 'SET_SCHOOL':
+      console.log('_school state called with state: ', state, 'and action: ', action);
+      return action.text;
+
+    default:
+      return state
+  }
+}
+
+export function _isSchoolEmpty(state=initialIsSchoolEmptyState, action) {
+  if (['LOGOUT','ENTER_REGISTRATION_PAGE'].includes(action.type)) {
+      return initialIsSchoolEmptyState;
+    }
+  switch (action.type) {
+
+    case 'SET_IS_SCHOOL_EMPTY':
+      console.log('_isSchoolEmpty state called with state: ', state, 'and action: ', action);
       return action.bool;
 
     default:

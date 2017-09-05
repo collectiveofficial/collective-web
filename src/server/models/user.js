@@ -1,5 +1,13 @@
-const Promise = require('bluebird');
+const dotenv = require('dotenv').config();
+const googleMapsClient = require('@google/maps').createClient({
+  key: process.env.GOOGLE_MAPS_API_KEY,
+  Promise, // 'Promise' is the native constructor.
+});
 const models = require('../../database/models/index');
+const groupUtil = require('./group');
+const dropoffUtil = require('./dropoff');
+const googleMapsUtils = require('./utils/google-maps-utils');
+const restrictedAddressUtils = require('./restricted-address');
 
 module.exports.checkIfUserIsFacebookAuth = function (email) {
   return models.User.findOne({
@@ -143,25 +151,53 @@ module.exports.checkIfFacebookUserFinishedSignUp = function (uid) {
   .catch(err => console.log(err));
 };
 
-module.exports.saveSubmittedUserInfo = function (user) {
-  models.User.update({
-    firstName: user.firstName,
-    lastName: user.lastName,
-    phoneNumber: user.phoneNumber,
-    birthday: user.birthday,
-    streetAddress: user.streetAddress,
-    aptSuite: user.aptSuite,
-    city: user.city,
-    state: user.state,
-    zipCode: user.zipCode,
-    fullAddress: user.aptSuite.length > 0 ? `${user.streetAddress}, ${user.aptSuite}, ${user.city}, ${user.state}, ${user.zipCode}`:`${user.streetAddress}, ${user.city}, ${user.state} ${user.zipCode}`,
-    hasUserFinishedSignUp: true,
-  }, {
-    where: {
-      firebaseUID: user.uid,
+module.exports.saveSubmittedUserInfo = async (user, restrictionType) => {
+  try {
+    const userGroupId = await groupUtil.findGroupIDbyName(user.school);
+    let isQualifiedForDelivery;
+    const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(userGroupId);
+    const unformattedAddressWithoutAptSuite = `${user.streetAddress}, ${user.city}, ${user.state} ${user.zipCode}`;
+    const distanceLimit = 5;
+    const googleMapsObj = await googleMapsUtils.findFormattedAddressLatLong(unformattedAddressWithoutAptSuite);
+    // need to check lat long with 5 mile
+    if (googleMapsObj.isValidAddress) {
+      const distanceObj = await googleMapsUtils.findDistance(deliveryOrigin, unformattedAddressWithoutAptSuite);
+      const restrictedAddressesLatLong = await restrictedAddressUtils.getRestrictedAddressLatLong(userGroupId);
+      const userLatLongString = googleMapsObj.latitude + googleMapsObj.longitude;
+      // need to check lat long with 5 mile
+      if (distanceObj.distanceFromUserAddressInMiles <= distanceLimit && restrictedAddressesLatLong[userLatLongString] !== restrictionType) {
+        isQualifiedForDelivery = true;
+      } else {
+        isQualifiedForDelivery = false;
+      }
+      await models.User.update({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phoneNumber: user.phoneNumber,
+        birthday: user.birthday,
+        streetAddress: user.streetAddress,
+        aptSuite: user.aptSuite,
+        city: user.city,
+        state: user.state,
+        zipCode: user.zipCode,
+        fullAddress: googleMapsObj.formattedAddress,
+        hasUserFinishedSignUp: true,
+        userGroupId,
+        isQualifiedForDelivery,
+        latitude: googleMapsObj.latitude,
+        longitude: googleMapsObj.longitude,
+      }, {
+        where: {
+          firebaseUID: user.uid,
+        },
+      });
+      return true;
+    } else {
+      return false;
     }
-  })
-  .catch(err => console.log(err));
+  } catch(err) {
+    console.log(err);
+  }
 };
 
 module.exports.findUserID = async (firebaseUID) => {
@@ -171,4 +207,151 @@ module.exports.findUserID = async (firebaseUID) => {
     },
   });
   return findUserIDResult.dataValues.id;
+};
+
+module.exports.findUserInfoByID = async (id) => {
+  const user = await models.User.findOne({
+    where: {
+      id,
+    },
+  });
+  return {
+    firstName: user.dataValues.firstName,
+    lastName: user.dataValues.lastName,
+    email: user.dataValues.email,
+    phoneNumber: user.dataValues.phoneNumber,
+  };
+};
+
+module.exports.getUniqueUsersByGroupID = async (userGroupId) => {
+  let usersObjByIds = {};
+  const usersByGroupID = await models.User.findAll({
+    where: {
+      userGroupId,
+    },
+  });
+  for (let i = 0; i < usersByGroupID.length; i++) {
+    usersObjByIds[usersByGroupID[i].dataValues.id] = {
+      lastName: usersByGroupID[i].dataValues.lastName,
+      firstName: usersByGroupID[i].dataValues.firstName,
+      email: usersByGroupID[i].dataValues.email,
+    };
+  }
+  return usersObjByIds;
+};
+
+module.exports.updateAllUsersAddressLatLong = async () => {
+  try {
+    const firstUser = await models.User.findOne({
+      where: {
+        id: 1,
+      },
+    });
+    if (firstUser !== null) {
+      if (firstUser.dataValues.latitude === null) {
+        const users = await models.User.findAll({
+          where: {
+          },
+        });
+        for (let i = 0; i < users.length; i++) {
+          if (users[i].dataValues.fullAddress !== null) {
+            const unformattedAddressWithoutAptSuite = `${users[i].dataValues.streetAddress},
+            ${users[i].dataValues.city}, ${users[i].dataValues.state} ${users[i].dataValues.zipCode}`;
+            const googleMapsObj = await googleMapsUtils.findFormattedAddressLatLong(unformattedAddressWithoutAptSuite);
+            if (googleMapsObj.isValidAddress) {
+              await models.User.update({
+                fullAddress: googleMapsObj.formattedAddress,
+                latitude: googleMapsObj.latitude,
+                longitude: googleMapsObj.longitude,
+              }, {
+                where: {
+                  id: users[i].dataValues.id,
+                },
+              });
+            }
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports.updateIsQualifiedForDelivery = async (groupID, restrictionType) => {
+  try {
+    const users = await models.User.findAll({
+      where: {
+        userGroupId: groupID,
+      },
+    });
+    let isQualifiedForDelivery;
+    for (let i = 0; i < users.length; i++) {
+      if (users[i].dataValues.fullAddress !== null) {
+        const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(groupID);
+        const userAddress = users[i].dataValues.fullAddress;
+        const distanceLimit = 5;
+        const distanceObj = await googleMapsUtils.findDistance(deliveryOrigin, userAddress);
+        const restrictedAddressesLatLong = await restrictedAddressUtils.getRestrictedAddressLatLong(groupID);
+        if (distanceObj.isValidAddress) {
+          const userLatLongString = users[i].dataValues.latitude + users[i].dataValues.longitude;
+          // need to check lat long with 5 mile
+          if (distanceObj.distanceFromUserAddressInMiles <= distanceLimit && restrictedAddressesLatLong[userLatLongString] !== restrictionType) {
+            isQualifiedForDelivery = true;
+          } else {
+            isQualifiedForDelivery = false;
+          }
+          await models.User.update({
+            isQualifiedForDelivery,
+          }, {
+            where: {
+              id: users[i].dataValues.id,
+            },
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports.checkIfUserEligibleForDelivery = async (firebaseUID) => {
+  let isUserEligibleForDelivery = false;
+  const user = await models.User.findOne({
+    where: {
+      firebaseUID,
+    }
+  });
+  const userFormattedAddress = user.dataValues.fullAddress;
+  const groupID = user.dataValues.userGroupId;
+  const userLatLongString = user.dataValues.latitude + user.dataValues.longitude;
+  const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(groupID);
+  const distanceObj = await googleMapsUtils.findDistance(deliveryOrigin, userFormattedAddress);
+  let isAddressBeyondDeliveryReach;
+  if (distanceObj.distanceFromUserAddressInMiles > 5) {
+    isAddressBeyondDeliveryReach = true;
+  } else {
+    isAddressBeyondDeliveryReach = false;
+  }
+  const isAddressDorm = await restrictedAddressUtils.checkIfAddressIsDorm(userLatLongString, groupID);
+  if (!isAddressBeyondDeliveryReach && !isAddressDorm) {
+    isUserEligibleForDelivery = true;
+  }
+  const eligibilityObj = {
+    isUserEligibleForDelivery,
+    isAddressBeyondDeliveryReach,
+    isAddressDorm,
+  };
+  return eligibilityObj;
+};
+
+module.exports.findFormattedAddress = async (firebaseUID) => {
+  const user = await models.User.findOne({
+    where: {
+      firebaseUID,
+    },
+  });
+  const formattedAddress = user.dataValues.fullAddress;
+  return formattedAddress;
 };
