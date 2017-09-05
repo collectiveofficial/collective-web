@@ -73,7 +73,7 @@ class Payment extends React.Component {
         if (this.props.cook === 0) {
           this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage('You would need to purchase at least 1 cooking package for delivery'));
         } else {
-          this.props.dispatch(paymentActionCreators.setUserWantsDelivery(!this.props.userWantsDelivery));
+          await this.props.dispatch(paymentActionCreators.setUserWantsDelivery(!this.props.userWantsDelivery));
           if (this.props.userWantsDelivery) {
             this.props.dispatch(paymentActionCreators.setDeliveryPriceImpact(3));
             this.props.dispatch(paymentActionCreators.setPrice(this.props.price + 3));
