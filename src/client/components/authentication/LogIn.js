@@ -119,7 +119,7 @@ class Login extends React.Component {
       }
       const routeToRegisterForm = doesUserEmailExist && !hasUserFinishedSignUp && !isUserFacebookAuth;
       if (routeToRegisterForm) {
-        const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+        const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
         this.props.dispatch(appActionCreators.setFirebaseAccessToken(firebaseAccessToken));
         this.props.dispatch(appActionCreators.setUserWantsEmailSignup(true));
       }

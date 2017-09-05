@@ -85,7 +85,7 @@ class App extends Component {
     this.firebaseListener = firebaseAuth().onAuthStateChanged(async (user) => {
       if (user) { // is signed in
         await console.log('Logged in');
-        const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+        const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
         this.props.dispatch(appActionCreators.setFirebaseAccessToken(firebaseAccessToken));
         const response = await fetch('/auth/check', {
           method: 'POST',
@@ -108,7 +108,7 @@ class App extends Component {
       } else { // isn't signed in
         this.props.dispatch(appActionCreators.setUserAuthenticated(false));
         this.props.dispatch(appActionCreators.setLoading(false));
-        this.props.dispatch(appActionCreators.setUserAuthorized(false))
+        this.props.dispatch(appActionCreators.setUserAuthorized(false));
       }
     });
   }
@@ -133,7 +133,7 @@ class App extends Component {
     await provider.addScope('email, public_profile, user_friends');
     const result = await firebaseAuth().signInWithPopup(provider);
     // const firebaseAccessToken = result.user.ie;
-    const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+    const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
     // await this.setState({ firebaseAccessToken });
     this.props.dispatch(appActionCreators.setFirebaseAccessToken(firebaseAccessToken));
     const token = result.credential.accessToken;
