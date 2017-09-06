@@ -4,6 +4,8 @@ import {
   Link,
   Redirect,
 } from 'react-router-dom';
+import { connect } from 'react-redux';
+import * as paymentActionCreators from '../../action-creators/paymentActions'
 import s from './Home.css';
 import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label, Message, Grid } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
@@ -14,21 +16,6 @@ import PaymentConfirmation from './PaymentConfirmation.js';
 class Payment extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      hasAllergies: false,
-      modalIsOpen: false,
-      price: 0,
-      paymentErrorMessage: '',
-      dorm: 0,
-      cook: 0,
-      hasPaymentCompleted: false,
-      votesSaved: false,
-      email: '',
-      userWantsDelivery: false,
-      errorMessage: '',
-      deliveryPriceImpact: 0,
-      allergiesList: [],
-    };
     this.handleAllergies = this.handleAllergies.bind(this);
     this.handleDorm = this.handleDorm.bind(this);
     this.handleCook = this.handleCook.bind(this);
@@ -40,64 +27,70 @@ class Payment extends React.Component {
 
   async componentWillMount() {
     const email = await firebaseAuth().currentUser.email;
-    await this.setState({ email });
+    console.log('Payment is mounting');
+    await this.props.dispatch(paymentActionCreators.enterPaymentPage());
+    this.props.dispatch(paymentActionCreators.setPaymentEmail(email));
   }
 
   async handleAllergies({ checked }) {
-    await this.setState({ hasAllergies: !this.state.hasAllergies });
-    if (this.state.hasAllergies === false) {
-      await this.setState({ allergiesList: [] });
+    this.props.dispatch(paymentActionCreators.setHasAllegies(!this.props.hasAllergies));
+    if (this.props.hasAllergies === false) {
+      this.props.dispatch(paymentActionCreators.setAllergiesList([]));
     }
   }
 
-  async handleDorm(e, { value }) {
-    await this.setState({ errorMessage: '' });
-    await this.setState({ dorm: value });
-    const newPrice = ((value * 6) + (this.state.cook * 11)) + this.state.deliveryPriceImpact;
-    await this.setState({ price: newPrice });
+  handleDorm(e, { value }) {
+    this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage(''));
+    this.props.dispatch(paymentActionCreators.setDorm(value));
+    let newPrice = this.props.price;
+    newPrice = ((value * 6) + (this.props.cook * 11)) + this.props.deliveryPriceImpact;
+    this.props.dispatch(paymentActionCreators.setPrice(newPrice));
   }
 
-  async handleCook(e, { value }) {
-    await this.setState({ errorMessage: '' });
-    await this.setState({ cook: value });
-    const newPrice = ((this.state.dorm * 6) + (value * 11)) + this.state.deliveryPriceImpact;
-    await this.setState({ price: newPrice });
+  handleCook(e, { value }) {
+    this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage(''));
+    this.props.dispatch(paymentActionCreators.setCook(value));
+    let newPrice = this.props.price;
+    newPrice = ((this.props.dorm * 6) + (value * 11)) + this.props.deliveryPriceImpact;
+    this.props.dispatch(paymentActionCreators.setPrice(newPrice));
   }
 
   async handleDelivery() {
     if (this.props.availableDeliveriesLeft === 0) {
-      await this.setState({ errorMessage: 'There are no more available deliveries left for this round of bulk buy. We apologize for any inconvenience. We promise we\'ll be back with more deliveries in the future.' });
+      this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage('There are no more available deliveries left for this round of bulk buy. We apologize for any inconvenience. We promise we\'ll be back with more deliveries in the future.'));
     } else {
       if (!this.props.deliveryEligibilityObj.isUserEligibleForDelivery) {
         if (this.props.deliveryEligibilityObj.isAddressDorm) {
-          await this.setState({ errorMessage: 'It looks like your address is a dorm address. Our pickup location is not far away.' });
+          this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage('It looks like your address is a dorm address. Our pickup location is not far away.'));
         }
         if (this.props.deliveryEligibilityObj.isAddressBeyondDeliveryReach) {
-          await this.setState({ errorMessage: 'It looks like your address is beyond our 5 mile delivery boundaries. We will try our best to extend our delivery boundaries in our next bulk buy. Thank you for your patience.' });
+          this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage('It looks like your address is beyond our 5 mile delivery boundaries. We will try our best to extend our delivery boundaries in our next bulk buy. Thank you for your patience.'));
         }
       } else {
-        if (this.state.cook === 0) {
-          await this.setState({ errorMessage: 'You would need to purchase at least 1 cooking package for delivery' });
+        if (this.props.cook === 0) {
+          this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage('You would need to purchase at least 1 cooking package for delivery'));
         } else {
-          await this.setState({ userWantsDelivery: !this.state.userWantsDelivery });
-          if (this.state.userWantsDelivery) {
-            await this.setState({ deliveryPriceImpact: 3 });
-            await this.setState({ price: this.state.price + 3 });
+          await this.props.dispatch(paymentActionCreators.setUserWantsDelivery(!this.props.userWantsDelivery));
+          if (this.props.userWantsDelivery) {
+            this.props.dispatch(paymentActionCreators.setDeliveryPriceImpact(3));
+            this.props.dispatch(paymentActionCreators.setPrice(this.props.price + 3));
+
           } else {
-            this.setState({ deliveryPriceImpact: 0 });
-            await this.setState({ price: this.state.price - 3 });
+            this.props.dispatch(paymentActionCreators.setDeliveryPriceImpact(0));
+            this.props.dispatch(paymentActionCreators.setPrice(this.props.price - 3));
           }
         }
       }
     }
   }
 
+
   async submitInitialVotes() {
     const foodObj = {};
     for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
       foodObj[this.props.ballotsAndVotes[i].name] = {
         isCurrent: this.props.ballotsAndVotes[i].isCurrent,
-        isAllergic: this.state.allergiesList.indexOf(this.props.ballotsAndVotes[i].name) > -1 ? true : false,
+        isAllergic: this.props.allergiesList.indexOf(this.props.ballotsAndVotes[i].name) > -1 ? true : false,
       };
     }
     // save votes to DB and allow to continue to payment
@@ -114,22 +107,22 @@ class Payment extends React.Component {
     });
     const responseData = await response.json();
     if (responseData.votesSaved) {
-      this.setState({ votesSaved: true });
+      this.props.dispatch(paymentActionCreators.setVotesSaved(true));
     } else {
-      this.setState({ votesSaved: false });
+      this.props.dispatch(paymentActionCreators.setVotesSaved(false));
     }
   }
 
   async handlePayment() {
-    await this.setState({ paymentErrorMessage: '' });
-    await this.setState({ errorMessage: '' });
-    if (this.state.price === 0) {
-      await this.setState({ paymentErrorMessage: 'Please specify an amount for the packages.' });
+    this.props.dispatch(paymentActionCreators.setPaymentErrorMessage(''));
+    this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage(''));
+    if (this.props.price === 0) {
+      this.props.dispatch(paymentActionCreators.setPaymentErrorMessage('Please specify an amount for the packages.'));
     }
   }
 
   async onToken(token) {
-    await this.setState({ hasPaymentCompleted: false });
+    this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(false));
     const submitPaymentResult = await fetch('/confirm-payment', {
       method: 'POST',
       headers: {
@@ -139,40 +132,42 @@ class Payment extends React.Component {
       body: JSON.stringify({
         firebaseAccessToken: this.props.firebaseAccessToken,
         token,
-        email: this.state.email,
-        dormPackagesOrdered: this.state.dorm,
-        cookingPackagesOrdered: this.state.cook,
-        userWantsDelivery: this.state.userWantsDelivery,
-        hasAllergies: this.state.hasAllergies,
+        email: this.props.paymentEmail,
+        dormPackagesOrdered: this.props.dorm,
+        cookingPackagesOrdered: this.props.cook,
+        userWantsDelivery: this.props.userWantsDelivery,
+        hasAllergies: this.props.hasAllergies,
       }),
     });
+
     const submitPaymentResultData = await submitPaymentResult.json();
-    await this.setState({ errorMessage: submitPaymentResultData.errorMessage });
+    this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage(submitPaymentResultData.errorMessage));
     // handle for delivery error message from server (must order at least 1 cooking package and make sure count <= 50)
-    if (this.state.errorMessage.length === 0) {
+    if (this.props.serverPaymentErrorMessage.length === 0) {
       if (submitPaymentResultData.paymentCompleted) {
         await this.submitInitialVotes();
-        if (this.state.votesSaved) {
-          this.setState({ hasPaymentCompleted: true });
+        if (this.props.votesSaved) {
+          this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(true));
         } else {
           alert('Voting failed. Please contact Collective to resolve this issue. We appreciate your patience.');
         }
       } else {
         alert('Payment failed. Please contact Collective to resolve this issue. We appreciate your patience.');
-        this.setState({ hasPaymentCompleted: false });
+        this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(false));
       }
     }
   }
 
   async handleAllergiesChange(e, { value, checked }) {
-    const allergiesList = this.state.allergiesList.slice('');
+    const allergiesList = this.props.allergiesList.slice('');
     if (checked) {
       allergiesList.push(value);
     } else {
       const allergiesIndex = allergiesList.indexOf(value);
       allergiesList.splice(allergiesIndex, 1);
     }
-    await this.setState({ allergiesList });
+
+    this.props.dispatch(paymentActionCreators.setAllergiesList(allergiesList));
   }
 
   render() {
@@ -203,7 +198,7 @@ class Payment extends React.Component {
       { text: 7, value: 7 },
     ];
     const cookNumOptions = [
-      { text: 0, value: 0, disabled: this.state.userWantsDelivery },
+      { text: 0, value: 0, disabled: this.props.userWantsDelivery },
       { text: 1, value: 1 },
       { text: 2, value: 2 },
       { text: 3, value: 3 },
@@ -217,8 +212,8 @@ class Payment extends React.Component {
       <div>
         <div className={s.cont}>
           <div className={s.ballot}>
-            {this.state.hasPaymentCompleted ?
-              <PaymentConfirmation email={this.state.email} />
+            {this.props.hasPaymentCompleted ?
+              <PaymentConfirmation email={this.props.paymentEmail} />
               :
               <Card>
                 <Card.Content>
@@ -277,7 +272,7 @@ class Payment extends React.Component {
                   </Feed.Event>
                   <Segment compact>
                     <Label color='red' floating>New!</Label>
-                    <Checkbox inline checked={this.state.userWantsDelivery} onClick={this.handleDelivery} />
+                    <Checkbox inline checked={this.props.userWantsDelivery} onClick={this.handleDelivery} />
                     <Modal trigger={<a className={s.mode}>Delivery ($3)</a>} basic size='small' closeIcon="close">
                     <Modal.Header>Introducing Delivery</Modal.Header>
                     <Modal.Content image>
@@ -310,7 +305,7 @@ class Payment extends React.Component {
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
-                        Total = ${this.state.price} <Modal trigger={<Icon link size="large" name='help circle' />} basic size='small' closeIcon='close'>
+                        Total = ${this.props.price} <Modal trigger={<Icon link size="large" name='help circle' />} basic size='small' closeIcon='close'>
                         <Modal.Content image>
                           <Modal.Description>
                             <br /><br />
@@ -326,7 +321,7 @@ class Payment extends React.Component {
                     </Feed.Summary>
                   </Feed.Content>
                 </Feed.Event>
-                <Checkbox inline checked={this.state.hasAllergies} onClick={this.handleAllergies} />
+                <Checkbox inline checked={this.props.hasAllergies} onClick={this.handleAllergies} />
                 <Modal trigger={<a className={s.mode}>I am allergic to one or more of the produces from this bulk buy</a>} basic size='small' closeIcon="close">
                 <Modal.Header>Safety Is Our Top Priority</Modal.Header>
                 <Modal.Content image>
@@ -341,7 +336,7 @@ class Payment extends React.Component {
                     </Modal.Description>
                   </Modal.Content>
                 </Modal>
-                {this.state.hasAllergies ?
+                {this.props.hasAllergies ?
                   <div style={styles.allergiesBox}>
                     <br />
                     <p>Which of these produces are you allergic to?</p>
@@ -367,17 +362,17 @@ class Payment extends React.Component {
                   trigger={<Feed.Event onClick={this.handlePayment}>
                   <Feed.Content>
                     <Feed.Summary>
-                      {this.state.price > 0 ? (
+                      {this.props.price > 0 ? (
                         <StripeCheckout
                           // style={styles.stripe}
                           name="Best Food Forward/Collective" // the pop-in header title
                           description="Easy healthy eating" // the pop-in header subtitle
                           ComponentClass="div"
                           // panelLabel="Give Money" prepended to the amount in the bottom pay button
-                          amount={this.state.price * 100} // cents
+                          amount={this.props.price * 100} // cents
                           currency="USD"
                           stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
-                          email={this.state.email}
+                          email={this.props.paymentEmail}
                           // Note: Enabling either address option will give the user the ability to
                           // fill out both. Addresses are sent as a second parameter in the token callback.
                           shippingAddress
@@ -404,14 +399,14 @@ class Payment extends React.Component {
                     </Feed.Content>
                   </Feed.Event>
                 }
-                content={this.state.paymentErrorMessage}
-                open={this.state.paymentErrorMessage.length > 0}
+                content={this.props.paymentErrorMessage}
+                open={this.props.paymentErrorMessage.length > 0}
                 offset={20}
                 position="right center"
               />
-              {this.state.errorMessage.length > 0 ?
+              {this.props.serverPaymentErrorMessage.length > 0 ?
                 <Message warning>
-                  <p>{this.state.errorMessage}</p>
+                  <p>{this.props.serverPaymentErrorMessage}</p>
                 </Message>
                 :
                 <div></div>
@@ -428,4 +423,33 @@ class Payment extends React.Component {
   }
 }
 
-export default Payment;
+
+const mapStateToProps = (state, props) => {
+  return {
+    // App Reducers
+    ballotsAndVotes: state.appReducer._ballotsAndVotes,
+    firebaseAccessToken: state.appReducer._firebaseAccessToken,
+    availableDeliveriesLeft: state.appReducer._availableDeliveriesLeft,
+    deliveryEligibilityObj: state.appReducer._deliveryEligibilityObj,
+    // Payment reducers
+    modalIsOpen: state.paymentReducer._modalIsOpenState,
+    price: state.paymentReducer._price,
+    paymentErrorMessage: state.paymentReducer._paymentErrorMessage,
+    dorm: state.paymentReducer._dorm,
+    cook: state.paymentReducer._cook,
+    hasPaymentCompleted: state.paymentReducer._hasPaymentCompleted,
+    votesSaved: state.paymentReducer._votesSaved,
+    hasAllergies: state.paymentReducer._hasAllergies,
+    paymentEmail: state.paymentReducer._paymentEmail,
+    userWantsDelivery: state.paymentReducer._userWantsDelivery,
+    serverPaymentErrorMessage: state.paymentReducer._serverPaymentErrorMessage,
+    deliveryPriceImpact: state.paymentReducer._deliveryPriceImpact,
+    allergiesList: state.paymentReducer._allergiesList
+  }
+};
+
+
+
+const ConnectedPayment = connect(mapStateToProps)(Payment);
+
+export default ConnectedPayment;

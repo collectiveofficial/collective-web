@@ -8,8 +8,6 @@ import s from './community.css';
 class community extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
   }
 
   render() {
