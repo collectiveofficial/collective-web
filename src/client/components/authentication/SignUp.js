@@ -149,7 +149,7 @@ class SignUp extends React.Component {
         }
         const isValidLogin = !(this.state.isInvalidEmail || this.state.isEmailAlreadyInUse);
         if (isValidLogin && this.state.isPasswordValidated) {
-          firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+          firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(true);
           await this.props.setFirebaseAccessTokenState(firebaseAccessToken);
           const response = await fetch('/auth/signup/email-signup/save', {
             method: 'POST',

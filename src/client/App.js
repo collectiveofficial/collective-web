@@ -92,7 +92,7 @@ class App extends Component {
     this.firebaseListener = firebaseAuth().onAuthStateChanged(async (user) => {
       if (user) { // is signed in
         await console.log('Logged in');
-        const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+        const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(true);
         await this.setState({ firebaseAccessToken });
         const response = await fetch('/auth/check', {
           method: 'POST',
@@ -154,7 +154,7 @@ class App extends Component {
     await provider.addScope('email, public_profile, user_friends');
     const result = await firebaseAuth().signInWithPopup(provider);
     // const firebaseAccessToken = result.user.ie;
-    const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
+    const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(true);
     await this.setState({ firebaseAccessToken });
     const token = result.credential.accessToken;
     const response = await fetch('/auth/facebook', {

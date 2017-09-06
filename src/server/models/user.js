@@ -201,44 +201,56 @@ module.exports.saveSubmittedUserInfo = async (user, restrictionType) => {
 };
 
 module.exports.findUserID = async (firebaseUID) => {
-  const findUserIDResult = await models.User.findOne({
-    where: {
-      firebaseUID,
-    },
-  });
-  return findUserIDResult.dataValues.id;
+  try {
+    const findUserIDResult = await models.User.findOne({
+      where: {
+        firebaseUID,
+      },
+    });
+    return findUserIDResult.dataValues.id;
+  } catch(err) {
+    console.log(err);
+  }
 };
 
 module.exports.findUserInfoByID = async (id) => {
-  const user = await models.User.findOne({
-    where: {
-      id,
-    },
-  });
-  return {
-    firstName: user.dataValues.firstName,
-    lastName: user.dataValues.lastName,
-    email: user.dataValues.email,
-    phoneNumber: user.dataValues.phoneNumber,
-    birthday: user.dataValues.birthday,
-  };
+  try {
+    const user = await models.User.findOne({
+      where: {
+        id,
+      },
+    });
+    return {
+      firstName: user.dataValues.firstName,
+      lastName: user.dataValues.lastName,
+      email: user.dataValues.email,
+      phoneNumber: user.dataValues.phoneNumber,
+      birthday: user.dataValues.birthday,
+    };
+  } catch(err) {
+    console.log(err);
+  }
 };
 
 module.exports.getUniqueUsersByGroupID = async (userGroupId) => {
-  let usersObjByIds = {};
-  const usersByGroupID = await models.User.findAll({
-    where: {
-      userGroupId,
-    },
-  });
-  for (let i = 0; i < usersByGroupID.length; i++) {
-    usersObjByIds[usersByGroupID[i].dataValues.id] = {
-      lastName: usersByGroupID[i].dataValues.lastName,
-      firstName: usersByGroupID[i].dataValues.firstName,
-      email: usersByGroupID[i].dataValues.email,
-    };
+  try {
+    let usersObjByIds = {};
+    const usersByGroupID = await models.User.findAll({
+      where: {
+        userGroupId,
+      },
+    });
+    for (let i = 0; i < usersByGroupID.length; i++) {
+      usersObjByIds[usersByGroupID[i].dataValues.id] = {
+        lastName: usersByGroupID[i].dataValues.lastName,
+        firstName: usersByGroupID[i].dataValues.firstName,
+        email: usersByGroupID[i].dataValues.email,
+      };
+    }
+    return usersObjByIds;
+  } catch(err) {
+    console.log(err);
   }
-  return usersObjByIds;
 };
 
 module.exports.updateAllUsersAddressLatLong = async () => {
@@ -318,41 +330,49 @@ module.exports.updateIsQualifiedForDelivery = async (groupID, restrictionType) =
 };
 
 module.exports.checkIfUserEligibleForDelivery = async (firebaseUID) => {
-  let isUserEligibleForDelivery = false;
-  const user = await models.User.findOne({
-    where: {
-      firebaseUID,
+  try {
+    let isUserEligibleForDelivery = false;
+    const user = await models.User.findOne({
+      where: {
+        firebaseUID,
+      }
+    });
+    const userFormattedAddress = user.dataValues.fullAddress;
+    const groupID = user.dataValues.userGroupId;
+    const userLatLongString = user.dataValues.latitude + user.dataValues.longitude;
+    const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(groupID);
+    const distanceObj = await googleMapsUtils.findDistance(deliveryOrigin, userFormattedAddress);
+    let isAddressBeyondDeliveryReach;
+    if (distanceObj.distanceFromUserAddressInMiles > 5) {
+      isAddressBeyondDeliveryReach = true;
+    } else {
+      isAddressBeyondDeliveryReach = false;
     }
-  });
-  const userFormattedAddress = user.dataValues.fullAddress;
-  const groupID = user.dataValues.userGroupId;
-  const userLatLongString = user.dataValues.latitude + user.dataValues.longitude;
-  const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(groupID);
-  const distanceObj = await googleMapsUtils.findDistance(deliveryOrigin, userFormattedAddress);
-  let isAddressBeyondDeliveryReach;
-  if (distanceObj.distanceFromUserAddressInMiles > 5) {
-    isAddressBeyondDeliveryReach = true;
-  } else {
-    isAddressBeyondDeliveryReach = false;
+    const isAddressDorm = await restrictedAddressUtils.checkIfAddressIsDorm(userLatLongString, groupID);
+    if (!isAddressBeyondDeliveryReach && !isAddressDorm) {
+      isUserEligibleForDelivery = true;
+    }
+    const eligibilityObj = {
+      isUserEligibleForDelivery,
+      isAddressBeyondDeliveryReach,
+      isAddressDorm,
+    };
+    return eligibilityObj;
+  } catch(err) {
+    console.log(err);
   }
-  const isAddressDorm = await restrictedAddressUtils.checkIfAddressIsDorm(userLatLongString, groupID);
-  if (!isAddressBeyondDeliveryReach && !isAddressDorm) {
-    isUserEligibleForDelivery = true;
-  }
-  const eligibilityObj = {
-    isUserEligibleForDelivery,
-    isAddressBeyondDeliveryReach,
-    isAddressDorm,
-  };
-  return eligibilityObj;
 };
 
 module.exports.findFormattedAddress = async (firebaseUID) => {
-  const user = await models.User.findOne({
-    where: {
-      firebaseUID,
-    },
-  });
-  const formattedAddress = user.dataValues.fullAddress;
-  return formattedAddress;
+  try {
+    const user = await models.User.findOne({
+      where: {
+        firebaseUID,
+      },
+    });
+    const formattedAddress = user.dataValues.fullAddress;
+    return formattedAddress;
+  } catch(err) {
+    console.log(err);
+  }
 };

@@ -174,9 +174,9 @@ module.exports.getUsersWhoHaveNotPaid = async (dropoffID, groupID) => {
   return usersWhoHaveNotPaid;
 };
 
-module.exports.getUserInfoForPickup = async (dropoffID, userID) => {
+module.exports.getUserInfoForPickup = async (dropoffID, firebaseUID) => {
   try {
-    // const userID = await userUtil.findUserID(firebaseUID);
+    const userID = await userUtil.findUserID(firebaseUID);
     const transaction = await models.Transaction.findOne({
       where: {
         dropoffID,
@@ -202,12 +202,36 @@ module.exports.getUserInfoForPickup = async (dropoffID, userID) => {
 };
 
 module.exports.recordUserPickup = async (id) => {
-  await models.Transaction.update({
-    hasUserPickedUp: true,
-    pickupTime: moment.tz(new Date(), 'America/New_York').format(),
-  }, {
-    where: {
-      id,
-    },
-  });
+  try {
+    await models.Transaction.update({
+      hasUserPickedUp: true,
+      pickupTime: moment.tz(new Date(), 'America/New_York').format(),
+    }, {
+      where: {
+        id,
+      },
+    });
+  } catch(err) {
+    console.log(err);
+  }
+};
+
+module.exports.findEmailReceiptInfo = async (dropoffID, firebaseUID) => {
+  try {
+    const userID = await userUtil.findUserID(firebaseUID);
+    const userObj = await userUtil.findUserInfoByID(userID);
+    const dropoffObj = await dropoffUtil.findDateTimesByID(dropoffID);
+    const intendedShipDate = moment.tz(dropoffObj.intendedShipDate, 'America/New_York').format('MM-DD-YYYY');
+    const intendedPickupTimeStart = moment.tz(dropoffObj.intendedPickupTimeStart, 'America/New_York').format('HH:MM A');
+    const intendedPickupTimeEnd = moment.tz(dropoffObj.intendedShipDate, 'America/New_York').format('HH:MM A');
+    const emailReceiptInfo = {
+      firstName: userObj.firstName,
+      intendedShipDate,
+      intendedPickupTimeStart,
+      intendedPickupTimeEnd,
+    };
+    return emailReceiptInfo;
+  } catch(err) {
+    console.log(err);
+  }
 };

@@ -182,14 +182,14 @@ const initializeData = async () => {
         null,
         process.env.NODE_ENV === 'production' ? JSON.parse(process.env.GOOGLE_SERVICE_PRIVATE_KEY) : process.env.GOOGLE_SERVICE_PRIVATE_KEY,
         ['https://mail.google.com/'], // an array of auth scopes
-        'johnny@collectivefoods.com'
+        'support@collectivefoods.com'
       );
       await jwtClient.authorize(async (err, token) => {
         if (err) {
           console.log(err);
           return;
         }
-
+        console.log('\n\ntoken: ', token);
         const emailBody = 'Hi Johnny, here\'s the QR';
 
         const transporter = await nodemailer.createTransport({
@@ -198,8 +198,7 @@ const initializeData = async () => {
           secure: true,
           auth: {
             type: 'OAuth2',
-            // user: 'johnny.chen54@gmail.com',
-            user: 'johnny@collectivefoods.com',
+            user: 'support@collectivefoods.com',
             serviceClient: process.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_ID,
             privateKey: process.env.NODE_ENV === 'production' ? JSON.parse(process.env.GOOGLE_SERVICE_PRIVATE_KEY) : process.env.GOOGLE_SERVICE_PRIVATE_KEY,
             accessToken: token.access_token,
@@ -216,7 +215,7 @@ const initializeData = async () => {
         });
         const userEmail = 'johnny.chen54@gmail.com';
         const message = {
-          from: 'johnny@collectivefoods.com',
+          from: 'support@collectivefoods.com',
           to: userEmail,
           subject: 'Your Collective Order Confirmation and Receipt',
           text: emailBody,
@@ -228,13 +227,11 @@ const initializeData = async () => {
           //         `<Grid.Row stretched>` +
           //         `</Grid.Row>` +
           //       `</Grid>`,
-          // html: 'Embedded image: <img src="cid:johnny.chen54@gmail.com"/>',
           attachments: [{
             path: qrFile,
-            // cid: 'johnny.chen54@gmail.com', //same cid value as in the html img src
           }],
         };
-        await transporter.sendMail(message);
+        // await transporter.sendMail(message);
       });
     } catch (err) {
       console.log(err);
@@ -468,95 +465,143 @@ module.exports = {
   },
   savePaymentVotes: {
     async post(req, res) {
-      console.log(req.body);
-      const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
-      let uid = decodedToken.uid;
-      req.body.uid = uid;
-      // TODO: dynamic dropoffID
-      const dropoffID = 2;
-      // declare variable called errorMessage
-      let errorMessage = '';
-      const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(dropoffID);
-      // TODO: dynamic delivery limit
-      // declare variable to keep track of avaiable deliveries left
-      const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
-      const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(req.body.uid);
-      if (req.body.userWantsDelivery && !deliveryEligibilityObj.isUserEligibleForDelivery) {
-        if (deliveryEligibilityObj.isAddressDorm) {
-          errorMessage = 'It looks like your address is a dorm address. Our pickup location is not far away.';
-        }
-        if (deliveryEligibilityObj.isAddressBeyondDeliveryReach) {
-          errorMessage = 'It looks like your address is beyond our 5 mile delivery boundaries. We will try our best to extend our delivery boundaries in our next bulk buy. Thank you for your patience.';
-        }
-        res.json({ errorMessage, availableDeliveriesLeft });
-      }
-      // if user wants delivery and cooking packages ordered is greater than 0
-      if (req.body.userWantsDelivery && req.body.cookingPackagesOrdered > 0) {
-        // if available deliveries left is equal to 0
-        if (availableDeliveriesLeft === 0) {
-          // assign error message that tells client there are no more available deliveries
-          errorMessage = 'There are no more available deliveries left for this round of bulk buy. We apologize for any inconvenience. We promise we\'ll be back with more deliveries in the future.';
-          // respond back with the error message and avaiable deliveries left
+      try {
+        const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+        let uid = decodedToken.uid;
+        req.body.uid = uid;
+        // TODO: dynamic dropoffID
+        const dropoffID = 2;
+        // declare variable called errorMessage
+        let errorMessage = '';
+        const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(dropoffID);
+        // TODO: dynamic delivery limit
+        // declare variable to keep track of avaiable deliveries left
+        const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
+        const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(req.body.uid);
+        if (req.body.userWantsDelivery && !deliveryEligibilityObj.isUserEligibleForDelivery) {
+          if (deliveryEligibilityObj.isAddressDorm) {
+            errorMessage = 'It looks like your address is a dorm address. Our pickup location is not far away.';
+          }
+          if (deliveryEligibilityObj.isAddressBeyondDeliveryReach) {
+            errorMessage = 'It looks like your address is beyond our 5 mile delivery boundaries. We will try our best to extend our delivery boundaries in our next bulk buy. Thank you for your patience.';
+          }
           res.json({ errorMessage, availableDeliveriesLeft });
         }
-      }
-
-      // if user wants delivery and cooking packages ordered is 0
-      if (req.body.userWantsDelivery && req.body.cookingPackagesOrdered === 0) {
-        errorMessage = 'You would need to purchase at least 1 cooking package for delivery';
-        res.json({ errorMessage, availableDeliveriesLeft });
-      }
-
-      const dormPackagesTotalDollarAmount = req.body.dormPackagesOrdered * 6;
-      const cookingPackagesTotalDollarAmount = req.body.cookingPackagesOrdered * 11;
-      req.body.cookingPackagesTotalDollarAmount = cookingPackagesTotalDollarAmount;
-      req.body.deliveryFee = req.body.userWantsDelivery ? 3 : 0;
-      const totalDollarAmount = dormPackagesTotalDollarAmount + cookingPackagesTotalDollarAmount + req.body.deliveryFee;
-      req.body.totalDollarAmount = totalDollarAmount;
-      const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, req.body.uid);
-      const qrCode = await QRCode.toFile(__dirname + `/../adminData/qr.png`, JSON.stringify(userInfoForPickup), (err) => {
-        console.log(err);
-      });
-      const dormPackageEmailDescription = req.body.dormPackagesOrdered > 0 ? `${req.body.dormPackagesOrdered} x Dorm Package${req.body.dormPackagesOrdered < 2 ? '' : 's'} $${dormPackagesTotalDollarAmount}` : '';
-      const cookingPackageEmailDescription = req.body.cookingPackagesOrdered > 0 ? `${req.body.cookingPackagesOrdered} x Cooking Package${req.body.cookingPackagesOrdered < 2 ? '' : 's'} $${cookingPackagesTotalDollarAmount}` : '';
-      const deliveryAddress = await userUtil.findFormattedAddress(req.body.uid);
-      const deliveryEmailDescription = req.body.userWantsDelivery ? `Delivery $${req.body.deliveryFee}\nDelivery Address:\n${deliveryAddress}\n(Dropoff at door to apartment/house)` : '';
-      const packageConditionalNextLine = req.body.dormPackagesOrdered > 0 && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
-      const deliveryConditionalNextLine = req.body.userWantsDelivery && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
-      const description = `${dormPackageEmailDescription}${packageConditionalNextLine}${cookingPackageEmailDescription}${deliveryConditionalNextLine}${deliveryEmailDescription}`;
-      await stripe.charges.create({
-        amount: Math.round(totalDollarAmount * 100),
-        currency: 'usd',
-        card: req.body.token.id,
-        description,
-        receipt_email: req.body.email, // will only send in production, must go to dashboard to send test receipts from test Payments
-      }, async (err, charge) => {
-        if (err) {
-          console.log(err);
-        } else {
-          let transporter = await nodemailer.createTransport({
-              host: 'smtp.gmail.com',
-              port: 465,
-              secure: true,
-              auth: {
-                  type: 'OAuth2',
-                  user: 'johnny.chen54@gmail.com',
-                  serviceClient: process.env.GOOGLE_SERVICE_ACCOUNT_KEY_ID,
-                  privateKey: process.env.NODE_ENV === 'production' ? JSON.parse(process.env.GOOGLE_SERVICE_PRIVATE_KEY) : process.env.GOOGLE_SERVICE_PRIVATE_KEY,
-                  accessToken: 'ya29.Xx_XX0xxxxx-xX0X0XxXXxXxXXXxX0x',
-                  expires: 1484314697598
-              }
-          });
-          await transactionUtil.savePaymentInfo(req.body, dropoffID);
-          // invoke vote util function that takes in the request body as an argument
-          await voteUtil.saveVotes(req.body, dropoffID);
-          await res.json({
-            paymentCompleted: true,
-            emailSentTo: req.body.email,
-            errorMessage,
-          });
+        // if user wants delivery and cooking packages ordered is greater than 0
+        if (req.body.userWantsDelivery && req.body.cookingPackagesOrdered > 0) {
+          // if available deliveries left is equal to 0
+          if (availableDeliveriesLeft === 0) {
+            // assign error message that tells client there are no more available deliveries
+            errorMessage = 'There are no more available deliveries left for this round of bulk buy. We apologize for any inconvenience. We promise we\'ll be back with more deliveries in the future.';
+            // respond back with the error message and avaiable deliveries left
+            res.json({ errorMessage, availableDeliveriesLeft });
+          }
         }
-      });
+
+        // if user wants delivery and cooking packages ordered is 0
+        if (req.body.userWantsDelivery && req.body.cookingPackagesOrdered === 0) {
+          errorMessage = 'You would need to purchase at least 1 cooking package for delivery';
+          res.json({ errorMessage, availableDeliveriesLeft });
+        }
+
+        const dormPackagesTotalDollarAmount = req.body.dormPackagesOrdered * 6;
+        const cookingPackagesTotalDollarAmount = req.body.cookingPackagesOrdered * 11;
+        req.body.cookingPackagesTotalDollarAmount = cookingPackagesTotalDollarAmount;
+        req.body.deliveryFee = req.body.userWantsDelivery ? 3 : 0;
+        const totalDollarAmount = dormPackagesTotalDollarAmount + cookingPackagesTotalDollarAmount + req.body.deliveryFee;
+        req.body.totalDollarAmount = totalDollarAmount;
+        const dormPackageEmailDescription = req.body.dormPackagesOrdered > 0 ? `${req.body.dormPackagesOrdered} x Dorm Package${req.body.dormPackagesOrdered < 2 ? '' : 's'} $${dormPackagesTotalDollarAmount}` : '';
+        const cookingPackageEmailDescription = req.body.cookingPackagesOrdered > 0 ? `${req.body.cookingPackagesOrdered} x Cooking Package${req.body.cookingPackagesOrdered < 2 ? '' : 's'} $${cookingPackagesTotalDollarAmount}` : '';
+        const deliveryAddress = await userUtil.findFormattedAddress(req.body.uid);
+        const deliveryEmailDescription = req.body.userWantsDelivery ? `Delivery $${req.body.deliveryFee}\n\nDelivery Address:\n${deliveryAddress}\n(Dropoff at door to apartment/house)` : '';
+        const packageConditionalNextLine = req.body.dormPackagesOrdered > 0 && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
+        const deliveryConditionalNextLine = req.body.userWantsDelivery && req.body.cookingPackagesOrdered > 0 ? '\n' : '';
+        const description = `${dormPackageEmailDescription}${packageConditionalNextLine}${cookingPackageEmailDescription}${deliveryConditionalNextLine}${deliveryEmailDescription}`;
+        await stripe.charges.create({
+          amount: Math.round(totalDollarAmount * 100),
+          currency: 'usd',
+          card: req.body.token.id,
+          description,
+          // receipt_email: req.body.email, // will only send in production, must go to dashboard to send test receipts from test Payments
+        }, async (err, charge) => {
+          if (err) {
+            console.log(err);
+          } else {
+            await transactionUtil.savePaymentInfo(req.body, dropoffID);
+            // invoke vote util function that takes in the request body as an argument
+            await voteUtil.saveVotes(req.body, dropoffID);
+            await res.json({
+              paymentCompleted: true,
+              emailSentTo: req.body.email,
+              errorMessage,
+            });
+            const qrFile = __dirname + `/../adminData/qr.png`;
+            const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, req.body.uid);
+            await QRCode.toFile(qrFile, JSON.stringify(userInfoForPickup), (err) => {
+              console.log(err);
+            });
+            const supportEmail = 'support@collectivefoods.com';
+            const jwtClient = await new google.auth.JWT(
+              process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+              null,
+              process.env.NODE_ENV === 'production' ? JSON.parse(process.env.GOOGLE_SERVICE_PRIVATE_KEY) : process.env.GOOGLE_SERVICE_PRIVATE_KEY,
+              ['https://mail.google.com/'], // an array of auth scopes
+              supportEmail
+            );
+            await jwtClient.authorize(async (err, token) => {
+              if (err) {
+                console.log(err);
+                return;
+              }
+              console.log('\n\ntoken: ', token);
+              const emailReceiptInfo = await transactionUtil.findEmailReceiptInfo(dropoffID, req.body.uid);
+              const emailBody = `Hi ${emailReceiptInfo.firstName},\n\nThe bulk buy is happening on ${emailReceiptInfo.intendedShipDate} from ${emailReceiptInfo.intendedPickupTimeStart} to ${emailReceiptInfo.intendedPickupTimeEnd}\n\nYour orders:\n${description}`;
+
+              const transporter = await nodemailer.createTransport({
+                host: 'smtp.gmail.com',
+                port: 465,
+                secure: true,
+                auth: {
+                  type: 'OAuth2',
+                  user: supportEmail,
+                  serviceClient: process.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_ID,
+                  privateKey: process.env.NODE_ENV === 'production' ? JSON.parse(process.env.GOOGLE_SERVICE_PRIVATE_KEY) : process.env.GOOGLE_SERVICE_PRIVATE_KEY,
+                  accessToken: token.access_token,
+                  expires: token.expiry_date,
+                }
+              });
+              // verify connection configuration
+              await transporter.verify((error, success) => {
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log('Server is ready to take our messages');
+                }
+              });
+              const message = {
+                from: supportEmail,
+                to: req.body.email,
+                subject: 'Your Collective Order Confirmation and Receipt',
+                text: emailBody,
+                // html: `<Grid columns={1}>` +
+                //         `<Grid.Row stretched>` +
+                //         `</Grid.Row>` +
+                //         `<Grid.Row stretched>` +
+                //         `</Grid.Row>` +
+                //         `<Grid.Row stretched>` +
+                //         `</Grid.Row>` +
+                //       `</Grid>`,
+                attachments: [{
+                  path: qrFile,
+                }],
+              };
+              await transporter.sendMail(message);
+            });
+          }
+        });
+      } catch(err) {
+        console.log(err);
+      }
     },
   },
   checkTransaction: {
