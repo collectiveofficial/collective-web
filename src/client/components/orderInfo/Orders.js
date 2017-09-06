@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { Table, Header, Icon } from 'semantic-ui-react';
 import moment from 'moment';
+import { connect } from 'react-redux';
 
 class Orders extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
     this.parseDateFromTimeZone = this.parseDateFromTimeZone.bind(this);
   }
   parseDateFromTimeZone(s) {
@@ -32,7 +31,7 @@ class Orders extends React.Component {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {this.props.userTransactionHistory.map((transaction) => {
+            {this.props.transactionHistory.map((transaction) => {
               console.log('typeof transaction.date', typeof transaction.date);
               const dropoffDate = this.parseDateFromTimeZone(transaction.dropoffDate);
               const date = moment(transaction.date).format('LL');
@@ -68,4 +67,13 @@ class Orders extends React.Component {
   }
 }
 
-export default Orders;
+const mapStateToProps = (state, props) => {
+  return {
+    // App Reducers
+    transactionHistory: state.appReducer._transactionHistory,
+  }
+};
+
+const ConnectedOrders = connect(mapStateToProps)(Orders);
+
+export default ConnectedOrders;

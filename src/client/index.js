@@ -1,9 +1,12 @@
 import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import createStore from './create-store'
 import App from './App';
 import { HashRouter as Router } from 'react-router-dom';
 import createBrowserHistory from 'history/createBrowserHistory'
+import { Provider } from 'react-redux';
+import { withRouter } from 'react-router';
 
 // if (process.env.NODE_ENV !== 'production') {
 //   const {whyDidYouUpdate} = require('why-did-you-update');
@@ -17,11 +20,13 @@ import createBrowserHistory from 'history/createBrowserHistory'
 //
 //   whyDidYouUpdate(React);
 // }
-
+const store = createStore();
 const history = createBrowserHistory();
-
+const AppAvoid = withRouter(App); // React Route + connect() bug
 ReactDOM.render((
-  <Router history={history}>
-    <App />
-  </Router>
+  <Provider store={ store }>
+    <Router history={history}>
+      <AppAvoid/>
+    </Router>
+  </Provider>
 ), document.getElementById('root'));
