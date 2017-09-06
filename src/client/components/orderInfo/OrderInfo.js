@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { Icon, Message, Header } from 'semantic-ui-react';
 import Orders from "./Orders.js";
+import { connect } from 'react-redux';
 
 class OrderInfo extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
   }
 
   render() {
@@ -21,15 +20,24 @@ class OrderInfo extends React.Component {
           <Icon name="shopping basket" />
           Order Info
         </Header>
-        {this.props.userTransactionHistory.length === 0 ?
+        {this.props.transactionHistory.length === 0 ?
           <Message color="yellow">If you recently ordered a package, please refresh your page to see the most recent order.</Message>
           :
           <div></div>
         }
-        <Orders userTransactionHistory={this.props.userTransactionHistory} />
+        <Orders />
       </div>
     );
   }
 }
 
-export default OrderInfo;
+const mapStateToProps = (state, props) => {
+  return {
+    // App Reducers
+    transactionHistory: state.appReducer._transactionHistory,
+  }
+};
+
+const ConnectedOrderInfo = connect(mapStateToProps)(OrderInfo);
+
+export default ConnectedOrderInfo;

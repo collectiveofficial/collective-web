@@ -8,8 +8,6 @@ import s from './Legal.css';
 class terms extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
   }
 
   render() {

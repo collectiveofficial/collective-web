@@ -4,6 +4,9 @@ import {
   Link,
   Redirect,
 } from 'react-router-dom';
+import { connect } from 'react-redux'
+import * as appActionCreators from '../../action-creators/appActions';
+import * as loginActionCreators from '../../action-creators/loginActions'
 import TextField from 'material-ui/TextField';
 import MailOutline from 'material-ui/svg-icons/communication/mail-outline';
 import LockOutline from 'material-ui/svg-icons/action/lock-outline';
@@ -16,22 +19,14 @@ import s from './Login.css';
 class Login extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      emailInput: '',
-      passwordInput: '',
-      isEmailValidated: '',
-      isPasswordValidated: '',
-      wrongPassword: '',
-      userDisabled: '',
-      userNotFound: '',
-      emailErrorMessage: '',
-      passwordErrorMessage: '',
-    };
     this.handleEmailContinue = this.handleEmailContinue.bind(this);
     this.nativeLogin = this.nativeLogin.bind(this);
     this.validateEmail = this.validateEmail.bind(this);
     this.validatePassword = this.validatePassword.bind(this);
-    this.resetErrorStates = this.resetErrorStates.bind(this);
+  }
+  componentWillMount() {
+    console.log('Login is mounting');
+    this.props.dispatch(loginActionCreators.enterLoginPage());
   }
 
   async validateEmail() {
@@ -42,15 +37,15 @@ class Login extends React.Component {
         'Content-Type': 'application/json; charset=utf-8'
       },
       body: JSON.stringify({
-        emailInput: this.state.emailInput,
+        emailInput: this.props.emailInput,
       }),
     });
     const responseData = await response.json();
     if (responseData.emailValidated) {
-      await this.setState({ isEmailValidated: true });
+      this.props.dispatch(loginActionCreators.setIsEmailValidated(true));
     } else {
-      await this.setState({ isEmailValidated: false });
-      await this.setState({ emailErrorMessage: 'Hmm...that doesn\'t look like an email address.' });
+      this.props.dispatch(loginActionCreators.setIsEmailValidated(false));
+      this.props.dispatch(loginActionCreators.setEmailErrorMessage('Hmm...that doesn\'t look like an email address.'));
     }
   }
 
@@ -62,15 +57,15 @@ class Login extends React.Component {
         'Content-Type': 'application/json; charset=utf-8'
       },
       body: JSON.stringify({
-        passwordInput: this.state.passwordInput,
+        passwordInput: this.props.passwordInput,
       }),
     })
     const responseData = await response.json();
     if (responseData.passwordValidated) {
-      await this.setState({ isPasswordValidated: true });
+      this.props.dispatch(loginActionCreators.setIsPasswordValidated(true));
     } else {
-      await this.setState({ isPasswordValidated: false });
-      await this.setState({ passwordErrorMessage: 'Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number.' });
+      this.props.dispatch(loginActionCreators.setIsPasswordValidated(false));
+      this.props.dispatch(loginActionCreators.setPasswordErrorMessage('Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number.'));
     }
   }
 
@@ -81,37 +76,29 @@ class Login extends React.Component {
       const errorCode = error.code;
       const errorMessage = error.message;
       if (errorCode === 'auth/wrong-password') {
-        this.setState({ wrongPassword: true });
-        this.setState({ passwordErrorMessage: 'Wrong password.' });
+        this.props.dispatch(loginActionCreators.setIsWrongPassword(true));
+        this.props.dispatch(loginActionCreators.setPasswordErrorMessage('Wrong password.'));
       }
       if (errorCode === 'auth/user-disabled') {
-        this.setState({ userDisabled: true });
-        this.setState({ emailErrorMessage: 'User disabled.' });
+        this.props.dispatch(loginActionCreators.setIsUserDisabled(true));
+        this.props.dispatch(loginActionCreators.setEmailErrorMessage('User disabled.'));
       }
       if (errorCode === 'auth/user-not-found') {
-        this.setState({ userNotFound: true });
-        this.setState({ emailErrorMessage: 'User not found.' });
+        this.props.dispatch(loginActionCreators.setIsUserNotFound(true));
+        this.props.dispatch(loginActionCreators.setEmailErrorMessage('User not found.'));
       }
       console.log(error);
     });
     return user;
   }
 
-  resetErrorStates() {
-    this.setState({ isPasswordValidated: '' });
-    this.setState({ isInvalidEmail: '' });
-    this.setState({ wrongPassword: '' });
-    this.setState({ userDisabled: '' });
-    this.setState({ userNotFound: '' });
-  }
-
   async handleEmailContinue(event) {
     event.preventDefault();
-    await this.resetErrorStates();
+    this.props.dispatch(loginActionCreators.resetLoginErrorStates());
     await this.validateEmail();
     await this.validatePassword();
-    if (this.state.isEmailValidated && this.state.isPasswordValidated) {
-      const user = await this.nativeLogin(this.state.emailInput, this.state.passwordInput);
+    if (this.props.isEmailValidated && this.props.isPasswordValidated) {
+      const user = await this.nativeLogin(this.props.emailInput, this.props.passwordInput);
       const checkEmailResponse = await fetch('/auth/signup/check-email', {
         method: 'POST',
         headers: {
@@ -119,7 +106,7 @@ class Login extends React.Component {
           'Content-Type': 'application/json; charset=utf-8',
         },
         body: JSON.stringify({
-          email: this.state.emailInput,
+          email: this.props.emailInput,
         }),
       });
       const checkEmailResponseData = await checkEmailResponse.json();
@@ -132,11 +119,12 @@ class Login extends React.Component {
       }
       const routeToRegisterForm = doesUserEmailExist && !hasUserFinishedSignUp && !isUserFacebookAuth;
       if (routeToRegisterForm) {
-        const firebaseAccessToken = await firebaseAuth().currentUser.getToken(/* forceRefresh */ true);
-        await this.props.setFirebaseAccessTokenState(firebaseAccessToken);
-        await this.props.setUserWantsEmailSignupState(true);
+        const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
+        this.props.dispatch(appActionCreators.setFirebaseAccessToken(firebaseAccessToken));
+        this.props.dispatch(appActionCreators.setUserWantsEmailSignup(true));
       }
-      await this.props.setRouteToRegisterFormState(routeToRegisterForm);
+      
+      this.props.dispatch(appActionCreators.setRouteToRegisterForm(routeToRegisterForm));
     }
   }
 
@@ -158,8 +146,8 @@ class Login extends React.Component {
               <RegisterForm
                 authorizeUser={this.props.authorizeUser}
                 userWantsEmailSignup={this.props.userWantsEmailSignup}
-                emailInput={this.state.emailInput}
-                passwordInput={this.state.passwordInput}
+                emailInput={this.props.emailInput}
+                passwordInput={this.props.passwordInput}
                 facebookData={this.props.facebookData}
                 firebaseAccessToken={this.props.firebaseAccessToken}
               />
@@ -179,11 +167,11 @@ class Login extends React.Component {
                     trigger={<TextField
                       hintText="Email"
                       style={styles.iconStyles}
-                      onChange={(event) => this.setState({ emailInput: event.target.value })}
+                      onChange={(event) => this.props.dispatch(loginActionCreators.setEmailInput(event.target.value))}
                     />
                   }
-                  content={this.state.emailErrorMessage}
-                  open={this.state.isEmailValidated === false || this.state.userDisabled === true || this.state.userNotFound === true}
+                  content={this.props.emailErrorMessage}
+                  open={this.props.isEmailValidated === false || this.props.isUserDisabled === true || this.props.isUserNotFound === true}
                   offset={20}
                   position="right center"
                 /><br />
@@ -193,11 +181,11 @@ class Login extends React.Component {
                     type="password"
                     hintText="Password"
                     style={styles.iconStyles}
-                    onChange={(event) => this.setState({ passwordInput: event.target.value })}
+                    onChange={(event) => this.props.dispatch(loginActionCreators.setPasswordInput(event.target.value))}
                   />
                 }
-                content={this.state.passwordErrorMessage}
-                open={(this.state.isPasswordValidated === false || this.state.wrongPassword === true) && (this.state.isEmailValidated === true && this.state.userDisabled !== true && this.state.userNotFound !== true)}
+                content={this.props.passwordErrorMessage}
+                open={(this.props.isPasswordValidated === false || this.props.isWrongPassword === true) && (this.props.isEmailValidated === true && this.props.isUserDisabled !== true && this.props.isUserNotFound !== true)}
                 offset={20}
                 position="right center"
               /><br />
@@ -219,5 +207,28 @@ class Login extends React.Component {
   }
 }
 
+const mapStateToProps = (state, props) => {
+  return {
+    // appReducers
+    userAuthorized: state.appReducer._userAuthorized,
+    firebaseAccessToken: state.appReducer._firebaseAccessToken,
+    routeToRegisterForm: state.appReducer._routeToRegisterForm,
+    userWantsEmailSignup: state.appReducer._userWantsEmailSignup,
+    facebookData: state.appReducer._facebookData,
 
-export default Login;
+    // loginReducers
+    emailInput: state.loginReducer._emailInput,
+    passwordInput: state.loginReducer._passwordInput,
+    isEmailValidated: state.loginReducer._isEmailValidated,
+    isPasswordValidated: state.loginReducer._isPasswordValidated,
+    isWrongPassword: state.loginReducer._isWrongPassword,
+    emailErrorMessage: state.loginReducer._emailErrorMessage,
+    isUserDisabled:state.loginReducer._isUserDisabled,
+    isUserNotFound:state.loginReducer._isUserNotFound,
+    passwordErrorMessage: state.loginReducer._passwordErrorMessage,
+  }
+};
+
+const ConnectedLogin = connect(mapStateToProps)(Login);
+
+export default ConnectedLogin;

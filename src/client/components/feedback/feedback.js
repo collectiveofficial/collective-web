@@ -8,8 +8,6 @@ import s from './feedback.css';
 class feedback extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
   }
 
   render() {
