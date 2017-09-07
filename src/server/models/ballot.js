@@ -51,14 +51,18 @@ module.exports.findFoodInfo = async (foodName, dropoffID) => {
 };
 
 module.exports.changeVoteCount = async (voteCount, foodID, dropoffID) => {
-  await models.Ballot.update({
-    voteCount,
-  }, {
-    where: {
-      foodID,
-      dropoffID,
-    },
-  });
+  try {
+    await models.Ballot.update({
+      voteCount,
+    }, {
+      where: {
+        foodID,
+        dropoffID,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 module.exports.getBallotUserVotes = async (requestBody) => {

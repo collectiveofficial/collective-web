@@ -126,12 +126,6 @@ const initializeData = async () => {
     }
   };
 
-  const updateDropoffIDonRestrictedAddresses = async () => {
-    // TODO: Remove this function after merge to master
-    const dropoffID = 3;
-    await restrictedAddressUtil.updateDropoffIDonRestrictedAddresses(dropoffID);
-  };
-
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
     const dropoffID = 2;
@@ -155,7 +149,7 @@ const initializeData = async () => {
     };
 
     const sendUserNamesAndPackagesOrdered = async () => {
-      fields = ['Last Name', 'First Name', 'Date of Birth', 'Email', 'Phone Number', 'Dorm Packages Ordered', 'Cooking Packages Ordered', 'Allergies'];
+      fields = ['Last Name', 'First Name', 'Date of Birth', 'Email', 'Phone Number', 'Dorm Packages Ordered', 'Cooking Packages Ordered', 'Allergies', 'Delivery Address'];
       // csv in ascending alphabetical order
       const userInfoAndPackagesOrdered = await transactionUtil.getUserInfoAndPackagesOrdered(dropoffID);
       csv = json2csv({ data: userInfoAndPackagesOrdered, fields });
@@ -270,7 +264,6 @@ const initializeData = async () => {
   await initializeThirdDropoff();
   await initializeThirdDropFoodItemsBallots();
   await initializeRestrictedAddresses();
-  await updateDropoffIDonRestrictedAddresses();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
   // await testConfirmationEmail();
