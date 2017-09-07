@@ -70,7 +70,6 @@ module.exports.checkIfUserExists = function (uid) {
     }
   })
   .then((checkUserResult) => {
-    console.log('checkUserResult: ', checkUserResult);
     if (checkUserResult !== null) {
       return true;
     } else {

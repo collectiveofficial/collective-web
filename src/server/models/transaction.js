@@ -221,9 +221,9 @@ module.exports.findEmailReceiptInfo = async (dropoffID, firebaseUID) => {
     const userID = await userUtil.findUserID(firebaseUID);
     const userObj = await userUtil.findUserInfoByID(userID);
     const dropoffObj = await dropoffUtil.findDateTimesByID(dropoffID);
-    const intendedShipDate = moment.tz(dropoffObj.intendedShipDate, 'America/New_York').format('MM-DD-YYYY');
-    const intendedPickupTimeStart = moment.tz(dropoffObj.intendedPickupTimeStart, 'America/New_York').format('HH:MM A');
-    const intendedPickupTimeEnd = moment.tz(dropoffObj.intendedShipDate, 'America/New_York').format('HH:MM A');
+    const intendedShipDate = momentOriginal(dropoffObj.intendedShipDate).format('MM-DD-YYYY');
+    const intendedPickupTimeStart = momentOriginal(dropoffObj.intendedPickupTimeStart).format('hh:mm A');
+    const intendedPickupTimeEnd = momentOriginal(dropoffObj.intendedShipDate).format('hh:mm A');
     const emailReceiptInfo = {
       firstName: userObj.firstName,
       intendedShipDate,

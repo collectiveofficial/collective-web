@@ -345,7 +345,7 @@ class Payment extends React.Component {
                           // panelLabel="Give Money" prepended to the amount in the bottom pay button
                           amount={this.props.price * 100} // cents
                           currency="USD"
-                          stripeKey="pk_test_o6trMS2lojkAKMM0HbRJ0tDI"
+                          stripeKey="pk_live_sJsPA40Mp18TUyoMH2CmCWIG"
                           email={this.props.paymentEmail}
                           // Note: Enabling either address option will give the user the ability to
                           // fill out both. Addresses are sent as a second parameter in the token callback.

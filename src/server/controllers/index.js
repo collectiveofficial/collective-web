@@ -18,7 +18,7 @@ const json2csv = require('json2csv');
 const configureStripe = require('stripe');
 const google = require('googleapis');
 const nodemailer = require('nodemailer');
-const { restrictedAddresses, firstDropoff, firstDropFoodItems, secondDropoff, secondDropFoodItems, firstGroup } = require('./local-db-initialize-data');
+const { restrictedAddresses, firstDropoff, firstDropFoodItems, secondDropoff, secondDropFoodItems, thirdDropoff, thirdDropoffFoodItems, firstGroup } = require('./local-db-initialize-data');
 let STRIPE_SECRET_KEY;
 
 if (process.env.NODE_ENV === 'production') {
@@ -51,7 +51,7 @@ const initializeData = async () => {
 
   const updateCurrentDropoffID = async () => {
     // TODO: dynamic voting dropoff ID (current datetime)
-    const currentDropoffID = 2;
+    const currentDropoffID = 3;
     const groupID = 1;
     await groupUtil.updateCurrentDropoffID(currentDropoffID, groupID);
   };
@@ -83,6 +83,16 @@ const initializeData = async () => {
     }
   };
 
+  const initializeThirdDropoff = async () => {
+    const dropoffID = 3;
+    // initialize dropoff
+    const doesThirdDropoffExist = await dropoffUtil.doesDropoffExist(dropoffID);
+    // if dropoff at id 1 does not exist
+    if (doesThirdDropoffExist === false) {
+      await dropoffUtil.populateDropoff(thirdDropoff);
+    }
+  };
+
   const initializeFirstDropFoodItemsBallots = async () => {
     const ballotID = 1;
     const foodID = 1;
@@ -93,21 +103,33 @@ const initializeData = async () => {
   };
 
   const initializeSecondDropFoodItemsBallots = async () => {
-    const ballotID = 2;
     const doesPapayaExist = await foodUtil.doesPapayaExist();
     if (doesPapayaExist === false) {
-      await foodUtil.populateFoodItemsBallots(secondDropFoodItems, ballotID, secondDropoff);
+      await foodUtil.populateFoodItemsBallots(secondDropFoodItems, null, secondDropoff);
+    }
+  };
+
+  const initializeThirdDropFoodItemsBallots = async () => {
+    const doesLimesExist = await foodUtil.doesLimesExist();
+    if (doesLimesExist === false) {
+      await foodUtil.populateFoodItemsBallots(thirdDropoffFoodItems, null, thirdDropoff);
     }
   };
 
   const initializeRestrictedAddresses = async () => {
     const groupID = 1;
-    const dropoffID = 2;
+    const dropoffID = 3;
     const restrictedAddressesID = 1;
     const doesRestrictedAddressExist = await restrictedAddressUtil.checkIfRestrictedAddressExist(restrictedAddressesID);
     if (doesRestrictedAddressExist === false) {
       await restrictedAddressUtil.initializeRestrictedAddresses(restrictedAddresses, groupID, dropoffID);
     }
+  };
+
+  const updateDropoffIDonRestrictedAddresses = async () => {
+    // TODO: Remove this function after merge to master
+    const dropoffID = 3;
+    await restrictedAddressUtil.updateDropoffIDonRestrictedAddresses(dropoffID);
   };
 
   const sendNightlyCSVupdates = async () => {
@@ -169,10 +191,10 @@ const initializeData = async () => {
 
   const testConfirmationEmail = async () => {
     try {
-      const dropoffID = 2;
+      const dropoffID = 3;
       // get rid of later
       const userID = 1;
-      const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, userID);
+      const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, null, userID);
       const qrFile = __dirname + `/../adminData/qr.png`;
       await QRCode.toFile(qrFile, JSON.stringify(userInfoForPickup), (err) => {
         console.log(err);
@@ -245,7 +267,10 @@ const initializeData = async () => {
   await initializeFirstDropFoodItemsBallots();
   await initializeSecondDropoff();
   await initializeSecondDropFoodItemsBallots();
+  await initializeThirdDropoff();
+  await initializeThirdDropFoodItemsBallots();
   await initializeRestrictedAddresses();
+  await updateDropoffIDonRestrictedAddresses();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
   // await testConfirmationEmail();
@@ -436,7 +461,7 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 2;
+      req.body.dropoffID = 3;
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
       const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
       const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
@@ -457,7 +482,7 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 2;
+      req.body.dropoffID = 3;
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.updateVotes(req.body);
       res.json({ votesSaved: true });
@@ -470,7 +495,7 @@ module.exports = {
         let uid = decodedToken.uid;
         req.body.uid = uid;
         // TODO: dynamic dropoffID
-        const dropoffID = 2;
+        const dropoffID = 3;
         // declare variable called errorMessage
         let errorMessage = '';
         const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(dropoffID);
@@ -522,7 +547,7 @@ module.exports = {
           currency: 'usd',
           card: req.body.token.id,
           description,
-          // receipt_email: req.body.email, // will only send in production, must go to dashboard to send test receipts from test Payments
+          receipt_email: req.body.email, // will only send in production, must go to dashboard to send test receipts from test Payments
         }, async (err, charge) => {
           if (err) {
             console.log(err);
@@ -535,68 +560,68 @@ module.exports = {
               emailSentTo: req.body.email,
               errorMessage,
             });
-            const qrFile = __dirname + `/../adminData/qr.png`;
-            const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, req.body.uid);
-            await QRCode.toFile(qrFile, JSON.stringify(userInfoForPickup), (err) => {
-              console.log(err);
-            });
-            const supportEmail = 'support@collectivefoods.com';
-            const jwtClient = await new google.auth.JWT(
-              process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-              null,
-              process.env.NODE_ENV === 'production' ? JSON.parse(process.env.GOOGLE_SERVICE_PRIVATE_KEY) : process.env.GOOGLE_SERVICE_PRIVATE_KEY,
-              ['https://mail.google.com/'], // an array of auth scopes
-              supportEmail
-            );
-            await jwtClient.authorize(async (err, token) => {
-              if (err) {
-                console.log(err);
-                return;
-              }
-              console.log('\n\ntoken: ', token);
-              const emailReceiptInfo = await transactionUtil.findEmailReceiptInfo(dropoffID, req.body.uid);
-              const emailBody = `Hi ${emailReceiptInfo.firstName},\n\nThe bulk buy is happening on ${emailReceiptInfo.intendedShipDate} from ${emailReceiptInfo.intendedPickupTimeStart} to ${emailReceiptInfo.intendedPickupTimeEnd}\n\nYour orders:\n${description}`;
-
-              const transporter = await nodemailer.createTransport({
-                host: 'smtp.gmail.com',
-                port: 465,
-                secure: true,
-                auth: {
-                  type: 'OAuth2',
-                  user: supportEmail,
-                  serviceClient: process.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_ID,
-                  privateKey: process.env.NODE_ENV === 'production' ? JSON.parse(process.env.GOOGLE_SERVICE_PRIVATE_KEY) : process.env.GOOGLE_SERVICE_PRIVATE_KEY,
-                  accessToken: token.access_token,
-                  expires: token.expiry_date,
-                }
-              });
-              // verify connection configuration
-              await transporter.verify((error, success) => {
-                if (error) {
-                  console.log(error);
-                } else {
-                  console.log('Server is ready to take our messages');
-                }
-              });
-              const message = {
-                from: supportEmail,
-                to: req.body.email,
-                subject: 'Your Collective Order Confirmation and Receipt',
-                text: emailBody,
-                // html: `<Grid columns={1}>` +
-                //         `<Grid.Row stretched>` +
-                //         `</Grid.Row>` +
-                //         `<Grid.Row stretched>` +
-                //         `</Grid.Row>` +
-                //         `<Grid.Row stretched>` +
-                //         `</Grid.Row>` +
-                //       `</Grid>`,
-                attachments: [{
-                  path: qrFile,
-                }],
-              };
-              await transporter.sendMail(message);
-            });
+            // const qrFile = __dirname + `/../adminData/qr.png`;
+            // const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, req.body.uid);
+            // await QRCode.toFile(qrFile, JSON.stringify(userInfoForPickup), (err) => {
+            //   console.log(err);
+            // });
+            // const supportEmail = 'support@collectivefoods.com';
+            // const jwtClient = await new google.auth.JWT(
+            //   process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+            //   null,
+            //   process.env.NODE_ENV === 'production' ? JSON.parse(process.env.GOOGLE_SERVICE_PRIVATE_KEY) : process.env.GOOGLE_SERVICE_PRIVATE_KEY,
+            //   ['https://mail.google.com/'], // an array of auth scopes
+            //   supportEmail
+            // );
+            // await jwtClient.authorize(async (err, token) => {
+            //   if (err) {
+            //     console.log(err);
+            //     return;
+            //   }
+            //   console.log('\n\ntoken: ', token);
+            //   const emailReceiptInfo = await transactionUtil.findEmailReceiptInfo(dropoffID, req.body.uid);
+            //   const emailBody = `Hi ${emailReceiptInfo.firstName},\n\nThe bulk buy is happening on ${emailReceiptInfo.intendedShipDate} from ${emailReceiptInfo.intendedPickupTimeStart} to ${emailReceiptInfo.intendedPickupTimeEnd}\n\nYour orders:\n${description}`;
+            //
+            //   const transporter = await nodemailer.createTransport({
+            //     host: 'smtp.gmail.com',
+            //     port: 465,
+            //     secure: true,
+            //     auth: {
+            //       type: 'OAuth2',
+            //       user: supportEmail,
+            //       serviceClient: process.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_ID,
+            //       privateKey: process.env.NODE_ENV === 'production' ? JSON.parse(process.env.GOOGLE_SERVICE_PRIVATE_KEY) : process.env.GOOGLE_SERVICE_PRIVATE_KEY,
+            //       accessToken: token.access_token,
+            //       expires: token.expiry_date,
+            //     }
+            //   });
+            //   // verify connection configuration
+            //   await transporter.verify((error, success) => {
+            //     if (error) {
+            //       console.log(error);
+            //     } else {
+            //       console.log('Server is ready to take our messages');
+            //     }
+            //   });
+            //   const message = {
+            //     from: supportEmail,
+            //     to: req.body.email,
+            //     subject: 'Your Collective Order Confirmation and Receipt',
+            //     text: emailBody,
+            //     // html: `<Grid columns={1}>` +
+            //     //         `<Grid.Row stretched>` +
+            //     //         `</Grid.Row>` +
+            //     //         `<Grid.Row stretched>` +
+            //     //         `</Grid.Row>` +
+            //     //         `<Grid.Row stretched>` +
+            //     //         `</Grid.Row>` +
+            //     //       `</Grid>`,
+            //     attachments: [{
+            //       path: qrFile,
+            //     }],
+            //   };
+            //   await transporter.sendMail(message);
+            // });
           }
         });
       } catch(err) {
@@ -610,7 +635,7 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 2;
+      req.body.dropoffID = 3;
       const checkTransactionResult = await transactionUtil.checkTransaction(req.body);
       res.json(checkTransactionResult);
     },

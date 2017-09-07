@@ -1,18 +1,15 @@
-var initialDateState = "26 August 2017 from 9am to Noon";
-var initialVoteState = "Voting window is from 11 August to 23 August";
-var initialRemainingCalendarState = [
-  ['9 September 2017',  "Voting window is from 27 August to 6 September"],
-  ['23 September 2017',  "Voting window is from 10 September to 20 September"],
-  ['7 October 2017',  "Voting window is from 24 September to 4 October"],
-  ['28 October 2017',  "Voting window is from 8 October to 25 October"],
-  ['10 November 2017', "Voting window is from 29 October to 8 November"],
-  ['2 December 2017',  "Voting window is from 11 November to 29 November"]
+const initialDateState = '23 September 2017 from 9am to Noon';
+const initialVoteState = 'Voting window is from 7 September to 20 September at 12:00 AM to 23 August at 11:59 PM';
+const initialRemainingCalendarState = [
+  ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
+  ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
+  ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
+  ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
 ];
-var initialItemsState = ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'];
-var initialProviderState = "DNO Produce";
+const initialItemsState = ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'];
+const initialProviderState = 'DNO Produce';
 //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
-var initialLocationState = "https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university";
-
+const initialLocationState = 'https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university';
 
 export function _date(state=initialDateState, action) {
   if (['LOGOUT'].includes(action.type)) {

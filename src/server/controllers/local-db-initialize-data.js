@@ -77,23 +77,6 @@ module.exports.firstDropFoodItems = [{
   imageUrl: 'http://palmaworld.com/wp-content/uploads/2017/01/green-pepper.jpg',
 }];
 
-// this.state = {
-//   date: "26 August 2017 from 9am to Noon",
-//   vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
-//   remainingCalendar: [
-//     ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
-//   ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
-//   ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
-//   ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
-//   ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
-//   ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
-//   ],
-//   items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
-//   provider: "DNO Produce",
-//   //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
-//   location: "https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university",
-// };
-
 module.exports.secondDropoff = {
   id: 2,
   intendedShipDate: '2017-09-09',
@@ -209,6 +192,115 @@ module.exports.secondDropFoodItems = [
     name: 'Bananas',
     imageUrl: 'https://goo.gl/VvMUcM',
     // imageUrl: 'https://timedotcom.files.wordpress.com/2017/05/amazonfreebananas-em-86304874.jpg?quality=85',
+  },
+];
+
+// this.state = {
+//   date: "26 August 2017 from 9am to Noon",
+//   vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
+//   remainingCalendar: [
+//     ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
+//   ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
+//   ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
+//   ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
+//   ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
+//   ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
+//   ],
+//   items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
+//   provider: "DNO Produce",
+//   //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
+//   location: "https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university",
+// };
+
+module.exports.thirdDropoff = {
+  id: 3,
+  intendedShipDate: '2017-09-23',
+  intendedPickupTimeStart: moment.tz('2017-09-23 09:00:00', 'America/New_York').format(),
+  intendedPickupTimeEnd: moment.tz('2017-09-23 12:00:00', 'America/New_York').format(),
+  shipDate: null,
+  voteDateTimeBeg: moment.tz('2017-09-07 00:00:00', 'America/New_York').format(),
+  voteDateTimeEnd: moment.tz('2017-09-20 23:59:59', 'America/New_York').format(),
+  pricePerDormPackage: 6,
+  pricePerCookingPackage: 11,
+  totalDormPackagesOrdered: 0,
+  totalCookingPackagesOrdered: 0,
+  totalDollarAmount: 0,
+  pctFeePerPackage: 0,
+  totalRevenueBeforeStripe: 0,
+  totalRevenueAftereStripe: 0,
+  // TODO: dynamic groupID
+  groupID: 1,
+};
+
+
+module.exports.thirdDropoffFoodItems = [
+  {
+    name: 'Apples',
+    imageUrl: 'https://goo.gl/W6YmQZ',
+  },
+  {
+    name: 'Asparagus',
+    imageUrl: 'https://goo.gl/GdYJ1D',
+  },
+  {
+    name: 'Avocado',
+    imageUrl: 'https://goo.gl/r4CPYo',
+  },
+  {
+    name: 'Bananas',
+    imageUrl: 'https://goo.gl/VvMUcM',
+  },
+  {
+    name: 'Cabbage',
+    imageUrl: 'https://goo.gl/zYk9MV',
+  },
+  {
+    name: 'Carrots',
+    imageUrl: 'https://goo.gl/tKv14c',
+  },
+  {
+    name: 'Collards',
+    imageUrl: 'https://goo.gl/PaUpGv',
+  },
+  {
+    name: 'Corn',
+    imageUrl: 'https://goo.gl/8SqA6z',
+  },
+  {
+    name: 'Cucumbers',
+    imageUrl: 'https://goo.gl/UDqsdB',
+  },
+  {
+    name: 'Green Peppers',
+    imageUrl: 'https://goo.gl/fyjxBH',
+  },
+  {
+    name: 'Kiwi',
+    imageUrl: 'https://goo.gl/bzMN3v',
+  },
+  {
+    name: 'Limes',
+    imageUrl: 'https://goo.gl/LEqN1v',
+  },
+  {
+    name: 'Oranges',
+    imageUrl: 'https://goo.gl/ZAeoZD',
+  },
+  {
+    name: 'Red Onion',
+    imageUrl: 'https://goo.gl/iMbyHw',
+  },
+  {
+    name: 'Romaine Lettuce',
+    imageUrl: 'https://goo.gl/SC43h7',
+  },
+  {
+    name: 'Spinach',
+    imageUrl: 'https://goo.gl/unjadz',
+  },
+  {
+    name: 'Sweet Potatoes',
+    imageUrl: 'https://goo.gl/jEiem5',
   },
 ];
 
