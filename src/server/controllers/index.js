@@ -543,7 +543,9 @@ module.exports = {
           receipt_email: req.body.email, // will only send in production, must go to dashboard to send test receipts from test Payments
         }, async (err, charge) => {
           if (err) {
-            console.log(err);
+            res.json({
+              errorMessage: err.message,
+            });
           } else {
             await transactionUtil.savePaymentInfo(req.body, dropoffID);
             // invoke vote util function that takes in the request body as an argument
