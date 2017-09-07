@@ -84,6 +84,7 @@ module.exports.getUserInfoAndPackagesOrdered = async (dropoffID) => {
       const allergies = await voteUtil.getUserAllergies(userID, dropoffID);
       // const birthday = await userObj.birthday.toDateString();
       const birthday = await momentOriginal(userObj.birthday, 'YYYY-MM-DD').format('MM-DD-YYYY');
+      const deliveryAddress = transactions[i].dataValues.isDelivery === true ? await userUtil.findFormattedAddressByID(transactions[i].dataValues.userID) : '';
       const dataObj = {
         'Last Name': userObj.lastName,
         'First Name': userObj.firstName,
@@ -93,6 +94,7 @@ module.exports.getUserInfoAndPackagesOrdered = async (dropoffID) => {
         'Dorm Packages Ordered': transactions[i].dataValues.dormPackagesOrdered,
         'Cooking Packages Ordered': transactions[i].dataValues.cookingPackagesOrdered,
         Allergies: allergies,
+        'Delivery Address': deliveryAddress,
       };
       userNamesAndPackagesOrdered.push(dataObj);
     }
