@@ -121,12 +121,10 @@ class Payment extends React.Component {
 
     const submitPaymentResultData = await submitPaymentResult.json();
     this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage(submitPaymentResultData.errorMessage));
-    // handle for delivery error message from server (must order at least 1 cooking package and make sure count <= 50)
     if (this.props.serverPaymentErrorMessage.length === 0) {
       if (submitPaymentResultData.paymentCompleted) {
         this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(true));
       } else {
-        alert('Payment failed. Please contact Collective to resolve this issue. We appreciate your patience.');
         this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(false));
       }
     }
