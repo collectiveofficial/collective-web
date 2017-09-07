@@ -81,3 +81,16 @@ module.exports.checkIfAddressIsDorm = async (userLatLongString, groupID) => {
     console.log(err);
   }
 };
+
+module.exports.updateDropoffIDonRestrictedAddresses = async (dropoffID) => {
+  try {
+    await models.RestrictedAddress.update({
+      dropoffID,
+    }, {
+      where: {
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};

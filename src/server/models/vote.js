@@ -3,13 +3,13 @@ const ballotUtil = require('./ballot');
 const userUtil = require('./user');
 const foodUtil = require('./food');
 
-module.exports.saveVotes = async (requestBody) => {
+module.exports.saveVotes = async (requestBody, dropoffID) => {
   try {
     // iterate through the food object of the request body
     for (let foodItem in requestBody.foodObj) {
       // find food id from name in ballot table
       // find ballot id from food id in ballot table
-      const findFoodInfoResult = await ballotUtil.findFoodInfo(foodItem, requestBody.dropoffID);
+      const findFoodInfoResult = await ballotUtil.findFoodInfo(foodItem, dropoffID);
       const userID = await userUtil.findUserID(requestBody.uid);
       // TODO: save findFoodInfoResult's foodID, foodName, ballotID into Vote
       await models.Vote.create({

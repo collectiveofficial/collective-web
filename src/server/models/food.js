@@ -60,6 +60,23 @@ module.exports.doesPapayaExist = async () => {
   }
 };
 
+module.exports.doesLimesExist = async () => {
+  try {
+    const doesLimesExistResult = await models.Food.findOne({
+      where: {
+        name: 'Limes',
+      },
+    });
+    if (doesLimesExistResult !== null) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports.findAllFirstDropFoodItems = () => {
   return models.Food.findAll()
   .then((findAllFoodItemsResult) => {

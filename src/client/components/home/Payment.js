@@ -84,35 +84,6 @@ class Payment extends React.Component {
     }
   }
 
-
-  async submitInitialVotes() {
-    const foodObj = {};
-    for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
-      foodObj[this.props.ballotsAndVotes[i].name] = {
-        isCurrent: this.props.ballotsAndVotes[i].isCurrent,
-        isAllergic: this.props.allergiesList.indexOf(this.props.ballotsAndVotes[i].name) > -1 ? true : false,
-      };
-    }
-    // save votes to DB and allow to continue to payment
-    const response = await fetch('/vote/save', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      body: JSON.stringify({
-        firebaseAccessToken: this.props.firebaseAccessToken,
-        foodObj,
-      }),
-    });
-    const responseData = await response.json();
-    if (responseData.votesSaved) {
-      this.props.dispatch(paymentActionCreators.setVotesSaved(true));
-    } else {
-      this.props.dispatch(paymentActionCreators.setVotesSaved(false));
-    }
-  }
-
   async handlePayment() {
     this.props.dispatch(paymentActionCreators.setPaymentErrorMessage(''));
     this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage(''));
@@ -123,7 +94,14 @@ class Payment extends React.Component {
 
   async onToken(token) {
     this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(false));
-    const submitPaymentResult = await fetch('/confirm-payment', {
+    const foodObj = {};
+    for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
+      foodObj[this.props.ballotsAndVotes[i].name] = {
+        isCurrent: this.props.ballotsAndVotes[i].isCurrent,
+        isAllergic: this.props.allergiesList.indexOf(this.props.ballotsAndVotes[i].name) > -1 ? true : false,
+      };
+    }
+    const submitPaymentResult = await fetch('/payment-votes/save', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -137,6 +115,7 @@ class Payment extends React.Component {
         cookingPackagesOrdered: this.props.cook,
         userWantsDelivery: this.props.userWantsDelivery,
         hasAllergies: this.props.hasAllergies,
+        foodObj,
       }),
     });
 
@@ -145,12 +124,7 @@ class Payment extends React.Component {
     // handle for delivery error message from server (must order at least 1 cooking package and make sure count <= 50)
     if (this.props.serverPaymentErrorMessage.length === 0) {
       if (submitPaymentResultData.paymentCompleted) {
-        await this.submitInitialVotes();
-        if (this.props.votesSaved) {
-          this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(true));
-        } else {
-          alert('Voting failed. Please contact Collective to resolve this issue. We appreciate your patience.');
-        }
+        this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(true));
       } else {
         alert('Payment failed. Please contact Collective to resolve this issue. We appreciate your patience.');
         this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(false));
