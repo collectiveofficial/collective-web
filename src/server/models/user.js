@@ -375,3 +375,17 @@ module.exports.findFormattedAddress = async (firebaseUID) => {
     console.log(err);
   }
 };
+
+module.exports.findFormattedAddressByID = async (id) => {
+  try {
+    const user = await models.User.findOne({
+      where: {
+        id,
+      },
+    });
+    const formattedAddress = user.dataValues.fullAddress;
+    return formattedAddress;
+  } catch(err) {
+    console.log(err);
+  }
+};
