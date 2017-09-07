@@ -158,3 +158,21 @@ module.exports.findDropoffDateByID = async (id) => {
     console.log(err);
   }
 };
+
+module.exports.findDateTimesByID = async (id) => {
+  try {
+    const dropoff = await models.Dropoff.findOne({
+      where: {
+        id,
+      },
+    });
+    const dropoffObj = {
+      intendedShipDate: dropoff.dataValues.intendedShipDate,
+      intendedPickupTimeStart: dropoff.dataValues.intendedPickupTimeStart,
+      intendedPickupTimeEnd: dropoff.dataValues.intendedPickupTimeEnd,
+    };
+    return dropoffObj;
+  } catch(err) {
+    console.log(err);
+  }
+};

@@ -3,6 +3,8 @@ import {
   Route,
   Link
 } from 'react-router-dom';
+import { connect } from 'react-redux';
+import * as homeActionCreators from '../../action-creators/homeActions'
 import { Image, Modal } from 'semantic-ui-react';
 import s from './Home.css';
 import Voting from './Voting.js';
@@ -13,26 +15,6 @@ import { Message } from 'semantic-ui-react'
 class Home extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      // date: "26 August 2017 from 9am to Noon",
-      // vote: "Voting window is from 11 August at 12:00 AM to 23 August at 11:59 PM",
-      // remainingCalendar: [
-      //   ['9 September 2017',  "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM"],
-      pastDropoffDate: '26 August 2017 from 10 AM to 1 PM',
-      date: '9 September 2017 from 9 AM to Noon',
-      vote: "Voting window is from 24 August at 12:00 AM to 6 September at 11:59 PM",
-      remainingCalendar: [
-        ['23 September 2017',  "Voting window is from 7 September at 12:00 AM to 20 September at 11:59 PM"],
-        ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
-        ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
-        ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
-        ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
-      ],
-      items: ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'],
-      provider: "DNO Produce",
-      //label location as search query...for instance, if the location is Ohio Stadium, enter as as string "ohio+stadium+ohio+state" after q
-      location: "https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university",
-    };
   }
 
   render() {
@@ -48,20 +30,20 @@ class Home extends React.Component {
               </div>
               <h1 className={s.banner}>Upcoming Bulk Buys</h1>
             </div>
-            {/* <Message color='blue'>Next pickup: {this.state.pastDropoffDate} at Scott House</Message> */}
+            <Message color='blue'>Next pickup: 9 September 2017 from 9am to Noon at Scott House</Message>
             <Card style={{width: "800px", margin: "0 0 30px 0"}}>
               <CardTitle
-                title={this.state.date}
-                subtitle={this.state.vote}
+                title={this.props.date}
+                subtitle={this.props.vote}
               />
               <iframe
                 className={s.map}
-                src={this.state.location}
+                src={this.props.location}
                 ></iframe>
                 <div className={s.links}>
                   <Link className={s.link} to="/voting">Vote and Pay</Link>
                   <Modal trigger={<a className={s.link} href="javascript:void(0)">Provider info</a>} closeIcon="close">
-                    <Modal.Header>{this.state.provider}</Modal.Header>
+                    <Modal.Header>{this.props.provider}</Modal.Header>
                     <Modal.Content image>
                       <Image wrapped size='medium' src='https://static1.squarespace.com/static/560d50c5e4b0f68fd092a78f/t/577cfee7893fc03a12adcedb/1495464043705/?format=1500w' />
                       <Modal.Description>
@@ -76,7 +58,7 @@ class Home extends React.Component {
                   </Modal>
                 </div>
             </Card>
-            {this.state.remainingCalendar.map((x) => (
+            {this.props.remainingCalendar.map((x) => (
               <Card style={{width: "800px", margin: "0 0 30px 0"}}>
               <CardTitle
                 title={x[0]}
@@ -91,4 +73,19 @@ class Home extends React.Component {
   }
 }
 
-export default Home;
+const mapStateToProps = (state, props) => {
+  console.log('MAP STATE TO PROPS: ',state, props)
+  return {
+    authenticated: state.appReducer._userAuthenticated, // TODO RENAME
+    date: state.homeReducer._date,
+    vote: state.homeReducer._vote,
+    remainingCalendar: state.homeReducer._remainingCalendar,
+    items: state.homeReducer._items,
+    provider: state.homeReducer._provider,
+    location: state.homeReducer._location,
+  }
+};
+
+const ConnectedHome = connect(mapStateToProps)(Home);
+
+export default ConnectedHome;
