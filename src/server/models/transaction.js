@@ -176,9 +176,9 @@ module.exports.getUsersWhoHaveNotPaid = async (dropoffID, groupID) => {
   return usersWhoHaveNotPaid;
 };
 
-module.exports.getUserInfoForPickup = async (dropoffID, firebaseUID) => {
+module.exports.getUserInfoForPickup = async (dropoffID, firebaseUID, userID) => {
   try {
-    const userID = await userUtil.findUserID(firebaseUID);
+    // const userID = await userUtil.findUserID(firebaseUID);
     const transaction = await models.Transaction.findOne({
       where: {
         dropoffID,
