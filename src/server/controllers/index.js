@@ -282,7 +282,7 @@ const initializeData = async () => {
   await initializeRestrictedAddresses();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
-  await testConfirmationEmail();
+  // await testConfirmationEmail();
 };
 
 initializeData();
