@@ -242,7 +242,7 @@ class Payment extends React.Component {
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
-                  <Segment compact>
+                  {/* <Segment compact>
                     <Label color='red' floating>New!</Label>
                     <Checkbox inline checked={this.props.userWantsDelivery} onClick={this.handleDelivery} />
                     <Modal trigger={<a className={s.mode}>Delivery ($3)</a>} basic size='small' closeIcon="close">
@@ -273,7 +273,7 @@ class Payment extends React.Component {
                     </Modal>
                     <p>Limit 50 participants</p>
                     <p>Available deliveries left: {this.props.availableDeliveriesLeft}</p>
-                  </Segment>
+                  </Segment> */}
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>

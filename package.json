@@ -28,6 +28,7 @@
   "homepage": "https://github.com/jchen54/collective-web#readme",
   "dependencies": {
     "@google/maps": "^0.4.3",
+    "babel": "^6.23.0",
     "babel-core": "^6.23.1",
     "babel-eslint": "^7.2.3",
     "babel-loader": "^6.3.2",
