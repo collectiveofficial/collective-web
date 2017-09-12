@@ -18,6 +18,9 @@ const json2csv = require('json2csv');
 const configureStripe = require('stripe');
 const google = require('googleapis');
 const nodemailer = require('nodemailer');
+const ReactDOMServer = require('react-dom/server');
+require('babel-register');
+const EmailReceipt = require('./EmailReceipt')
 const { restrictedAddresses, firstDropoff, firstDropFoodItems, secondDropoff, secondDropFoodItems, thirdDropoff, thirdDropoffFoodItems, firstGroup } = require('./local-db-initialize-data');
 let STRIPE_SECRET_KEY;
 
@@ -230,11 +233,23 @@ const initializeData = async () => {
           }
         });
         const userEmail = 'johnny.chen54@gmail.com';
+        const firstName = 'Johnny';
+        const deliveryAddress = '1046 Corvette Dr., San Jose, CA 95129';
+        const dormPackagesOrdered = 0;
+        const cookingPackagesOrdered = 1;
+        const userWantsDelivery = false;
+        const emailReceiptInfo = {
+          firstName,
+          dormPackagesOrdered,
+          cookingPackagesOrdered,
+          userWantsDelivery,
+          deliveryAddress,
+        };
         const message = {
           from: 'support@collectivefoods.com',
           to: userEmail,
           subject: 'Your Collective Order Confirmation and Receipt',
-          text: emailBody,
+          // text: emailBody,
           // html: `<Grid columns={1}>` +
           //         `<Grid.Row stretched>` +
           //         `</Grid.Row>` +
@@ -243,6 +258,7 @@ const initializeData = async () => {
           //         `<Grid.Row stretched>` +
           //         `</Grid.Row>` +
           //       `</Grid>`,
+          html: EmailReceipt(emailReceiptInfo),
           attachments: [{
             path: qrFile,
           }],
