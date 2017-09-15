@@ -20,7 +20,8 @@ const google = require('googleapis');
 const nodemailer = require('nodemailer');
 const ReactDOMServer = require('react-dom/server');
 require('babel-register');
-const EmailReceipt = require('./EmailReceipt')
+const EmailReceipt = require('./EmailReceipt');
+const moment = require('moment-timezone');
 const { restrictedAddresses, firstDropoff, firstDropFoodItems, secondDropoff, secondDropFoodItems, thirdDropoff, thirdDropoffFoodItems, firstGroup } = require('./local-db-initialize-data');
 let STRIPE_SECRET_KEY;
 
@@ -127,6 +128,16 @@ const initializeData = async () => {
     if (doesRestrictedAddressExist === false) {
       await restrictedAddressUtil.initializeRestrictedAddresses(restrictedAddresses, groupID, dropoffID);
     }
+  };
+
+  const updateDropoff = async () => {
+    const dropoff = {
+      id: 3,
+      intendedShipDate: '2017-09-22',
+      intendedPickupTimeStart: moment.tz('2017-09-22 08:00:00', 'America/New_York').format(),
+      intendedPickupTimeEnd: moment.tz('2017-09-22 16:00:00', 'America/New_York').format(),
+    };
+    await dropoffUtil.updateDropoff(dropoff);
   };
 
   const sendNightlyCSVupdates = async () => {
@@ -282,6 +293,7 @@ const initializeData = async () => {
   await initializeRestrictedAddresses();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
+  await updateDropoff();
   // await testConfirmationEmail();
 };
 

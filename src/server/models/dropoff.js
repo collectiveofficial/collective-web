@@ -99,6 +99,22 @@ module.exports.updatePickupTimeOnDropoff = async (id, pickupTimes) => {
   }
 };
 
+module.exports.updateDropoff = async (dropoff) => {
+  try {
+    await models.Dropoff.update({
+      intendedShipDate: dropoff.intendedShipDate,
+      intendedPickupTimeStart: dropoff.intendedPickupTimeStart,
+      intendedPickupTimeEnd: dropoff.intendedPickupTimeEnd,
+    }, {
+      where: {
+        id: dropoff.id,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports.findDeliveriesOrderedCount = async (id) => {
   try {
     const dropoffResult = await models.Dropoff.findOne({
