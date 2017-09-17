@@ -130,16 +130,6 @@ const initializeData = async () => {
     }
   };
 
-  const updateDropoff = async () => {
-    const dropoff = {
-      id: 3,
-      intendedShipDate: '2017-09-22',
-      intendedPickupTimeStart: moment.tz('2017-09-22 08:00:00', 'America/New_York').format(),
-      intendedPickupTimeEnd: moment.tz('2017-09-22 16:00:00', 'America/New_York').format(),
-    };
-    await dropoffUtil.updateDropoff(dropoff);
-  };
-
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
     const dropoffID = 2;
@@ -293,7 +283,6 @@ const initializeData = async () => {
   await initializeRestrictedAddresses();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
-  await updateDropoff();
   // await testConfirmationEmail();
 };
 

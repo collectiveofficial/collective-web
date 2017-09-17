@@ -214,9 +214,9 @@ module.exports.secondDropFoodItems = [
 
 module.exports.thirdDropoff = {
   id: 3,
-  intendedShipDate: '2017-09-23',
-  intendedPickupTimeStart: moment.tz('2017-09-23 09:00:00', 'America/New_York').format(),
-  intendedPickupTimeEnd: moment.tz('2017-09-23 12:00:00', 'America/New_York').format(),
+  intendedShipDate: '2017-09-22',
+  intendedPickupTimeStart: moment.tz('2017-09-22 08:00:00', 'America/New_York').format(),
+  intendedPickupTimeEnd: moment.tz('2017-09-22 16:00:00', 'America/New_York').format(),
   shipDate: null,
   voteDateTimeBeg: moment.tz('2017-09-07 00:00:00', 'America/New_York').format(),
   voteDateTimeEnd: moment.tz('2017-09-20 23:59:59', 'America/New_York').format(),
