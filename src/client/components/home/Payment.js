@@ -43,7 +43,7 @@ class Payment extends React.Component {
     this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage(''));
     this.props.dispatch(paymentActionCreators.setDorm(value));
     let newPrice = this.props.price;
-    newPrice = ((value * 6) + (this.props.cook * 11)) + this.props.deliveryPriceImpact;
+    newPrice = ((value * 6) + (this.props.cook * 6)) + this.props.deliveryPriceImpact;
     this.props.dispatch(paymentActionCreators.setPrice(newPrice));
   }
 
@@ -51,7 +51,7 @@ class Payment extends React.Component {
     this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage(''));
     this.props.dispatch(paymentActionCreators.setCook(value));
     let newPrice = this.props.price;
-    newPrice = ((this.props.dorm * 6) + (value * 11)) + this.props.deliveryPriceImpact;
+    newPrice = ((this.props.dorm * 6) + (value * 6)) + this.props.deliveryPriceImpact;
     this.props.dispatch(paymentActionCreators.setPrice(newPrice));
   }
 
@@ -227,14 +227,14 @@ class Payment extends React.Component {
                           <Dropdown inline options={cookNumOptions}
                             onChange={this.handleCook}
                             defaultValue={cookNumOptions[0].value}
-                          /><Modal trigger={<a className={s.mode}>cooking packages ($11)</a>} basic size='small' closeIcon="close">
+                          /><Modal trigger={<a className={s.mode}>cooking packages ($6)</a>} basic size='small' closeIcon="close">
                           <Modal.Header>Cooking package</Modal.Header>
                           <Modal.Content image>
                             <Modal.Description>
-                              <p>Our cooking package is $11 and includes food that, well...can be cooked! (:</p>
-                                <p>To give you an idea, a package in the past has included 6 apples</p>
-                                <p>1 pound of carrots, 4 bananas, 1.5 pounds of grapes, 6 kiwis, 2 onions</p>
-                                <p>a half pound of spinach, 5 sweet potatoes, and 1 pound of tomatoes.</p>
+                              <p>Our cooking package is $6 and includes food that, well...can be cooked! (:</p>
+                                <p>To give you an idea, a package in the past has included 3 sweet potatoes,</p>
+                                <p>1 lb mini peppers, 1 lb tomatoes, 2 onions, 2 potatoes, 2 limes,</p>
+                                <p>0.5 lb of spinach, 1 lb baby carrots.</p>
                               </Modal.Description>
                             </Modal.Content>
                           </Modal>

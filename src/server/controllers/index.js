@@ -540,7 +540,7 @@ module.exports = {
         }
 
         const dormPackagesTotalDollarAmount = req.body.dormPackagesOrdered * 6;
-        const cookingPackagesTotalDollarAmount = req.body.cookingPackagesOrdered * 11;
+        const cookingPackagesTotalDollarAmount = req.body.cookingPackagesOrdered * 6;
         req.body.cookingPackagesTotalDollarAmount = cookingPackagesTotalDollarAmount;
         req.body.deliveryFee = req.body.userWantsDelivery ? 3 : 0;
         const totalDollarAmount = dormPackagesTotalDollarAmount + cookingPackagesTotalDollarAmount + req.body.deliveryFee;
