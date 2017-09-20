@@ -155,7 +155,7 @@ const initializeData = async () => {
 
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
-    const dropoffID = 2;
+    const dropoffID = 3;
     let fields;
     let csv;
     let fileName;
@@ -197,7 +197,7 @@ const initializeData = async () => {
     const fields = ['Last Name', 'First Name', 'Email'];
     // TODO: dynamic groupID
     const groupID = 1;
-    const dropoffID = 2;
+    const dropoffID = 3;
     const usersWhoHaveNotPaid = await transactionUtil.getUsersWhoHaveNotPaid(dropoffID, groupID);
     const csv = json2csv({ data: usersWhoHaveNotPaid, fields });
     const fileName = 'usersWhoHaveNotPaid.csv';
