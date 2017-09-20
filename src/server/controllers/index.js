@@ -306,7 +306,7 @@ const initializeData = async () => {
   await initializeFourthDropoff();
   await initializeFourthDropFoodItemsBallots();
   await initializeRestrictedAddresses();
-  await updateDropoffIDonRestrictedAddresses();
+  // await updateDropoffIDonRestrictedAddresses();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
   // await testConfirmationEmail();
