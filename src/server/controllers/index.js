@@ -147,6 +147,12 @@ const initializeData = async () => {
     }
   };
 
+  const updateDropoffIDonRestrictedAddresses = async () => {
+     // TODO: Remove this function after merge to master
+     const dropoffID = 4;
+     await restrictedAddressUtil.updateDropoffIDonRestrictedAddresses(dropoffID);
+   };
+
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
     const dropoffID = 2;
@@ -300,6 +306,7 @@ const initializeData = async () => {
   await initializeFourthDropoff();
   await initializeFourthDropFoodItemsBallots();
   await initializeRestrictedAddresses();
+  await updateDropoffIDonRestrictedAddresses();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
   // await testConfirmationEmail();
