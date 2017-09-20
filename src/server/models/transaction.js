@@ -10,11 +10,12 @@ const dropoffUtil = require('./dropoff');
 module.exports.savePaymentInfo = async (requestBody, dropoffID) => {
   try {
     const stripeFees = Number(((requestBody.totalDollarAmount * 0.029) + 0.3).toFixed(2));
-    const feeChargedToBFF = requestBody.dormPackagesOrdered * 0.5;
+    // const feeChargedToBFF = requestBody.dormPackagesOrdered * 0.5;
+    const earningsOnCookingPackages = (requestBody.dormPackagesOrdered * 0.5) + (requestBody.cookingPackagesOrdered * 1);
     const deliveryFeeAttributedToCollective = requestBody.deliveryFee / 3;
-    // const revenueBeforeStripe = Number((requestBody.cookingPackageFees + requestBody.transactionFee + feeChargedToBFF + deliveryFeeAttributedToCollective).toFixed(2));
-    const earningsOnCookingPackages = Number(requestBody.cookingPackagesTotalDollarAmount - (10 * requestBody.cookingPackagesOrdered))
-    const revenueBeforeStripe = Number((earningsOnCookingPackages + feeChargedToBFF + deliveryFeeAttributedToCollective).toFixed(2));
+    // const earningsOnCookingPackages = Number(requestBody.cookingPackagesTotalDollarAmount - (6 * requestBody.cookingPackagesOrdered));
+    // const revenueBeforeStripe = Number((earningsOnCookingPackages + feeChargedToBFF + deliveryFeeAttributedToCollective).toFixed(2));
+    const revenueBeforeStripe = Number((earningsOnCookingPackages + deliveryFeeAttributedToCollective).toFixed(2));
     const revenueAfterStripe = Number((revenueBeforeStripe - stripeFees).toFixed(2));
     const userID = await userUtil.findUserID(requestBody.uid);
     await models.Transaction.create({
