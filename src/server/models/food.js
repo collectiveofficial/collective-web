@@ -77,6 +77,23 @@ module.exports.doesLimesExist = async () => {
   }
 };
 
+module.exports.doesLemonsExist = async () => {
+  try {
+    const doesLemonsExistResult = await models.Food.findOne({
+      where: {
+        name: 'Lemons',
+      },
+    });
+    if (doesLemonsExistResult !== null) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports.findAllFirstDropFoodItems = () => {
   return models.Food.findAll()
   .then((findAllFoodItemsResult) => {

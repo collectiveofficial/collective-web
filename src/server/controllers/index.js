@@ -22,7 +22,7 @@ const ReactDOMServer = require('react-dom/server');
 require('babel-register');
 const EmailReceipt = require('./EmailReceipt');
 const moment = require('moment-timezone');
-const { restrictedAddresses, firstDropoff, firstDropFoodItems, secondDropoff, secondDropFoodItems, thirdDropoff, thirdDropoffFoodItems, firstGroup } = require('./local-db-initialize-data');
+const { restrictedAddresses, firstDropoff, firstDropFoodItems, secondDropoff, secondDropFoodItems, thirdDropoff, thirdDropoffFoodItems, fourthDropoff, fourthDropoffFoodItems, firstGroup } = require('./local-db-initialize-data');
 let STRIPE_SECRET_KEY;
 
 if (process.env.NODE_ENV === 'production') {
@@ -97,6 +97,16 @@ const initializeData = async () => {
     }
   };
 
+  const initializeFourthDropoff = async () => {
+    const dropoffID = 4;
+    // initialize dropoff
+    const doesFourthDropoffExist = await dropoffUtil.doesDropoffExist(dropoffID);
+    // if dropoff at id 1 does not exist
+    if (doesFourthDropoffExist === false) {
+      await dropoffUtil.populateDropoff(fourthDropoff);
+    }
+  };
+
   const initializeFirstDropFoodItemsBallots = async () => {
     const ballotID = 1;
     const foodID = 1;
@@ -120,24 +130,21 @@ const initializeData = async () => {
     }
   };
 
+  const initializeFourthDropFoodItemsBallots = async () => {
+    const doesLemonsExist = await foodUtil.doesLemonsExist();
+    if (doesLemonsExist === false) {
+      await foodUtil.populateFoodItemsBallots(fourthDropoffFoodItems, null, fourthDropoff);
+    }
+  };
+
   const initializeRestrictedAddresses = async () => {
     const groupID = 1;
-    const dropoffID = 3;
+    const dropoffID = 4;
     const restrictedAddressesID = 1;
     const doesRestrictedAddressExist = await restrictedAddressUtil.checkIfRestrictedAddressExist(restrictedAddressesID);
     if (doesRestrictedAddressExist === false) {
       await restrictedAddressUtil.initializeRestrictedAddresses(restrictedAddresses, groupID, dropoffID);
     }
-  };
-
-  const updateDropoff = async () => {
-    const dropoff = {
-      id: 3,
-      intendedShipDate: '2017-09-22',
-      intendedPickupTimeStart: moment.tz('2017-09-22 08:00:00', 'America/New_York').format(),
-      intendedPickupTimeEnd: moment.tz('2017-09-22 16:00:00', 'America/New_York').format(),
-    };
-    await dropoffUtil.updateDropoff(dropoff);
   };
 
   const sendNightlyCSVupdates = async () => {
@@ -199,7 +206,7 @@ const initializeData = async () => {
 
   const testConfirmationEmail = async () => {
     try {
-      const dropoffID = 3;
+      const dropoffID = 4;
       // get rid of later
       const userID = 1;
       const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, null, userID);
@@ -290,10 +297,11 @@ const initializeData = async () => {
   await initializeSecondDropFoodItemsBallots();
   await initializeThirdDropoff();
   await initializeThirdDropFoodItemsBallots();
+  await initializeFourthDropoff();
+  await initializeFourthDropFoodItemsBallots();
   await initializeRestrictedAddresses();
   await sendNightlyCSVupdates();
   await sendVotingReminderCSVupdates();
-  await updateDropoff();
   // await testConfirmationEmail();
 };
 
@@ -482,7 +490,7 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 3;
+      req.body.dropoffID = 4;
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
       const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
       const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
@@ -503,7 +511,7 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 3;
+      req.body.dropoffID = 4;
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.updateVotes(req.body);
       res.json({ votesSaved: true });
@@ -516,7 +524,7 @@ module.exports = {
         let uid = decodedToken.uid;
         req.body.uid = uid;
         // TODO: dynamic dropoffID
-        const dropoffID = 3;
+        const dropoffID = 4;
         // declare variable called errorMessage
         let errorMessage = '';
         const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(dropoffID);
@@ -551,7 +559,7 @@ module.exports = {
         }
 
         const dormPackagesTotalDollarAmount = req.body.dormPackagesOrdered * 6;
-        const cookingPackagesTotalDollarAmount = req.body.cookingPackagesOrdered * 11;
+        const cookingPackagesTotalDollarAmount = req.body.cookingPackagesOrdered * 6;
         req.body.cookingPackagesTotalDollarAmount = cookingPackagesTotalDollarAmount;
         req.body.deliveryFee = req.body.userWantsDelivery ? 3 : 0;
         const totalDollarAmount = dormPackagesTotalDollarAmount + cookingPackagesTotalDollarAmount + req.body.deliveryFee;
@@ -658,7 +666,7 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 3;
+      req.body.dropoffID = 4;
       const checkTransactionResult = await transactionUtil.checkTransaction(req.body);
       res.json(checkTransactionResult);
     },

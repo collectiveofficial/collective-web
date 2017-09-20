@@ -1,7 +1,6 @@
-const initialDateState = '22 September 2017 from 8:00 AM to 4:00 PM';
-const initialVoteState = 'Voting window is from 7 September at 12:00 AM to 19 September at 11:59 PM';
+const initialDateState = '7 October 2017 from 9:00 AM to 12:00 PM';
+const initialVoteState = 'Voting window is from 20 September at 12:00 AM to 4 October at 11:59 PM';
 const initialRemainingCalendarState = [
-  ['7 October 2017',  "Voting window is from 21 September at 12:00 AM to 4 October at 11:59 PM"],
   ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
   ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
   ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
