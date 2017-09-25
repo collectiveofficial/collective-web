@@ -29,6 +29,7 @@ const Header = (props) => (
         <div />
       }
       <Link className={s.link} to="/about">About</Link>
+      <Link className={s.link} to="/faq">FAQ</Link>
       {/* <Link className={s.link} to="/foodwiki">FoodWiki</Link>
       <Link className={s.link} to="/community">Community</Link> */}
       {props.authenticated ?
