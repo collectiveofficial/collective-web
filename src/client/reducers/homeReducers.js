@@ -1,7 +1,8 @@
-const initialDateState = '7 October 2017 from 9:00 AM to 12:00 PM';
-const initialVoteState = 'Voting window is from 20 September at 12:00 AM to 4 October at 11:59 PM';
+const initialDateState = '8 October 2017 from 12:00 PM to 4:00 PM';
+const initialVoteState = 'Voting window is from 20 September at 12:00 AM to 5 October at 11:59 PM';
 const initialRemainingCalendarState = [
-  ['28 October 2017',  "Voting window is from 5 October at 12:00 AM to 25 October at 11:59 PM"],
+  ['17 October 2017',  "Voting window is from 6 October at 12:00 AM to 14 October at 11:59 PM"],
+  ['28 October 2017',  "Voting window is from 15 October at 12:00 AM to 25 October at 11:59 PM"],
   ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
   ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
 ];
@@ -16,7 +17,6 @@ export function _date(state=initialDateState, action) {
     }
   switch (action.type) {
     case 'SET_DATE':
-      console.log('_date state called with state: ', state, 'and action: ', action);
       return action.text;
 
     default:
@@ -30,7 +30,6 @@ export function _vote(state=initialVoteState, action) {
     }
   switch (action.type) {
     case 'SET_VOTE':
-      console.log('_vote state called with state: ', state, 'and action: ', action);
       return action.text;
 
     default:
@@ -44,7 +43,6 @@ export function _remainingCalendar(state=initialRemainingCalendarState, action) 
     }
   switch (action.type) {
     case 'SET_REMAINING_CALENDAR':
-      console.log('_remainingCalendar state called with state: ', state, 'and action: ', action);
       return [/*...state,*/ ...action.arr]; // We probably don't want to keep last state yet
 
     default:
@@ -58,7 +56,6 @@ export function _items(state=initialItemsState, action) {
     }
   switch (action.type) {
     case 'SET_ITEMS':
-      console.log('_items state called with state: ', state, 'and action: ', action);
       return action.text;
 
     default:
@@ -72,7 +69,6 @@ export function _provider(state=initialProviderState, action) {
     }
   switch (action.type) {
     case 'SET_PROVIDER':
-      console.log('_provider state called with state: ', state, 'and action: ', action);
       return action.text;
 
     default:
@@ -86,7 +82,6 @@ export function _location(state=initialLocationState, action) {
     }
   switch (action.type) {
     case 'SET_LOCATION':
-      console.log('_location state called with state: ', state, 'and action: ', action);
       return action.text;
 
     default:

@@ -5,7 +5,8 @@ import {
   Redirect,
 } from 'react-router-dom';
 import { connect } from 'react-redux';
-import * as paymentActionCreators from '../../action-creators/paymentActions'
+import { bindActionCreators } from 'redux';
+import * as paymentActionCreators from '../../action-creators/paymentActions';
 import s from './Home.css';
 import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label, Message, Grid } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
@@ -28,56 +29,56 @@ class Payment extends React.Component {
   async componentWillMount() {
     const email = await firebaseAuth().currentUser.email;
     console.log('Payment is mounting');
-    await this.props.dispatch(paymentActionCreators.enterPaymentPage());
-    this.props.dispatch(paymentActionCreators.setPaymentEmail(email));
+    await this.props.enterPaymentPage();
+    await this.props.setPaymentEmail(email);
   }
 
   async handleAllergies({ checked }) {
-    this.props.dispatch(paymentActionCreators.setHasAllegies(!this.props.hasAllergies));
+    await this.props.setHasAllegies(!this.props.hasAllergies);
     if (this.props.hasAllergies === false) {
-      this.props.dispatch(paymentActionCreators.setAllergiesList([]));
+      await this.props.setAllergiesList([]);
     }
   }
 
   handleDorm(e, { value }) {
-    this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage(''));
-    this.props.dispatch(paymentActionCreators.setDorm(value));
+    this.props.setServerPaymentErrorMessage('');
+    this.props.setDorm(value);
     let newPrice = this.props.price;
     newPrice = ((value * 6) + (this.props.cook * 6)) + this.props.deliveryPriceImpact;
-    this.props.dispatch(paymentActionCreators.setPrice(newPrice));
+    this.props.setPrice(newPrice);
   }
 
   handleCook(e, { value }) {
-    this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage(''));
-    this.props.dispatch(paymentActionCreators.setCook(value));
+    this.props.setServerPaymentErrorMessage('');
+    this.props.setCook(value);
     let newPrice = this.props.price;
     newPrice = ((this.props.dorm * 6) + (value * 6)) + this.props.deliveryPriceImpact;
-    this.props.dispatch(paymentActionCreators.setPrice(newPrice));
+    this.props.setPrice(newPrice);
   }
 
   async handleDelivery() {
     if (this.props.availableDeliveriesLeft === 0) {
-      this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage('There are no more available deliveries left for this round of bulk buy. We apologize for any inconvenience. We promise we\'ll be back with more deliveries in the future.'));
+      this.props.setServerPaymentErrorMessage('There are no more available deliveries left for this round of bulk buy. We apologize for any inconvenience. We promise we\'ll be back with more deliveries in the future.');
     } else {
       if (!this.props.deliveryEligibilityObj.isUserEligibleForDelivery) {
         if (this.props.deliveryEligibilityObj.isAddressDorm) {
-          this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage('It looks like your address is a dorm address. Our pickup location is not far away.'));
+          this.props.setServerPaymentErrorMessage('It looks like your address is a dorm address. Our pickup location is not far away.');
         }
         if (this.props.deliveryEligibilityObj.isAddressBeyondDeliveryReach) {
-          this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage('It looks like your address is beyond our 5 mile delivery boundaries. We will try our best to extend our delivery boundaries in our next bulk buy. Thank you for your patience.'));
+          this.props.setServerPaymentErrorMessage('It looks like your address is beyond our 5 mile delivery boundaries. We will try our best to extend our delivery boundaries in our next bulk buy. Thank you for your patience.');
         }
       } else {
         if (this.props.cook === 0) {
-          this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage('You would need to purchase at least 1 cooking package for delivery'));
+          this.props.setServerPaymentErrorMessage('You would need to purchase at least 1 cooking package for delivery');
         } else {
-          await this.props.dispatch(paymentActionCreators.setUserWantsDelivery(!this.props.userWantsDelivery));
+          await this.props.setUserWantsDelivery(!this.props.userWantsDelivery);
           if (this.props.userWantsDelivery) {
-            this.props.dispatch(paymentActionCreators.setDeliveryPriceImpact(3));
-            this.props.dispatch(paymentActionCreators.setPrice(this.props.price + 3));
+            this.props.setDeliveryPriceImpact(3);
+            this.props.setPrice(this.props.price + 3);
 
           } else {
-            this.props.dispatch(paymentActionCreators.setDeliveryPriceImpact(0));
-            this.props.dispatch(paymentActionCreators.setPrice(this.props.price - 3));
+            this.props.setDeliveryPriceImpact(0);
+            this.props.setPrice(this.props.price - 3);
           }
         }
       }
@@ -85,15 +86,15 @@ class Payment extends React.Component {
   }
 
   async handlePayment() {
-    this.props.dispatch(paymentActionCreators.setPaymentErrorMessage(''));
-    this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage(''));
+    this.props.setPaymentErrorMessage('');
+    this.props.setServerPaymentErrorMessage('');
     if (this.props.price === 0) {
-      this.props.dispatch(paymentActionCreators.setPaymentErrorMessage('Please specify an amount for the packages.'));
+      this.props.setPaymentErrorMessage('Please specify an amount for the packages.');
     }
   }
 
   async onToken(token) {
-    this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(false));
+    this.props.setHasPaymentCompleted(false);
     const foodObj = {};
     for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
       foodObj[this.props.ballotsAndVotes[i].name] = {
@@ -120,12 +121,12 @@ class Payment extends React.Component {
     });
 
     const submitPaymentResultData = await submitPaymentResult.json();
-    this.props.dispatch(paymentActionCreators.setServerPaymentErrorMessage(submitPaymentResultData.errorMessage));
+    this.props.setServerPaymentErrorMessage(submitPaymentResultData.errorMessage);
     if (this.props.serverPaymentErrorMessage.length === 0) {
       if (submitPaymentResultData.paymentCompleted) {
-        this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(true));
+        this.props.setHasPaymentCompleted(true);
       } else {
-        this.props.dispatch(paymentActionCreators.setHasPaymentCompleted(false));
+        this.props.setHasPaymentCompleted(false);
       }
     }
   }
@@ -139,7 +140,7 @@ class Payment extends React.Component {
       allergiesList.splice(allergiesIndex, 1);
     }
 
-    this.props.dispatch(paymentActionCreators.setAllergiesList(allergiesList));
+    this.props.setAllergiesList(allergiesList);
   }
 
   render() {
@@ -359,13 +360,13 @@ class Payment extends React.Component {
                           // Note: `reconfigureOnUpdate` should be set to true IFF, for some reason
                           // you are using multiple stripe keys
                           reconfigureOnUpdate={false}
-                          // Note: you can change the event to `onTouchTap`, `onClick`, `onTouchStart`
+                          // Note: you can change the event to `onClick`, `onClick`, `onTouchStart`
                           // useful if you're using React-Tap-Event-Plugin
-                          triggerEvent="onTouchTap"
+                          triggerEvent="onClick"
                           >
                           </StripeCheckout>
                         ) : (
-                          <RaisedButton label="Pay With Card" primary={true} onTouchTap={this.handlePayment} />
+                          <RaisedButton label="Pay With Card" primary={true} onClick={this.handlePayment} />
                         )}
                       </Feed.Summary>
                     </Feed.Content>
@@ -396,7 +397,7 @@ class Payment extends React.Component {
 }
 
 
-const mapStateToProps = (state, props) => {
+const mapStateToProps = (state) => {
   return {
     // App Reducers
     ballotsAndVotes: state.appReducer._ballotsAndVotes,
@@ -420,8 +421,10 @@ const mapStateToProps = (state, props) => {
   }
 };
 
+const bundledActionCreators = Object.assign({},
+  paymentActionCreators,
+);
 
+const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);
 
-const ConnectedPayment = connect(mapStateToProps)(Payment);
-
-export default ConnectedPayment;
+export default connect(mapStateToProps, mapDispatchToProps)(Payment);

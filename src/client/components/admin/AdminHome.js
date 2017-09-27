@@ -14,13 +14,13 @@ const AdminHome = (props) => {
       marginBottom: '1.5%',
     },
     header: {
-      marginLeft: '32%'
+      marginLeft: '36%',
     },
     table: {
-      margin: '0 2% 0 10%',
-      width: '70%',
+      margin: '2% 0 2% 2%',
     },
   };
+  // export to csv
 
   return (
     <div style={styles.home}>
@@ -34,43 +34,36 @@ const AdminHome = (props) => {
       <Table celled selectable style={styles.table}>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell>Name</Table.HeaderCell>
+            <Table.HeaderCell>Date</Table.HeaderCell>
+            <Table.HeaderCell>Voting Window</Table.HeaderCell>
+            <Table.HeaderCell>Dorm Packages Ordered</Table.HeaderCell>
+            <Table.HeaderCell>Cooking Packages Ordered</Table.HeaderCell>
+            <Table.HeaderCell>Total Packages Ordered</Table.HeaderCell>
+            <Table.HeaderCell>Total Participants</Table.HeaderCell>
+            <Table.HeaderCell>Net Volume from Sales</Table.HeaderCell>
             <Table.HeaderCell>Status</Table.HeaderCell>
-            <Table.HeaderCell>Notes</Table.HeaderCell>
-            <Table.HeaderCell>Notes</Table.HeaderCell>
-            <Table.HeaderCell>Notes</Table.HeaderCell>
+            {/* <Table.HeaderCell>Export Summary</Table.HeaderCell>
+            <Table.HeaderCell>Export Food Ballots</Table.HeaderCell>
+            <Table.HeaderCell>Export Participant Data</Table.HeaderCell> */}
           </Table.Row>
         </Table.Header>
 
         <Table.Body>
-          <Table.Row>
-            <Table.Cell>John</Table.Cell>
-            <Table.Cell>No Action</Table.Cell>
-            <Table.Cell>None</Table.Cell>
-            <Table.Cell>John</Table.Cell>
-            <Table.Cell>John</Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>Jamie</Table.Cell>
-            <Table.Cell>Approved</Table.Cell>
-            <Table.Cell>Requires call</Table.Cell>
-            <Table.Cell>John</Table.Cell>
-            <Table.Cell>John</Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>Jill</Table.Cell>
-            <Table.Cell>Denied</Table.Cell>
-            <Table.Cell>None</Table.Cell>
-            <Table.Cell>John</Table.Cell>
-            <Table.Cell>John</Table.Cell>
-          </Table.Row>
-          <Table.Row warning>
-            <Table.Cell>John</Table.Cell>
-            <Table.Cell>No Action</Table.Cell>
-            <Table.Cell>None</Table.Cell>
-            <Table.Cell>John</Table.Cell>
-            <Table.Cell>John</Table.Cell>
-          </Table.Row>
+            {props.adminReducers.adminData.map(data => (
+              <Table.Row>
+                <Table.Cell>{data.formattedIntendedPickupDateTimeStart} - {data.formattedIntendedPickupTimeEnd}</Table.Cell>
+                <Table.Cell>{data.formattedVoteDateTimeBeg} - {data.formattedVoteDateTimeEnd}</Table.Cell>
+                <Table.Cell>{data.totalDormPackagesOrdered}</Table.Cell>
+                <Table.Cell>{data.totalCookingPackagesOrdered}</Table.Cell>
+                <Table.Cell>{data.totalDormPackagesOrdered + data.totalCookingPackagesOrdered}</Table.Cell>
+                <Table.Cell>{data.totalParticipants}</Table.Cell>
+                <Table.Cell>${data.netVolumeFromSalesAfterFees}</Table.Cell>
+                <Table.Cell>{data.status}</Table.Cell>
+                {/* <Table.Cell><a onClick={async () => { await props.setDownloadUrl(data.id, 'summary'); }} href={props.adminReducers.downloadUrl} >Export as CSV</a></Table.Cell>
+                <Table.Cell><a onClick={async () => { await props.setDownloadUrl(data.id, 'ballot'); }} href={props.adminReducers.downloadUrl} >Export as CSV</a></Table.Cell>
+                <Table.Cell><a onClick={async () => { await props.setDownloadUrl(data.id, 'participant'); }} href={props.adminReducers.downloadUrl} >Export as CSV</a></Table.Cell> */}
+              </Table.Row>
+            ))}
         </Table.Body>
       </Table>
     </div>
