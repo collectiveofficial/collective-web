@@ -152,15 +152,6 @@ const initializeData = async () => {
   //    await restrictedAddressUtil.updateDropoffIDonRestrictedAddresses(dropoffID);
   //  };
 
-  const updatePackagesOrdered = async () => {
-    await dropoffUtil.updatePackagesOrdered();
-  };
-
-  const updateDropoffDateTimes = async () => {
-    await dropoffUtil.updateDropoff(thirdDropoff);
-    await dropoffUtil.updateDropoff(fourthDropoff);
-  };
-
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
     const dropoffID = 4;
@@ -313,8 +304,6 @@ const initializeData = async () => {
   await initializeThirdDropFoodItemsBallots();
   await initializeFourthDropoff();
   await initializeFourthDropFoodItemsBallots();
-  await updatePackagesOrdered();
-  await updateDropoffDateTimes();
   await initializeRestrictedAddresses();
   // await updateDropoffIDonRestrictedAddresses();
   await sendNightlyCSVupdates();
