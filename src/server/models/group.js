@@ -91,7 +91,7 @@ module.exports.updateCurrentVotingDropoffID = async (currentVotingDropoffID, gro
 
 module.exports.findDeliveryAddressFromGroupID = async (id) => {
   try {
-    console.log('----> id': id);
+    console.log('----> id: ', id);
     const group = await models.Group.findOne({
       where: {
         id,
