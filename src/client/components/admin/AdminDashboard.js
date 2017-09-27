@@ -11,7 +11,6 @@ import AdminHomeContainer from './AdminHomeContainer.js';
 import BulkBuy from './BulkBuy.js';
 
 const AdminDashboard = (props) => {
-  console.log('hi');
   // const styles = {
   // };
   let menuComponent;
