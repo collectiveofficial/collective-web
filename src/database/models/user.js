@@ -22,6 +22,7 @@ module.exports = function(sequelize, DataTypes) {
     isQualifiedForDelivery: DataTypes.BOOLEAN,
     latitude: DataTypes.STRING,
     longitude: DataTypes.STRING,
+    isAdmin: DataTypes.BOOLEAN,
   }, {
     classMethods: {
       associate: function(models) {

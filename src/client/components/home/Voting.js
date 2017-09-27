@@ -5,6 +5,7 @@ import {
   Redirect,
 } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import * as appActionCreators from '../../action-creators/appActions'
 import * as votingActionCreators from '../../action-creators/votingActions' // TODO RENAME 2 VOTE
 import s from './Home.css';
@@ -30,7 +31,7 @@ class Voting extends React.Component {
           votes--;
         }
       }
-      this.props.dispatch(votingActionCreators.setVotes(votes));
+      this.props.setVotes(votes);
       const checkIfUserHasPaidResult = await fetch('/transaction/check', {
         method: 'POST',
         headers: {
@@ -42,8 +43,8 @@ class Voting extends React.Component {
         }),
       });
       const checkIfUserHasPaidResultData = await checkIfUserHasPaidResult.json();
-      this.props.dispatch(votingActionCreators.setHasUserPaid(checkIfUserHasPaidResultData.hasUserPaid));
-      this.props.dispatch(votingActionCreators.enterVotesPage());
+      this.props.setHasUserPaid(checkIfUserHasPaidResultData.hasUserPaid);
+      this.props.enterVotesPage();
     }
   }
 
@@ -58,30 +59,30 @@ class Voting extends React.Component {
         newBallotsAndVotes[i].isCurrent = checked;
       }
     }
-    await this.props.dispatch(appActionCreators.setBallotsAndVotes(newBallotsAndVotes));
+    await this.props.setBallotsAndVotes(newBallotsAndVotes);
     let newVote = this.props.votes;
     checked ? newVote-- : newVote++;
-    await this.props.dispatch(votingActionCreators.setVotes(newVote));
+    await this.props.setVotes(newVote);
   }
 
   async handleContinueToPayment() {
-    this.props.dispatch(votingActionCreators.setVoteErrorMessage(''));
-    this.props.dispatch(votingActionCreators.setAllowContinueToPayment(''));
+    this.props.setVoteErrorMessage('');
+    this.props.setAllowContinueToPayment('');
     if (this.props.votes !== 0) {
-      this.props.dispatch(votingActionCreators.setVoteErrorMessage('Remember to use all your votes! You can change them later.'));
-      this.props.dispatch(votingActionCreators.setAllowContinueToPayment(false));
+      this.props.setVoteErrorMessage('Remember to use all your votes! You can change them later.');
+      this.props.setAllowContinueToPayment(false);
     }
     if (this.props.votes === 0) {
-      this.props.dispatch(votingActionCreators.setAllowContinueToPayment(true));
+      this.props.setAllowContinueToPayment(true);
     }
   }
 
   async handleSubmitUpdateVotes() {
-    this.props.dispatch(votingActionCreators.setVoteErrorMessage(''));
-    this.props.dispatch(votingActionCreators.setAllowContinueToPayment(''));
-    this.props.dispatch(votingActionCreators.setVotesHaveFinishedUpdating(''));
+    this.props.setVoteErrorMessage('');
+    this.props.setAllowContinueToPayment('');
+    this.props.setVotesHaveFinishedUpdating('');
     if (this.props.votes !== 0) {
-      this.props.dispatch(votingActionCreators.setVoteErrorMessage('Remember to use all your votes! You can change them later.'));
+      this.props.setVoteErrorMessage('Remember to use all your votes! You can change them later.');
     }
     if (this.props.votes === 0) {
       const foodObj = {};
@@ -102,9 +103,9 @@ class Voting extends React.Component {
       });
       const responseData = await response.json();
       alert('Your votes have been updated.');
-      this.props.dispatch(votingActionCreators.setVotesHaveFinishedUpdating(responseData.votesSaved));
+      this.props.setVotesHaveFinishedUpdating(responseData.votesSaved);
     } else {
-      this.props.dispatch(votingActionCreators.setVotesHaveFinishedUpdating(false));
+      this.props.setVotesHaveFinishedUpdating(false);
     }
   }
 
@@ -143,7 +144,7 @@ class Voting extends React.Component {
                     <RaisedButton
                       label="Update Votes"
                       primary={true}
-                      onTouchTap={this.handleSubmitUpdateVotes}
+                      onClick={this.handleSubmitUpdateVotes}
                     />
                   }
                   content={this.props.voteErrorMessage}
@@ -156,7 +157,7 @@ class Voting extends React.Component {
                   trigger={
                     <Button
                       positive
-                      onTouchTap={this.handleContinueToPayment}
+                      onClick={this.handleContinueToPayment}
                     >
                       Continue to Payment
                     </Button>
@@ -197,6 +198,11 @@ const mapStateToProps = (state, props) => {
   }
 };
 
-const ConnectedVoting = connect(mapStateToProps)(Voting);
+const bundledActionCreators = Object.assign({},
+  appActionCreators,
+  votingActionCreators,
+);
 
-export default ConnectedVoting;
+const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(Voting);

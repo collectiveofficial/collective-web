@@ -1,5 +1,6 @@
-const moment = require('moment-timezone');
-const momentOriginal = require('moment');
+const momentTZ = require('moment-timezone');
+const moment = require('moment');
+const _ = require('lodash');
 const models = require('../../database/models/index');
 const userUtil = require('./user');
 const foodUtil = require('./food');
@@ -84,7 +85,7 @@ module.exports.getUserInfoAndPackagesOrdered = async (dropoffID) => {
       const userObj = await userUtil.findUserInfoByID(userID);
       const allergies = await voteUtil.getUserAllergies(userID, dropoffID);
       // const birthday = await userObj.birthday.toDateString();
-      const birthday = await momentOriginal(userObj.birthday, 'YYYY-MM-DD').format('MM-DD-YYYY');
+      const birthday = await moment(userObj.birthday, 'YYYY-MM-DD').format('MM-DD-YYYY');
       const deliveryAddress = transactions[i].dataValues.isDelivery === true ? await userUtil.findFormattedAddressByID(transactions[i].dataValues.userID) : '';
       const dataObj = {
         'Last Name': userObj.lastName,
@@ -187,7 +188,7 @@ module.exports.getUserInfoForPickup = async (dropoffID, firebaseUID, userID) => 
       },
     });
     const userObj = await userUtil.findUserInfoByID(userID);
-    const birthday = await momentOriginal(userObj.birthday, 'YYYY-MM-DD').format('MM-DD-YYYY');
+    const birthday = await moment(userObj.birthday, 'YYYY-MM-DD').format('MM-DD-YYYY');
     const allergies = await voteUtil.getUserAllergies(userID, dropoffID);
     const userNameAndPackagesOrdered = {
       'Order ID': transaction.id,
@@ -208,7 +209,7 @@ module.exports.recordUserPickup = async (id) => {
   try {
     await models.Transaction.update({
       hasUserPickedUp: true,
-      pickupTime: moment.tz(new Date(), 'America/New_York').format(),
+      pickupTime: momentTZ.tz(new Date(), 'America/New_York').format(),
     }, {
       where: {
         id,
@@ -224,9 +225,9 @@ module.exports.findEmailReceiptInfo = async (dropoffID, firebaseUID) => {
     const userID = await userUtil.findUserID(firebaseUID);
     const userObj = await userUtil.findUserInfoByID(userID);
     const dropoffObj = await dropoffUtil.findDateTimesByID(dropoffID);
-    const intendedShipDate = momentOriginal(dropoffObj.intendedShipDate).format('MM-DD-YYYY');
-    const intendedPickupTimeStart = momentOriginal(dropoffObj.intendedPickupTimeStart).format('hh:mm A');
-    const intendedPickupTimeEnd = momentOriginal(dropoffObj.intendedShipDate).format('hh:mm A');
+    const intendedShipDate = moment(dropoffObj.intendedShipDate).format('MM-DD-YYYY');
+    const intendedPickupTimeStart = moment(dropoffObj.intendedPickupTimeStart).format('hh:mm A');
+    const intendedPickupTimeEnd = moment(dropoffObj.intendedShipDate).format('hh:mm A');
     const emailReceiptInfo = {
       firstName: userObj.firstName,
       intendedShipDate,
@@ -235,6 +236,82 @@ module.exports.findEmailReceiptInfo = async (dropoffID, firebaseUID) => {
     };
     return emailReceiptInfo;
   } catch(err) {
+    console.log(err);
+  }
+};
+
+module.exports.getDropoffPackagesOrdered = async (dropoffID) => {
+  try {
+    const dropoffPackagesOrdered = {
+      dormPackagesOrdered: 0,
+      cookingPackagesOrdered: 0,
+    };
+    const transactions = await models.Transaction.findAll({
+      where: {
+        dropoffID,
+      },
+    });
+    for (let i = 0; i < transactions.length; i++) {
+      dropoffPackagesOrdered.dormPackagesOrdered += transactions[i].dataValues.dormPackagesOrdered;
+      dropoffPackagesOrdered.cookingPackagesOrdered += transactions[i].dataValues.cookingPackagesOrdered;
+    }
+    return dropoffPackagesOrdered;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports.getCustomersForDropoff = async (dropoffID) => {
+  try {
+    const customerData = [];
+    let transactions = await models.Transaction.findAll({
+      where: {
+        dropoffID,
+      },
+    });
+    transactions = _.uniqBy(transactions, 'dataValues.userID');
+    for (let i = 0; i < transactions.length; i++) {
+      const userID = transactions[i].dataValues.userID;
+      const dormPackagesOrdered = transactions[i].dataValues.dormPackagesOrdered;
+      const cookingPackagesOrdered = transactions[i].dataValues.cookingPackagesOrdered;
+      const totalDollarAmount = transactions[i].dataValues.totalDollarAmount;
+      const transactionCreatedAt = transactions[i].dataValues.createdAt;
+      const userInfo = await userUtil.findUserInfoByID(userID);
+      const lastName = userInfo.lastName;
+      const firstName = userInfo.firstName;
+      const email = userInfo.email;
+      const phoneNumber = userInfo.phoneNumber;
+      const transaction = {
+        lastName,
+        firstName,
+        email,
+        phoneNumber,
+        dormPackagesOrdered,
+        cookingPackagesOrdered,
+        totalDollarAmount,
+        transactionCreatedAt,
+      };
+      customerData.push(transaction);
+    }
+    return customerData;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports.findSalesAfterFeesByDropoffID = async (dropoffID) => {
+  try {
+    let salesAfterFees = 0;
+    const transactions = await models.Transaction.findAll({
+      where: {
+        dropoffID,
+      },
+    });
+    for (let i = 0; i < transactions.length; i++) {
+      salesAfterFees += transactions[i].dataValues.totalDollarAmount - transactions[i].dataValues.revenueBeforeStripe;
+    }
+    return salesAfterFees;
+  } catch (err) {
     console.log(err);
   }
 };

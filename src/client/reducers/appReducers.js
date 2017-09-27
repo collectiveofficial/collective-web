@@ -16,7 +16,6 @@ export function _userAuthenticated(state=initialUserAuthenticatedState, action) 
     }
   switch (action.type) {
     case 'SET_USER_AUTHENTICATED':
-      console.log('_userAuthenticated state called with state: ', state, 'and action: ', action);
       return action.bool;
 
     default:
@@ -30,7 +29,6 @@ export function _userAuthorized(state=initialUserAuthorizedState, action) {
     }
   switch (action.type) {
     case 'SET_USER_AUTHORIZED':
-      console.log('_userAuthorized state called with state: ', state, 'and action: ', action);
       return action.bool;
 
     default:
@@ -44,7 +42,6 @@ export function _ballotsAndVotes(state=initialBallotsAndVotesState, action) {
     }
   switch (action.type) {
     case 'SET_BALLOTS_AND_VOTES':
-      console.log('_ballotsAndVotes state called with state: ', state, 'and action: ', action);
       return [...action.arr];
 
     default:
@@ -58,7 +55,6 @@ export function _firebaseAccessToken(state=initialFirebaseAccessTokenState, acti
     }
   switch (action.type) {
     case 'SET_FIREBASE_ACCESS_TOKEN':
-      console.log('_firebaseAccessToken state called with state: ', state, 'and action: ', action);
       return action.text;
 
     default:
@@ -72,7 +68,6 @@ export function _loading(state=initialLoadingState, action) {
     }
   switch (action.type) {
     case 'SET_LOADING':
-      console.log('_loading state called with state: ', state, 'and action: ', action);
       return action.bool;
 
     default:
@@ -86,7 +81,6 @@ export function _routeToRegisterForm(state=initialRouteToRegisterFormState, acti
     }
   switch (action.type) {
     case 'SET_ROUTE_TO_REGISTER_FORM':
-      console.log('_routeToRegisterForm state called with state: ', state, 'and action: ', action);
       return action.bool;
 
     default:
@@ -100,7 +94,6 @@ export function _userWantsEmailSignup(state=initialUserWantsEmailSignupState, ac
     }
   switch (action.type) {
     case 'SET_USER_WANTS_EMAIL_SIGNUP':
-      console.log('_userWantsEmailSignup state called with state: ', state, 'and action: ', action);
       return action.text;
 
     default:
@@ -114,7 +107,6 @@ export function _facebookData(state=initialFacebookDataState, action) {
     }
   switch (action.type) {
     case 'SET_FACEBOOK_DATA':
-      console.log('_facebookData state called with state: ', state, 'and action: ', action);
       return {...action.obj};
 
     default:
@@ -128,7 +120,6 @@ export function _transactionHistory(state=initialTransactionHistoryState, action
     }
   switch (action.type) {
     case 'SET_USER_TRANSACTION_HISTORY':
-      console.log('_transactionHistory state called with state: ', state, 'and action: ', action);
       return [...action.arr];
 
     default:
@@ -142,7 +133,6 @@ export function _availableDeliveriesLeft(state=initialAvailableDeliveriesLeftSta
     }
   switch (action.type) {
     case 'SET_AVAILABLE_DELIVERIES_LEFT':
-      console.log('_availableDeliveriesLeft state called with state: ', state, 'and action: ', action);
       return action.num;
 
     default:
@@ -156,7 +146,6 @@ export function _deliveryEligibilityObj(state=initialDeliveryEligibilityObjState
     }
   switch (action.type) {
     case 'SET_DELIVERY_ELIGIBILITY_OBJ':
-      console.log('_deliveryEligibilityObj state called with state: ', state, 'and action: ', action);
       return {...action.obj};
 
     default:
