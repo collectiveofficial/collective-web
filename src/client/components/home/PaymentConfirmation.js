@@ -3,7 +3,7 @@ import {
   Redirect,
 } from 'react-router-dom';
 import { Button } from 'semantic-ui-react';
-import { Message } from 'semantic-ui-react'
+import { Message } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 
 class PaymentConfirmation extends React.Component {
@@ -26,7 +26,7 @@ class PaymentConfirmation extends React.Component {
         <Message color='green'>Thank you for voting! Your votes are now recorded. Your payment receipt has been sent to {this.props.paymentEmail}.</Message>
         <Button
           positive
-          onTouchTap={() => { this.setState({ doesUserWantHome: true }); }}
+          onClick={() => { this.setState({ doesUserWantHome: true }); }}
           style={styles.returnHomeButton}
         >
           Return to Home
@@ -48,6 +48,4 @@ const mapStateToProps = (state, props) => {
   }
 };
 
-const ConnectedPaymentConfirmation = connect(mapStateToProps)(PaymentConfirmation);
-
-export default ConnectedPaymentConfirmation;
+export default connect(mapStateToProps)(PaymentConfirmation);

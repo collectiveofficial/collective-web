@@ -4,10 +4,11 @@ import {
   Link,
   Redirect
 } from 'react-router-dom';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import * as appActionCreators from '../../action-creators/appActions';
-import * as loginActionCreators from '../../action-creators/loginActions'
-import * as signUpActionCreators from '../../action-creators/signUpActions'
+import * as loginActionCreators from '../../action-creators/loginActions';
+import * as signUpActionCreators from '../../action-creators/signUpActions';
 import TextField from 'material-ui/TextField';
 import MailOutline from 'material-ui/svg-icons/communication/mail-outline';
 import LockOutline from 'material-ui/svg-icons/action/lock-outline';
@@ -30,7 +31,7 @@ class SignUp extends React.Component {
 
   componentWillMount() {
     console.log('Signup is mounting');
-    this.props.dispatch(signUpActionCreators.enterSignupPage());
+    this.props.enterSignupPage();
   }
 
   async createNativeUser (email, pw) {
@@ -43,10 +44,10 @@ class SignUp extends React.Component {
       const errorCode = error.code;
       const errorMessage = error.message;
       if (errorCode === 'auth/weak-password') {
-        this.props.dispatch(signUpActionCreators.setIsWeakPassword(true));
-        this.props.dispatch(loginActionCreators.setPasswordErrorMessage('The password is too weak.'))
+        this.props.setIsWeakPassword(true);
+        this.props.setPasswordErrorMessage('The password is too weak.')
       } else {
-        this.props.dispatch(signUpActionCreators.setIsWeakPassword(false));
+        this.props.setIsWeakPassword(false);
       }
       console.log(error);
     });
@@ -65,10 +66,10 @@ class SignUp extends React.Component {
     })
     const responseData = await response.json();
     if (responseData.emailValidated) {
-      this.props.dispatch(loginActionCreators.setIsEmailValidated(true));
+      this.props.setIsEmailValidated(true);
     } else {
-      this.props.dispatch(loginActionCreators.setEmailErrorMessage('Hmm...that doesn\'t look like an email address.'));
-      this.props.dispatch(loginActionCreators.setIsEmailValidated(false));
+      this.props.setEmailErrorMessage('Hmm...that doesn\'t look like an email address.');
+      this.props.setIsEmailValidated(false);
     }
   }
 
@@ -85,16 +86,16 @@ class SignUp extends React.Component {
     })
     const responseData = await response.json();
     if (responseData.passwordValidated) {
-      this.props.dispatch(loginActionCreators.setIsPasswordValidated(true));
+      this.props.setIsPasswordValidated(true);
     } else {
-      this.props.dispatch(loginActionCreators.setIsPasswordValidated(false));
-      this.props.dispatch(loginActionCreators.setPasswordErrorMessage('Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number.'));
+      this.props.setIsPasswordValidated(false);
+      this.props.setPasswordErrorMessage('Your password needs a minimum of 8 characters with at least one uppercase letter, one lowercase letter and one number.');
     }
   }
 
   async handleEmailContinue() {
     await console.log('handleEmailContinue is executing/executed');
-    this.props.dispatch(loginActionCreators.resetErrorMessageStates());
+    this.props.resetErrorMessageStates();
     await this.validatePassword();
     let firebaseEmailSignUpUser;
     let firebaseAccessToken;
@@ -118,12 +119,12 @@ class SignUp extends React.Component {
       // if email exists and hasUserFinishedSignUp is false
       if (doesUserEmailExist && !hasUserFinishedSignUp && !isUserFacebookAuth) {
         // tell user to login because email exists
-        this.props.dispatch(signUpActionCreators.setIsEmailAlreadyInUse(true));
-        this.props.dispatch(loginActionCreators.setEmailErrorMessage('This email is already in use. Please log in or register with another email.'));
+        this.props.setIsEmailAlreadyInUse(true);
+        this.props.setEmailErrorMessage('This email is already in use. Please log in or register with another email.');
         // else if email doesn't exist
       } else if (doesUserEmailExist && isUserFacebookAuth) {
-        this.props.dispatch(signUpActionCreators.setIsExistingUserFBAuth(true));
-        his.props.dispatch(loginActionCreators.setEmailErrorMessage('This email is associated with a Facebook account. Please continue with Facebook.'));
+        this.props.setIsExistingUserFBAuth(true);
+        his.props.setEmailErrorMessage('This email is associated with a Facebook account. Please continue with Facebook.');
       } else if (!doesUserEmailExist) {
         // go through logic
         if (this.props.isPasswordValidated) {
@@ -135,7 +136,7 @@ class SignUp extends React.Component {
         const isValidLogin = !(!this.props.isEmailValidated || this.props.isEmailAlreadyInUse); // TODO MAKE BETTER
         if (isValidLogin && this.props.isPasswordValidated) {
           firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
-          this.props.dispatch(appActionCreators.setFirebaseAccessToken(firebaseAccessToken));
+          this.props.setFirebaseAccessToken(firebaseAccessToken);
           const response = await fetch('/auth/signup/email-signup/save', {
             method: 'POST',
             headers: {
@@ -148,8 +149,8 @@ class SignUp extends React.Component {
             }),
           });
           const responseData = await response.json();
-          this.props.dispatch(appActionCreators.setUserWantsEmailSignup(true));
-          this.props.dispatch(appActionCreators.setRouteToRegisterForm(true));
+          this.props.setUserWantsEmailSignup(true);
+          this.props.setRouteToRegisterForm(true);
         }
       }
     }
@@ -203,7 +204,7 @@ class SignUp extends React.Component {
                         type="email"
                         hintText="Email"
                         style={styles.iconStyles}
-                        onChange={(event) => this.props.dispatch(loginActionCreators.setEmailInput(event.target.value))}
+                        onChange={(event) => this.props.setEmailInput(event.target.value)}
                       />
                     }
                     content={this.props.emailErrorMessage}
@@ -219,7 +220,7 @@ class SignUp extends React.Component {
                         type="password"
                         hintText="Create New Password"
                         style={styles.iconStyles}
-                        onChange={(event) => this.props.dispatch(loginActionCreators.setPasswordInput(event.target.value))}
+                        onChange={(event) => this.props.setPasswordInput(event.target.value)}
                       />
                       }
                       content={this.props.passwordErrorMessage}
@@ -229,7 +230,7 @@ class SignUp extends React.Component {
                     /><br />
                   </div>
                   <br />
-                  <RaisedButton label="Continue" primary={true} onTouchTap={this.handleEmailContinue} /><br /><br />
+                  <RaisedButton label="Continue" primary={true} onClick={this.handleEmailContinue} /><br /><br />
                 </div>
                 <button
                   className={s.loginBtn}
@@ -247,7 +248,7 @@ class SignUp extends React.Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
+const mapStateToProps = (state) => {
   return {
     // appReducers
     userAuthorized: state.appReducer._userAuthorized,
@@ -271,5 +272,12 @@ const mapStateToProps = (state, props) => {
   }
 };
 
-const ConnectedSignUp = connect(mapStateToProps)(SignUp);
-export default ConnectedSignUp;
+const bundledActionCreators = Object.assign({},
+  appActionCreators,
+  loginActionCreators,
+  signUpActionCreators,
+);
+
+const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignUp);

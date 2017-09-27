@@ -30,7 +30,7 @@ class Home extends React.Component {
               </div>
               <h1 className={s.banner}>Upcoming Bulk Buys</h1>
             </div>
-            <Message color='blue'>Next pickup: 22 September 2017 from 8:00 AM to 4:00 PM at Scott House</Message>
+            {/* <Message color='blue'>Next pickup: 22 September 2017 from 8:00 AM to 4:00 PM at Scott House</Message> */}
             <Card style={{width: "800px", margin: "0 0 30px 0"}}>
               <CardTitle
                 title={this.props.date}
@@ -73,8 +73,7 @@ class Home extends React.Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
-  console.log('MAP STATE TO PROPS: ',state, props)
+const mapStateToProps = (state) => {
   return {
     authenticated: state.appReducer._userAuthenticated, // TODO RENAME
     date: state.homeReducer._date,
@@ -86,6 +85,4 @@ const mapStateToProps = (state, props) => {
   }
 };
 
-const ConnectedHome = connect(mapStateToProps)(Home);
-
-export default ConnectedHome;
+export default connect(mapStateToProps)(Home);

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-var injectTapEventPlugin = require("react-tap-event-plugin");
 import {
   Route,
   Link,
   Redirect
 } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import * as loginActionCreators from '../../action-creators/loginActions';
 import * as registerActionCreators from '../../action-creators/registerActions';
 import s from './Register.css';
@@ -14,8 +14,6 @@ import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Modal, Message } from 'semantic-ui-react';
 import schools from './universities_list.js';
-
-injectTapEventPlugin();
 
 const usStates = ['AK','AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','GU','HI',
 'IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MH','MI','MN','MO',
@@ -35,7 +33,7 @@ class RegisterForm extends React.Component {
   }
 
   componentWillMount() {
-    this.props.dispatch(registerActionCreators.enterRegisterPage());
+    this.props.enterRegisterPage();
   }
 
   componentDidMount() {
@@ -44,17 +42,17 @@ class RegisterForm extends React.Component {
 
   async transferUserSignup() {
     if (this.props.userWantsEmailSignup) {
-      this.props.dispatch(loginActionCreators.setEmailInput(this.props.emailInput));
+      this.props.setEmailInput(this.props.emailInput);
     } else {
-      this.props.dispatch(loginActionCreators.setEmailInput(this.props.facebookData.email));
-      this.props.dispatch(registerActionCreators.setFirstName(this.props.facebookData.first_name ));
-      this.props.dispatch(registerActionCreators.setLastName(this.props.facebookData.last_name ));
+      this.props.setEmailInput(this.props.facebookData.email);
+      this.props.setFirstName(this.props.facebookData.first_name );
+      this.props.setLastName(this.props.facebookData.last_name );
     }
   }
 
   handleChange(event) {
     event.preventDefault();
-    this.props.dispatch(registerActionCreators.setValue(event.target.value));
+    this.props.setValue(event.target.value);
   }
 
   handleSubmit(event) {
@@ -63,24 +61,24 @@ class RegisterForm extends React.Component {
   }
 
   async areThereEmptyFields() {
-    await this.props.dispatch(registerActionCreators.setIsFirstNameEmpty(this.props.firstName.length === 0));
-    await this.props.dispatch(registerActionCreators.setIsLastNameEmpty(this.props.lastName.length === 0));
-    await this.props.dispatch(registerActionCreators.setIsPhoneNumberEmpty(this.props.phoneNumber.length === 0));
-    await this.props.dispatch(registerActionCreators.setIsBirthdayEmpty(this.props.birthday.length === 0));
-    await this.props.dispatch(registerActionCreators.setIsStreetAddressEmpty(this.props.streetAddress.length === 0));
-    await this.props.dispatch(registerActionCreators.setIsCityEmpty(this.props.city.length === 0));
-    await this.props.dispatch(registerActionCreators.setIsStateEmpty(this.props.state.length === 0));
-    await this.props.dispatch(registerActionCreators.setIsZipcodeEmpty(this.props.zipcode.length === 0));
-    await this.props.dispatch(registerActionCreators.setIsInvalidState(usStates.indexOf(this.props.state) < 0));
-    await this.props.dispatch(registerActionCreators.setIsSchoolEmpty(this.props.school.length === 0));
-    await this.props.dispatch(registerActionCreators.setIsInvalidSchool(schools.universities.indexOf(this.props.school) < 0));
-    await this.props.dispatch(registerActionCreators.setAreThereEmptyFields(
+    await this.props.setIsFirstNameEmpty(this.props.firstName.length === 0);
+    await this.props.setIsLastNameEmpty(this.props.lastName.length === 0);
+    await this.props.setIsPhoneNumberEmpty(this.props.phoneNumber.length === 0);
+    await this.props.setIsBirthdayEmpty(this.props.birthday.length === 0);
+    await this.props.setIsStreetAddressEmpty(this.props.streetAddress.length === 0);
+    await this.props.setIsCityEmpty(this.props.city.length === 0);
+    await this.props.setIsStateEmpty(this.props.state.length === 0);
+    await this.props.setIsZipcodeEmpty(this.props.zipcode.length === 0);
+    await this.props.setIsInvalidState(usStates.indexOf(this.props.state) < 0);
+    await this.props.setIsSchoolEmpty(this.props.school.length === 0);
+    await this.props.setIsInvalidSchool(schools.universities.indexOf(this.props.school) < 0);
+    await this.props.setAreThereEmptyFields(
       this.props.isFirstNameEmpty || this.props.isLastNameEmpty ||
       this.props.isPhoneNumberEmpty || this.props.isBirthdayEmpty ||
       this.props.isStreetAddressEmpty || this.props.isCityEmpty ||
       this.props.isStateEmpty || this.props.isZipcodeEmpty ||
       this.props.isInvalidState || this.props.isSchoolEmpty ||
-      this.props.isInvalidSchool));
+      this.props.isInvalidSchool);
     //TODO REFACTOR ^^
   }
 
@@ -112,7 +110,7 @@ class RegisterForm extends React.Component {
       if (responseData.userSignedUp) {
         await this.props.authorizeUser();
       } else {
-        this.props.dispatch(registerActionCreators.setIsFakeAddress(true));
+        this.props.setIsFakeAddress(true);
       }
     }
   }
@@ -131,7 +129,7 @@ class RegisterForm extends React.Component {
           floatingLabelText="First Name"
           floatingLabelFixed={true}
           style={styles.field}
-          onChange={(event) => this.props.dispatch(registerActionCreators.setFirstName(event.target.value))}
+          onChange={(event) => this.props.setFirstName(event.target.value)}
           errorText={this.props.isFirstNameEmpty ? 'First name is required' : ''}
         /><br />
         <TextField
@@ -140,12 +138,12 @@ class RegisterForm extends React.Component {
           floatingLabelText="Last Name"
           floatingLabelFixed={true}
           style={styles.field}
-          onChange={(event) => this.props.dispatch(registerActionCreators.setLastName(event.target.value))}
+          onChange={(event) => this.props.setLastName(event.target.value)}
           errorText={this.props.isLastNameEmpty ? 'Last name is required' : ''}
         /><br />
         <AutoComplete
           searchText={this.props.school}
-          onUpdateInput={school => this.props.dispatch(registerActionCreators.setSchool(school))}
+          onUpdateInput={school => this.props.setSchool(school)}
           floatingLabelText="School"
           floatingLabelFixed={true}
           dataSource={schools.universities}
@@ -159,7 +157,7 @@ class RegisterForm extends React.Component {
          floatingLabelText="Date of Birth"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.props.dispatch(registerActionCreators.setBirthday(event.target.value))}
+         onChange={(event) => this.props.setBirthday(event.target.value)}
          errorText={this.props.isBirthdayEmpty ? 'Birthday is required' : ''}
         /><br />
         <TextField
@@ -167,7 +165,7 @@ class RegisterForm extends React.Component {
          floatingLabelText="Cell Phone"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.props.dispatch(registerActionCreators.setPhoneNumber(event.target.value))}
+         onChange={(event) => this.props.setPhoneNumber(event.target.value)}
          errorText={this.props.isPhoneNumberEmpty ? 'Phone number is required' : ''}
         /><br />
         <TextField
@@ -175,7 +173,7 @@ class RegisterForm extends React.Component {
          floatingLabelText="Street Address"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.props.dispatch(registerActionCreators.setStreetAddress(event.target.value))}
+         onChange={(event) => this.props.setStreetAddress(event.target.value)}
          errorText={this.props.isStreetAddressEmpty ? 'Street address is required' : ''}
         /><br />
         <TextField
@@ -183,19 +181,19 @@ class RegisterForm extends React.Component {
          floatingLabelText="Apt #/Suite"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.props.dispatch(registerActionCreators.setAptSuite(event.target.value))}
+         onChange={(event) => this.props.setAptSuite(event.target.value)}
         /><br />
         <TextField
          type='text'
          floatingLabelText="City"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.props.dispatch(registerActionCreators.setCity(event.target.value))}
+         onChange={(event) => this.props.setCity(event.target.value)}
          errorText={this.props.isCityEmpty ? 'City is required' : ''}
         /><br />
         <AutoComplete
           searchText={this.props.state}
-          onUpdateInput={state => this.props.dispatch(registerActionCreators.setState(state.toUpperCase()))}
+          onUpdateInput={state => this.props.setState(state.toUpperCase())}
           floatingLabelText="State"
           floatingLabelFixed={true}
           dataSource={usStates}
@@ -209,11 +207,11 @@ class RegisterForm extends React.Component {
          floatingLabelText="Zip Code"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.props.dispatch(registerActionCreators.setZipcode(event.target.value))}
+         onChange={(event) => this.props.setZipcode(event.target.value)}
          errorText={this.props.isZipcodeEmpty ? 'Zip code is required' : ''}
         /><br />
        <div>
-         <RaisedButton label="Submit" primary={true} onTouchTap={this.areThereEmptyFields} /><br /><br />
+         <RaisedButton label="Submit" primary={true} onClick={this.areThereEmptyFields} /><br /><br />
          <Modal open={this.props.areThereEmptyFields === false}>
            <Modal.Content>
              <p>By clicking continue I have read and agreed to Collective's <Link to="terms">terms of use</Link> and <Link to="privacy">privacy policy</Link> as well as Best Food Forward's <Link to="bff">terms of use</Link>, and I agree to not hold any involved individuals or entities liable for anything related to the use, consumption, storage, or purchasing of food within this site.</p>
@@ -227,8 +225,8 @@ class RegisterForm extends React.Component {
              }
            </Modal.Content>
            <Modal.Actions>
-             <RaisedButton label="Cancel" secondary={true} onTouchTap={() => { this.props.dispatch(registerActionCreators.setAreThereEmptyFields('')); }} />
-             <RaisedButton label="Continue" primary={true} onTouchTap={this.submitUserInfo} /><br /><br />
+             <RaisedButton label="Cancel" secondary={true} onClick={() => { this.props.setAreThereEmptyFields(''); }} />
+             <RaisedButton label="Continue" primary={true} onClick={this.submitUserInfo} /><br /><br />
            </Modal.Actions>
          </Modal>
       </div>
@@ -237,7 +235,7 @@ class RegisterForm extends React.Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
+const mapStateToProps = (state) => {
   return {
     // appReducers
     userAuthorized: state.appReducer._userAuthorized,
@@ -276,6 +274,11 @@ const mapStateToProps = (state, props) => {
   }
 };
 
-const ConnectedRegisterForm = connect(mapStateToProps)(RegisterForm);
+const bundledActionCreators = Object.assign({},
+  loginActionCreators,
+  registerActionCreators,
+);
 
-export default ConnectedRegisterForm;
+const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(RegisterForm);

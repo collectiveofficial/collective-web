@@ -33,7 +33,6 @@ module.exports.checkIfUserEmailExists = function (email) {
     }
   })
   .then((checkUserEmailResult) => {
-    console.log('checkUserEmailResult: ', checkUserEmailResult);
     if (checkUserEmailResult !== null) {
       return true;
     } else {
@@ -84,10 +83,9 @@ module.exports.checkIfUserAuthorized = function (uid) {
     where: {
       firebaseUID: uid,
       hasUserFinishedSignUp: true,
-    }
+    },
   })
   .then((checkIfUserFinishedSignUpResult) => {
-    console.log('checkUserResult: ', checkIfUserFinishedSignUpResult);
     if (checkIfUserFinishedSignUpResult !== null) {
       return true;
     } else {
@@ -95,6 +93,25 @@ module.exports.checkIfUserAuthorized = function (uid) {
     }
   })
   .catch(err => console.log(err));
+};
+
+module.exports.checkIfUserIsAdmin = async (uid) => {
+  try {
+    const checkIfUserIsAdminResult = await models.User.findOne({
+      where: {
+        firebaseUID: uid,
+        hasUserFinishedSignUp: true,
+        isAdmin: true,
+      },
+    });
+    if (checkIfUserIsAdminResult !== null) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch(err) {
+    console.log(err);
+  }
 };
 
 module.exports.checkIfUserFinishedSignUp = function (uid) {
@@ -105,7 +122,6 @@ module.exports.checkIfUserFinishedSignUp = function (uid) {
     }
   })
   .then((checkIfUserFinishedSignUpResult) => {
-    console.log('checkUserResult: ', checkIfUserFinishedSignUpResult);
     if (checkIfUserFinishedSignUpResult !== null) {
       return true;
     } else {
@@ -123,7 +139,6 @@ module.exports.checkIfEmailUserFinishedSignUp = function (email) {
     }
   })
   .then((checkIfEmailUserFinishedSignUpResult) => {
-    console.log('checkUserResult: ', checkIfEmailUserFinishedSignUpResult);
     if (checkIfEmailUserFinishedSignUpResult !== null) {
       return true;
     } else {
@@ -385,6 +400,20 @@ module.exports.findFormattedAddressByID = async (id) => {
     });
     const formattedAddress = user.dataValues.fullAddress;
     return formattedAddress;
+  } catch(err) {
+    console.log(err);
+  }
+};
+
+module.exports.findGroupIDByUID = async (firebaseUID) => {
+  try {
+    const user = await models.User.findOne({
+      where: {
+        firebaseUID,
+      },
+    });
+    const groupID = user.dataValues.userGroupId;
+    return groupID;
   } catch(err) {
     console.log(err);
   }

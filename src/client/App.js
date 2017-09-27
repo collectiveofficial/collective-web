@@ -1,5 +1,5 @@
 // React imports
-import React, { Component } from 'react';
+import React from 'react';
 
 import {
   Route,
@@ -8,10 +8,6 @@ import {
   Switch,
 } from 'react-router-dom';
 import initReactFastclick from 'react-fastclick';
-// Redux imports
-import { connect } from 'react-redux';
-// Redux actions impors
-import * as appActionCreators from './action-creators/appActions';
 // Firebase imports
 import firebase from 'firebase';
 import { nativeLogout } from './utils/auth.js';
@@ -33,14 +29,11 @@ import Terms from './components/legal/collectiveterms.js';
 import BFFTerms from './components/legal/BFFterms.js';
 import Privacy from './components/legal/privacypolicy.js';
 import OrderInfo from './components/orderInfo/OrderInfo.js';
-
+import AdminDashboardContainer from './components/admin/AdminDashboardContainer.js';
 
 initReactFastclick();
-// if ('ontouchstart' in document.documentElement) {
-//   document.body.style.cursor = 'pointer';
-// }
 
-const PrivateRoute = ({component: Component, userAuthorized, ...rest}) => { // TODO MOVE
+const PrivateRoute = ({ component: Component, userAuthorized, ...rest }) => { // TODO MOVE
   return (
     <Route
       {...rest}
@@ -51,7 +44,7 @@ const PrivateRoute = ({component: Component, userAuthorized, ...rest}) => { // T
   );
 };
 
-const PublicRoute = ({component: Component, userAuthorized, ...rest}) => {
+const PublicRoute = ({ component: Component, userAuthorized, ...rest }) => {
   return (
     <Route
       {...rest}
@@ -60,7 +53,7 @@ const PublicRoute = ({component: Component, userAuthorized, ...rest}) => {
   );
 };
 
-const DenyAuthorizedRoute = ({component: Component, userAuthorized, ...rest}) => {
+const DenyAuthorizedRoute = ({ component: Component, userAuthorized, ...rest }) => {
   return (
     <Route
       {...rest}
@@ -71,7 +64,18 @@ const DenyAuthorizedRoute = ({component: Component, userAuthorized, ...rest}) =>
   );
 };
 
-class App extends Component {
+const AdminRoute = ({ component: Component, userAuthorized, adminAuthorized, ...rest }) => { // TODO MOVE
+  return (
+    <Route
+      {...rest}
+      render={(props) => userAuthorized === true && adminAuthorized === true
+        ? <Component {...props} />
+        : <Redirect to='/home' />}
+    />
+  );
+};
+
+class App extends React.Component {
   constructor(props) {
     super(props);
 
@@ -81,12 +85,12 @@ class App extends Component {
     this.authorizeUser = this.authorizeUser.bind(this);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.firebaseListener = firebaseAuth().onAuthStateChanged(async (user) => {
       if (user) { // is signed in
         await console.log('Logged in');
         const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
-        this.props.dispatch(appActionCreators.setFirebaseAccessToken(firebaseAccessToken));
+        await this.props.setFirebaseAccessToken(firebaseAccessToken);
         const response = await fetch('/auth/check', {
           method: 'POST',
           headers: {
@@ -99,16 +103,19 @@ class App extends Component {
         })
         const responseData = await response.json();
         const userAuthorized = responseData.userAuthorized;
-        if (userAuthorized) {
-          this.authorizeUser();
+        const isUserAdmin = responseData.isUserAdmin;
+        if (userAuthorized && isUserAdmin) {
+          await this.authorizeUser();
+          await this.props.setAuthorizeAdmin(true);
+        } else if (userAuthorized) {
+          await this.authorizeUser();
         }
-      this.props.dispatch(appActionCreators.setUserAuthenticated(true));
-      this.props.dispatch(appActionCreators.setLoading(false));
-
+        await this.props.setUserAuthenticated(true);
+        await this.props.setLoading(false);
       } else { // isn't signed in
-        this.props.dispatch(appActionCreators.setUserAuthenticated(false));
-        this.props.dispatch(appActionCreators.setLoading(false));
-        this.props.dispatch(appActionCreators.setUserAuthorized(false));
+        await this.props.setUserAuthenticated(false);
+        await this.props.setLoading(false);
+        await this.props.setUserAuthorized(false);
       }
     });
   }
@@ -119,7 +126,8 @@ class App extends Component {
 
   async logOut() {
     await nativeLogout();
-    this.props.dispatch(appActionCreators.logOut());
+    this.props.logOut();
+    this.props.setAuthorizeAdmin(false);
     await console.log('User after log out', firebaseAuth().currentUser);
   }
 
@@ -135,7 +143,7 @@ class App extends Component {
     // const firebaseAccessToken = result.user.ie;
     const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
     // await this.setState({ firebaseAccessToken });
-    this.props.dispatch(appActionCreators.setFirebaseAccessToken(firebaseAccessToken));
+    this.props.setFirebaseAccessToken(firebaseAccessToken);
     const token = result.credential.accessToken;
     const response = await fetch('/auth/facebook', {
       method: 'POST',
@@ -148,7 +156,7 @@ class App extends Component {
       }),
     });
     const responseData = await response.json();
-    this.props.dispatch(appActionCreators.setFacebookData(responseData.facebook_payload));
+    this.props.setFacebookData(responseData.facebook_payload);
     const facebookCheckResponse = await fetch('/auth/facebook/check', {
       method: 'POST',
       headers: {
@@ -170,16 +178,16 @@ class App extends Component {
     if (userAlreadyExists && hasUserFinishedSignUp) {
       await this.authorizeUser();
     } else if ((userAlreadyExists && !hasUserFinishedSignUp)) {
-      this.props.dispatch(appActionCreators.setRouteToRegisterForm(true));
+      this.props.setRouteToRegisterForm(true);
     } else if (saveUserOnFacebookSignUpExecuted) {
       const currentFirebaseUser = await firebaseAuth().currentUser;
       const sendEmailVerification = await currentFirebaseUser.sendEmailVerification();
-      this.props.dispatch(appActionCreators.setRouteToRegisterForm(true));
+      this.props.setRouteToRegisterForm(true);
     }
   }
 
   async authorizeUser() {
-    this.props.dispatch(appActionCreators.setUserAuthorized(true));
+    this.props.setUserAuthorized(true);
     // TODO: Change hardcoded dropoff to dynamic
     const initialDataLoad = await fetch('/vote-ballot/get-ballot-votes', {
       method: 'POST',
@@ -190,13 +198,15 @@ class App extends Component {
       body: JSON.stringify({
         firebaseAccessToken: this.props.firebaseAccessToken,
       }),
-    })
+    });
     const initialDataLoadResults = await initialDataLoad.json();
-    await this.props.dispatch(appActionCreators.setBallotsAndVotes(initialDataLoadResults.ballotsAndVotes));
-    await this.props.dispatch(appActionCreators.setUserTransactionHistory(initialDataLoadResults.userTransactionHistory));
-    await this.props.dispatch(appActionCreators.setAvailableDeliveriesLeft(initialDataLoadResults.availableDeliveriesLeft));
-    await this.props.dispatch(appActionCreators.setDeliveryEligibilityObj(initialDataLoadResults.deliveryEligibilityObj));
-
+    await this.props.setBallotsAndVotes(initialDataLoadResults.ballotsAndVotes);
+    await this.props.setUserTransactionHistory(initialDataLoadResults.userTransactionHistory);
+    await this.props.setAvailableDeliveriesLeft(initialDataLoadResults.availableDeliveriesLeft);
+    await this.props.setDeliveryEligibilityObj(initialDataLoadResults.deliveryEligibilityObj);
+    if (initialDataLoadResults.isUserAdmin) {
+      await this.props.setAdminData(initialDataLoadResults.adminData);
+    }
   }
 
   render() {
@@ -218,23 +228,24 @@ class App extends Component {
                   authorizeUser={this.authorizeUser}
                 />)}
               />
-              <PrivateRoute userAuthorized={this.props.userAuthorized} path="/home" component={Home} />
-              <PrivateRoute userAuthorized={this.props.userAuthorized} path="/voting" component={Voting}/>
-              <PrivateRoute userAuthorized={this.props.userAuthorized} path="/order-info" component={OrderInfo} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/foodwiki" component={foodwiki} />
               <DenyAuthorizedRoute userAuthorized={this.props.userAuthorized} path="/signup" component={() =>
                 (<SignUp
                   handleFacebookAuth={this.handleFacebookAuth}
                   authorizeUser={this.authorizeUser}
                 />)}
               />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/community" component={community} />
               <DenyAuthorizedRoute userAuthorized={this.props.userAuthorized} path="/register-form" component={() =>
                 (<RegisterForm
                   authenticated={this.authenticated}
                   authorizeUser={this.authorizeUser}
                 />)}
               />
+              <PrivateRoute userAuthorized={this.props.userAuthorized} path="/home" component={Home} />
+              <PrivateRoute userAuthorized={this.props.userAuthorized} path="/voting" component={Voting}/>
+              <PrivateRoute userAuthorized={this.props.userAuthorized} path="/order-info" component={OrderInfo} />
+              <AdminRoute userAuthorized={this.props.userAuthorized} adminAuthorized={this.props.adminReducers.adminAuthorized} path="/admin-dashboard" component={AdminDashboardContainer} />
+              <PublicRoute userAuthorized={this.props.userAuthorized} path="/foodwiki" component={foodwiki} />
+              <PublicRoute userAuthorized={this.props.userAuthorized} path="/community" component={community} />
               <PublicRoute userAuthorized={this.props.userAuthorized} path="/terms" component={Terms} />
               <PublicRoute userAuthorized={this.props.userAuthorized} path="/bff" component={BFFTerms} />
               <PublicRoute userAuthorized={this.props.userAuthorized} path="/privacy" component={Privacy} />
@@ -251,18 +262,4 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
-  return {
-    authenticated: state.appReducer._userAuthenticated, // TODO RENAME
-    userAuthorized: state.appReducer._userAuthorized,
-    ballotsAndVotes: state.appReducer._ballotsAndVotes,
-    firebaseAccessToken: state.appReducer._firebaseAccessToken,
-    loading: state.appReducer._loading,
-    routeToRegisterForm: state.appReducer._routeToRegisterForm,
-    userWantsEmailSignup: state.appReducer._userWantsEmailSignup,
-    facebookData: state.appReducer._facebookData
-  }
-};
-
-const ConnectedApp = connect(mapStateToProps)(App);
-export default ConnectedApp;
+export default App;

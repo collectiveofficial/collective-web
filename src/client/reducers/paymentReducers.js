@@ -20,7 +20,6 @@ export function _modalIsOpenState(state=initialModalIsOpenState, action) {
     }
   switch (action.type) {
     case 'SET_MODAL_IS_OPEN':
-      console.log('_modalIsOpenState state called with state: ', state, 'and action: ', action);
       return action.bool;
 
     default:
@@ -34,7 +33,6 @@ export function _price(state=initialPriceState, action) {
     }
   switch (action.type) {
     case 'SET_PRICE':
-      console.log('_price state called with state: ', state, 'and action: ', action);
       return action.num;
 
     default:
@@ -48,7 +46,6 @@ export function _paymentErrorMessage(state=initialPaymentErrorMessageState, acti
     }
   switch (action.type) {
     case 'SET_PAYMENT_ERROR_MESSAGE':
-      console.log('_paymentErrorMessage state called with state: ', state, 'and action: ', action);
       return action.text;
 
     default:
@@ -62,7 +59,6 @@ export function _dorm(state=initialDormState, action) {
     }
   switch (action.type) {
     case 'SET_DORM':
-      console.log('_dorm state called with state: ', state, 'and action: ', action);
       return action.num;
 
     default:
@@ -76,7 +72,6 @@ export function _cook(state=initialCookState, action) {
     }
   switch (action.type) {
     case 'SET_COOK':
-      console.log('_cook state called with state: ', state, 'and action: ', action);
       return action.num;
 
     default:
@@ -90,7 +85,6 @@ export function _hasPaymentCompleted(state=initialHasPaymentCompletedState, acti
     }
   switch (action.type) {
     case 'SET_HAS_PAYMENT_COMPLETED':
-      console.log('_hasPaymentCompleted state called with state: ', state, 'and action: ', action);
       return action.bool;
 
     default:
@@ -104,7 +98,6 @@ export function _votesSaved(state=initialVotesSavedState, action) {
     }
   switch (action.type) {
     case 'SET_VOTES_SAVED':
-      console.log('_votesSaved state called with state: ', state, 'and action: ', action);
       return action.bool;
 
     default:
@@ -118,7 +111,6 @@ export function _hasAllergies(state=intialHasAllergiesState, action) {
     }
   switch (action.type) {
     case 'SET_HAS_ALLERGIES':
-      console.log('_hasAllergies state called with state: ', state, 'and action: ', action);
       return action.bool;
 
     default:
@@ -132,7 +124,6 @@ export function _paymentEmail(state=intialPaymentEmailState, action) {
     }
   switch (action.type) {
     case 'SET_PAYMENT_EMAIL':
-      console.log('_paymentEmail state called with state: ', state, 'and action: ', action);
       return action.text;
 
     default:
@@ -146,7 +137,6 @@ export function _userWantsDelivery(state=intialUserWantsDeliveryState, action) {
     }
   switch (action.type) {
     case 'SET_USER_WANTS_DELIVERY':
-      console.log('_userWantsDelivery state called with state: ', state, 'and action: ', action);
       return action.bool;
 
     default:
@@ -160,7 +150,6 @@ export function _serverPaymentErrorMessage(state=intialServerPaymentErrorMessage
     }
   switch (action.type) {
     case 'SET_SERVER_PAYMENT_ERROR_MSG':
-      console.log('_serverPaymentErrorMessage state called with state: ', state, 'and action: ', action);
       return action.text;
 
     default:
@@ -174,7 +163,6 @@ export function _deliveryPriceImpact(state=intialDeliveryPriceImpactState, actio
     }
   switch (action.type) {
     case 'SET_DELIVERY_PRICE_IMPACT':
-      console.log('_deliveryPriceImpact state called with state: ', state, 'and action: ', action);
       return action.num;
 
     default:
@@ -188,7 +176,6 @@ export function _allergiesList(state=intialAllergiesListState, action) {
     }
   switch (action.type) {
     case 'SET_ALLERGIES_LIST':
-      console.log('_allergiesList state called with state: ', state, 'and action: ', action);
       return [...action.arr];
 
     default:

@@ -21,7 +21,6 @@ const nodemailer = require('nodemailer');
 const ReactDOMServer = require('react-dom/server');
 require('babel-register');
 const EmailReceipt = require('./EmailReceipt');
-const moment = require('moment-timezone');
 const { restrictedAddresses, firstDropoff, firstDropFoodItems, secondDropoff, secondDropFoodItems, thirdDropoff, thirdDropoffFoodItems, fourthDropoff, fourthDropoffFoodItems, firstGroup } = require('./local-db-initialize-data');
 let STRIPE_SECRET_KEY;
 
@@ -147,15 +146,24 @@ const initializeData = async () => {
     }
   };
 
-  const updateDropoffIDonRestrictedAddresses = async () => {
-     // TODO: Remove this function after merge to master
-     const dropoffID = 4;
-     await restrictedAddressUtil.updateDropoffIDonRestrictedAddresses(dropoffID);
-   };
+  // const updateDropoffIDonRestrictedAddresses = async () => {
+  //    // TODO: Remove this function after merge to master
+  //    const dropoffID = 4;
+  //    await restrictedAddressUtil.updateDropoffIDonRestrictedAddresses(dropoffID);
+  //  };
+
+  const updatePackagesOrdered = async () => {
+    await dropoffUtil.updatePackagesOrdered();
+  };
+
+  const updateDropoffDateTimes = async () => {
+    await dropoffUtil.updateDropoff(thirdDropoff);
+    await dropoffUtil.updateDropoff(fourthDropoff);
+  };
 
   const sendNightlyCSVupdates = async () => {
     // TODO: dynamic dropoffID
-    const dropoffID = 3;
+    const dropoffID = 4;
     let fields;
     let csv;
     let fileName;
@@ -197,7 +205,7 @@ const initializeData = async () => {
     const fields = ['Last Name', 'First Name', 'Email'];
     // TODO: dynamic groupID
     const groupID = 1;
-    const dropoffID = 3;
+    const dropoffID = 4;
     const usersWhoHaveNotPaid = await transactionUtil.getUsersWhoHaveNotPaid(dropoffID, groupID);
     const csv = json2csv({ data: usersWhoHaveNotPaid, fields });
     const fileName = 'usersWhoHaveNotPaid.csv';
@@ -305,6 +313,8 @@ const initializeData = async () => {
   await initializeThirdDropFoodItemsBallots();
   await initializeFourthDropoff();
   await initializeFourthDropFoodItemsBallots();
+  await updatePackagesOrdered();
+  await updateDropoffDateTimes();
   await initializeRestrictedAddresses();
   // await updateDropoffIDonRestrictedAddresses();
   await sendNightlyCSVupdates();
@@ -314,8 +324,6 @@ const initializeData = async () => {
 
 initializeData();
 
-console.log(firebaseAdminApp);
-
 module.exports = {
   checkUser: {
     async post(req, res) {
@@ -324,7 +332,11 @@ module.exports = {
       const decodedToken = await admin.auth().verifyIdToken(firebaseAccessToken);
       let uid = decodedToken.uid;
       const userAuthorized = await userUtil.checkIfUserAuthorized(uid);
-      res.json({ userAuthorized });
+      const isUserAdmin = await userUtil.checkIfUserIsAdmin(uid);
+      res.json({
+        userAuthorized,
+        isUserAdmin,
+      });
     },
   },
   checkUserEmail: {
@@ -503,11 +515,19 @@ module.exports = {
       const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
       const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
       const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(req.body.uid);
+      const isUserAdmin = await userUtil.checkIfUserIsAdmin(uid);
+      let adminData;
+      if (isUserAdmin) {
+        adminData = await dropoffUtil.getAdminData(req.body.uid);
+        console.log('-------> adminData: ', adminData);
+      }
       const responseObject = {
         ballotsAndVotes,
         userTransactionHistory,
         availableDeliveriesLeft,
         deliveryEligibilityObj,
+        isUserAdmin,
+        adminData,
       };
       await res.json(responseObject);
     },
@@ -591,6 +611,7 @@ module.exports = {
             });
           } else {
             await transactionUtil.savePaymentInfo(req.body, dropoffID);
+            await dropoffUtil.updateDropoffPackagesOrdered(dropoffID);
             // invoke vote util function that takes in the request body as an argument
             await voteUtil.saveVotes(req.body, dropoffID);
             await res.json({
