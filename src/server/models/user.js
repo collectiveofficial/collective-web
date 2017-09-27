@@ -345,12 +345,14 @@ module.exports.updateIsQualifiedForDelivery = async (groupID, restrictionType) =
 
 module.exports.checkIfUserEligibleForDelivery = async (firebaseUID) => {
   try {
+    console.log('----> firebaseUID: ', firebaseUID);
     let isUserEligibleForDelivery = false;
     const user = await models.User.findOne({
       where: {
         firebaseUID,
       },
     });
+    console.log('----> user: ', user);
     const userFormattedAddress = user.dataValues.fullAddress;
     const groupID = user.dataValues.userGroupId;
     console.log('-----> groupID: ', groupID);

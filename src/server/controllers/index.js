@@ -514,11 +514,11 @@ module.exports = {
       const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
       const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
       const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
-      const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(req.body.uid);
+      const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(uid);
       const isUserAdmin = await userUtil.checkIfUserIsAdmin(uid);
       let adminData;
       if (isUserAdmin) {
-        adminData = await dropoffUtil.getAdminData(req.body.uid);
+        adminData = await dropoffUtil.getAdminData(uid);
         console.log('-------> adminData: ', adminData);
       }
       const responseObject = {
