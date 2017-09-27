@@ -90,10 +90,16 @@ module.exports.updateCurrentVotingDropoffID = async (currentVotingDropoffID, gro
 };
 
 module.exports.findDeliveryAddressFromGroupID = async (id) => {
-  const group = await models.Group.findOne({
-    where: {
-      id,
-    },
-  });
-  return group.dataValues.deliveryFullAddress;
+  try {
+    console.log('----> id': id);
+    const group = await models.Group.findOne({
+      where: {
+        id,
+      },
+    });
+    console.log('-----group: ', group);
+    return group.dataValues.deliveryFullAddress;
+  } catch(err) {
+    console.log(err);
+  }
 };
