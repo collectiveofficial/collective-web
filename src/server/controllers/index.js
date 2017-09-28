@@ -4,6 +4,7 @@ const dotenv = require('dotenv').config();
 const twilio = require('twilio');
 const cron = require('cron');
 const fs = require('fs');
+const Readable = require('stream').Readable;
 const QRCode = require('qrcode');
 const userUtil = require('../models/user');
 const dropoffUtil = require('../models/dropoff');
@@ -306,8 +307,8 @@ const initializeData = async () => {
   await initializeFourthDropFoodItemsBallots();
   await initializeRestrictedAddresses();
   // await updateDropoffIDonRestrictedAddresses();
-  await sendNightlyCSVupdates();
-  await sendVotingReminderCSVupdates();
+  // await sendNightlyCSVupdates();
+  // await sendVotingReminderCSVupdates();
   // await testConfirmationEmail();
 };
 
@@ -508,7 +509,6 @@ module.exports = {
       let adminData;
       if (isUserAdmin) {
         adminData = await dropoffUtil.getAdminData(uid);
-        console.log('-------> adminData: ', adminData);
       }
       const responseObject = {
         ballotsAndVotes,
@@ -692,6 +692,28 @@ module.exports = {
     async post(req, res) {
       await transactionUtil.recordUserPickup(req.body.transactionID);
       res.json({ userCheckedOff: true });
+    },
+  },
+  downloadDataFile: {
+    async post(req, res) {
+      try {
+        const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+        const uid = decodedToken.uid;
+        req.body.uid = uid;
+        const userAuthorized = await userUtil.checkIfUserAuthorized(uid);
+        const isUserAdmin = await userUtil.checkIfUserIsAdmin(uid);
+        let csv;
+        if (isUserAdmin && userAuthorized) {
+          csv = await dropoffUtil.getDataFile(req.body);
+        }
+        res.setHeader("content-type", "text/csv");
+        var s = new Readable();
+        s.push(csv);
+        s.push(null);
+        s.pipe(res);
+      } catch (err) {
+        console.log(err);
+      }
     },
   },
   voteNotification: {

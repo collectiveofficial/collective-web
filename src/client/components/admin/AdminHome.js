@@ -42,9 +42,9 @@ const AdminHome = (props) => {
             <Table.HeaderCell>Total Participants</Table.HeaderCell>
             <Table.HeaderCell>Net Volume from Sales</Table.HeaderCell>
             <Table.HeaderCell>Status</Table.HeaderCell>
-            {/* <Table.HeaderCell>Export Summary</Table.HeaderCell>
+            <Table.HeaderCell>Export Summary</Table.HeaderCell>
             <Table.HeaderCell>Export Food Ballots</Table.HeaderCell>
-            <Table.HeaderCell>Export Participant Data</Table.HeaderCell> */}
+            <Table.HeaderCell>Export Participant Data</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
 
@@ -59,9 +59,21 @@ const AdminHome = (props) => {
                 <Table.Cell>{data.totalParticipants}</Table.Cell>
                 <Table.Cell>${data.netVolumeFromSalesAfterFees}</Table.Cell>
                 <Table.Cell>{data.status}</Table.Cell>
-                {/* <Table.Cell><a onClick={async () => { await props.setDownloadUrl(data.id, 'summary'); }} href={props.adminReducers.downloadUrl} >Export as CSV</a></Table.Cell>
-                <Table.Cell><a onClick={async () => { await props.setDownloadUrl(data.id, 'ballot'); }} href={props.adminReducers.downloadUrl} >Export as CSV</a></Table.Cell>
-                <Table.Cell><a onClick={async () => { await props.setDownloadUrl(data.id, 'participant'); }} href={props.adminReducers.downloadUrl} >Export as CSV</a></Table.Cell> */}
+                <Table.Cell>
+                  <a onClick={async () => { await props.setDownloadFile(data.id, 'summary'); }} href="javascript:void(0)" target="_blank">
+                    Export as CSV
+                  </a>
+                </Table.Cell>
+                <Table.Cell>
+                  <a onClick={() => { props.setDownloadFile(data.id, 'ballot'); }} href="javascript:void(0)" target="_blank">
+                    Export as CSV
+                  </a>
+                </Table.Cell>
+                <Table.Cell>
+                  <a onClick={() => { props.setDownloadFile(data.id, 'participant'); }} href="javascript:void(0)" target="_blank">
+                    Export as CSV
+                  </a>
+                </Table.Cell>
               </Table.Row>
             ))}
         </Table.Body>

@@ -1,4 +1,5 @@
-import { createStore, /* applyMiddleware, */ combineReducers } from 'redux';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
+import thunk from 'redux-thunk';
 import * as appReducers from './reducers/appReducers' // TODO CHANGE;
 import * as loginReducers from './reducers/loginReducers';
 import * as registerReducers from './reducers/registerReducers';
@@ -29,9 +30,10 @@ export default function (data) {
   const rootReducer = combineReducers(reducers);
   // console.log('REDUCER: ', reducer);
   // In case we want to have middlewares later
-  // const finalCreateStore = applyMiddleware(promiseMiddleware)(createStore)
-  // const store = finalCreateStore(reducer, data)
-  const store = createStore(rootReducer, data,
+  const finalCreateStore = applyMiddleware(thunk)(createStore);
+  const store = finalCreateStore(rootReducer, data,
    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+  // const store = createStore(rootReducer, data,
+  //  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
   return store;
 }

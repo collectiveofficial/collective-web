@@ -1,5 +1,7 @@
 import actionTypes from './adminActionTypes';
+import fileSaver from 'file-saver';
 import { firebaseAuth } from '../../config';
+import momentTZ from 'moment-timezone';
 
 export function selectDashboardPage(text) {
   return {
@@ -22,27 +24,29 @@ export function setAdminData(dataArr) {
   };
 }
 
-export async function setDownloadUrl(dropoffID, dataType) {
-  // const isSummary = false;
-  // const isFoodBallots = false;
-  // const isParticipantData = false;
-  const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
-  const response = await fetch('/admin/download', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-    body: JSON.stringify({
-      firebaseAccessToken,
-      dropoffID,
-      dataType,
-    }),
-  });
-  const responseData = await response.json();
-  const url = responseData.url;
-  return {
-    type: actionTypes.DOWNLOAD_PARTICIPANT_DATA,
-    url,
+export function setDownloadFile(dropoffID, dataType) {
+  return async dispatch => {
+    try {
+      const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
+      const response = await fetch('/admin/download/data-file', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/octet-stream',
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify({
+          firebaseAccessToken,
+          dropoffID,
+          dataType,
+        }),
+      });
+
+      fileSaver.saveAs(new Blob([await response.blob()], {type: "text/csv"}), `${dataType}${momentTZ.tz(new Date(), 'America/New_York').format('MM_DD_YYYY_hhmm')}.csv`);
+      return await dispatch({
+        type: actionTypes.DOWNLOAD_DATA_FILE,
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 }

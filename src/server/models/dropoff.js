@@ -1,7 +1,11 @@
 const momentTZ = require('moment-timezone');
+const json2csv = require('json2csv');
+const fs = require('fs');
+const dotenv = require('dotenv').config();
 const models = require('../../database/models/index');
 const userUtil = require('./user');
 const transactionUtil = require('./transaction');
+const ballotUtil = require('./ballot');
 
 module.exports.doesDropoffExist = async (id) => {
   try {
@@ -237,7 +241,6 @@ module.exports.updateDropoffPackagesOrdered = async (id) => {
 };
 
 module.exports.getAdminData = async (uid) => {
-  // const customers = await transactionUtil.getCustomersForDropoff(id); //TODO: create route to grab customer data for dropoff
   try {
     let data = [];
     const groupID = await userUtil.findGroupIDByUID(uid);
@@ -296,6 +299,82 @@ module.exports.getAdminData = async (uid) => {
     }
     return data;
   } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports.getDataFile = async (requestBody) => {
+  try {
+    let fields;
+    let data;
+    if (requestBody.dataType === 'summary') {
+      fields = ['Date', 'Voting Window', 'Dorm Packages Ordered', 'Cooking Packages Ordered', 'Total Packages Ordered', 'Total Participants', 'Net Volume from Sales', 'Status'];
+      let summaryData = [];
+      const groupID = await userUtil.findGroupIDByUID(requestBody.uid);
+      const dropoffData = await models.Dropoff.findAll({
+        where: {
+          groupID,
+        },
+      });
+      for (let i = 0; i < dropoffData.length; i++) {
+        const id = dropoffData[i].dataValues.id;
+        const intendedShipDate = dropoffData[i].dataValues.intendedShipDate;
+        const intendedPickupDateTimeStart = await momentTZ.tz(dropoffData[i].dataValues.intendedPickupTimeStart, 'America/New_York');
+        const intendedPickupDateTimeEnd = await momentTZ.tz(dropoffData[i].dataValues.intendedPickupTimeEnd, 'America/New_York');
+        const voteDateTimeBeg = await momentTZ.tz(dropoffData[i].dataValues.voteDateTimeBeg, 'America/New_York');
+        const voteDateTimeEnd = await momentTZ.tz(dropoffData[i].dataValues.voteDateTimeEnd, 'America/New_York');
+
+        const formattedIntendedPickupDateTimeStart = await intendedPickupDateTimeStart.format('MM/DD/YYYY hh:mm A');
+        const formattedIntendedPickupTimeEnd = await intendedPickupDateTimeEnd.format('hh:mm A');
+        const formattedVoteDateTimeBeg = await voteDateTimeBeg.format('MM/DD/YYYY hh:mm A');
+        const formattedVoteDateTimeEnd = await voteDateTimeEnd.format('MM/DD/YYYY hh:mm A');
+
+        const totalDormPackagesOrdered = dropoffData[i].dataValues.totalDormPackagesOrdered;
+        const totalCookingPackagesOrdered = dropoffData[i].dataValues.totalCookingPackagesOrdered;
+        const customers = await transactionUtil.getCustomersForDropoff(id);
+        const totalParticipants = customers.length;
+        const netVolumeFromSalesAfterFees = await transactionUtil.findSalesAfterFeesByDropoffID(id);
+
+        const currentDateTime = await momentTZ.tz(new Date(), 'America/New_York');
+        let status = 'Incomplete';
+        if (await currentDateTime.isBetween(voteDateTimeBeg, voteDateTimeEnd)) {
+          status = 'Voting In Progress';
+        }
+        if (await currentDateTime.isBetween(voteDateTimeEnd, intendedPickupDateTimeStart)) {
+          status = 'Voting Closed. Data Finalized For Admin.';
+        }
+        if (await currentDateTime.isBetween(intendedPickupDateTimeStart, intendedPickupDateTimeEnd)) {
+          status = 'Bulk Buy In Progress';
+        }
+        if (await currentDateTime.isAfter(intendedPickupDateTimeEnd)) {
+          status = 'Complete';
+        }
+        const dropoff = {
+          Date: `${formattedIntendedPickupDateTimeStart} - ${formattedIntendedPickupTimeEnd}`,
+          'Voting Window': `${formattedVoteDateTimeBeg} - ${formattedVoteDateTimeEnd}`,
+          'Dorm Packages Ordered': totalDormPackagesOrdered,
+          'Cooking Packages Ordered': totalCookingPackagesOrdered,
+          'Total Packages Ordered': totalDormPackagesOrdered + totalCookingPackagesOrdered,
+          'Total Participants': totalParticipants,
+          'Net Volume from Sales': netVolumeFromSalesAfterFees,
+          Status: status,
+        };
+        summaryData.push(dropoff);
+      }
+      data = summaryData;
+    }
+    if (requestBody.dataType === 'ballot') {
+      fields = ['Food Name', 'Vote Count'];
+      data = await ballotUtil.getFoodNamesAndVoteCounts(requestBody.dropoffID);
+    }
+    if (requestBody.dataType === 'participant') {
+      fields = ['Last Name', 'First Name', 'Date of Birth', 'Email', 'Phone Number', 'Dorm Packages Ordered', 'Cooking Packages Ordered', 'Allergies', 'Delivery Address'];
+      // csv in ascending alphabetical order
+      data = await transactionUtil.getUserInfoAndPackagesOrdered(requestBody.dropoffID);
+    }
+    const csv = json2csv({ data, fields });
+    return csv;
+  } catch(err) {
     console.log(err);
   }
 };
