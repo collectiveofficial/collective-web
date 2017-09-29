@@ -345,20 +345,16 @@ module.exports.updateIsQualifiedForDelivery = async (groupID, restrictionType) =
 
 module.exports.checkIfUserEligibleForDelivery = async (firebaseUID) => {
   try {
-    console.log('----> firebaseUID: ', firebaseUID);
     let isUserEligibleForDelivery = false;
     const user = await models.User.findOne({
       where: {
         firebaseUID,
       },
     });
-    console.log('----> user: ', user);
     const userFormattedAddress = user.dataValues.fullAddress;
     const groupID = user.dataValues.userGroupId;
-    console.log('-----> groupID: ', groupID);
     const userLatLongString = user.dataValues.latitude + user.dataValues.longitude;
     const deliveryOrigin = await groupUtil.findDeliveryAddressFromGroupID(groupID);
-    console.log('-----> deliveryOrigin: ', deliveryOrigin);
     const distanceObj = await googleMapsUtils.findDistance(deliveryOrigin, userFormattedAddress);
     let isAddressBeyondDeliveryReach;
     if (distanceObj.distanceFromUserAddressInMiles > 5) {

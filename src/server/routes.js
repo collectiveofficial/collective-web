@@ -19,5 +19,6 @@ router.post('/vote/update', controller.updateVotes.post);
 router.post('/transaction/check', controller.checkTransaction.post);
 router.post('/payment-votes/save', controller.savePaymentVotes.post);
 router.post('/admin/pickup/checkoff-user', controller.checkOffUser.post);
+router.post('/admin/download/data-file', controller.downloadDataFile.post);
 
 module.exports = router;

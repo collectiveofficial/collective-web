@@ -1,10 +1,10 @@
 const initialDateState = '8 October 2017 from 12:00 PM to 4:00 PM';
 const initialVoteState = 'Voting window is from 20 September at 12:00 AM to 5 October at 11:59 PM';
 const initialRemainingCalendarState = [
-  ['17 October 2017',  "Voting window is from 6 October at 12:00 AM to 14 October at 11:59 PM"],
-  ['28 October 2017',  "Voting window is from 15 October at 12:00 AM to 25 October at 11:59 PM"],
-  ['10 November 2017', "Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM"],
-  ['2 December 2017',  "Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM"]
+  ['17 October 2017',  'Voting window is from 6 October at 12:00 AM to 14 October at 11:59 PM'],
+  ['28 October 2017',  'Voting window is from 15 October at 12:00 AM to 25 October at 11:59 PM'],
+  ['10 November 2017', 'Voting window is from 26 October at 12:00 AM to 8 November at 11:59 PM'],
+  ['2 December 2017',  'Voting window is from 9 November at 12:00 AM to 29 November at 11:59 PM']
 ];
 const initialItemsState = ['Apples', 'Bananas', 'Mangos', 'Sweet Potatoes', 'Pears', 'Potatoes', 'Kiwis', 'Oranges', 'Avocadoes'];
 const initialProviderState = 'DNO Produce';
