@@ -5,18 +5,10 @@ import {
 } from 'react-router-dom';
 import s from './Legal.css';
 
-class terms extends Component {
-  constructor(props) {
-    super(props);
-  }
+const BffTerms = props => (
+  <div className={s.container}>
+    <iframe src="https://drive.google.com/file/d/0B72SnxgPvfVAU2toajZ6cHZKYVU/preview" width="640" height="480"></iframe>
+  </div>
+);
 
-  render() {
-    return (
-      <div className={s.container}>
-        <iframe src="https://drive.google.com/file/d/0B72SnxgPvfVAU2toajZ6cHZKYVU/preview" width="640" height="480"></iframe>
-      </div>
-    );
-  }
-}
-
-export default terms;
+export default BffTerms;

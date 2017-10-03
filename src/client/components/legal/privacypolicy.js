@@ -5,19 +5,10 @@ import {
 } from 'react-router-dom';
 import s from './Legal.css';
 
+const PrivacyPolicy = props => (
+  <div className={s.container}>
+    <iframe src="https://drive.google.com/file/d/0B72SnxgPvfVASTFKeDE5YkliTzA/preview" width="640" height="480"></iframe>
+  </div>
+);
 
-class terms extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <div className={s.container}>
-        <iframe src="https://drive.google.com/file/d/0B72SnxgPvfVASTFKeDE5YkliTzA/preview" width="640" height="480"></iframe>
-      </div>
-    );
-  }
-}
-
-export default terms;
+export default PrivacyPolicy;
