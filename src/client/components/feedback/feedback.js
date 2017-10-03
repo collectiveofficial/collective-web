@@ -5,7 +5,7 @@ import {
 } from 'react-router-dom';
 import s from './feedback.css';
 
-const Feedback = () => {
+const Feedback = (props) => {
   const styles = {
     googleForm: {
       width: 800,

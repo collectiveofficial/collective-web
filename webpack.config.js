@@ -22,10 +22,20 @@ module.exports = {
         }
       },
       // CSS
+      // {
+      //   test: /\.css$/,
+      //   include: SRC_DIR,
+      //   loader: 'style-loader!css-loader!less-loader!sass-loader?modules&localIdentName=[name]---[local]---[hash:base64:5]'
+      // },
       {
         test: /\.css$/,
         loader: 'style-loader!css-loader?modules&localIdentName=[name]---[local]---[hash:base64:5]'
+      },
+      {
+        test: /\.less$/,
+        loader: 'style-loader!css-loader!less-loader?modules&localIdentName=[name]---[local]---[hash:base64:5]'
       }
     ]
-  }
+  },
+  devtool: 'source-map'
 };

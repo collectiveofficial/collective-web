@@ -5,7 +5,7 @@ import {
 } from 'react-router-dom';
 import s from './community.css';
 
-const Community = () => (
+const Community = props => (
   <div>
     <div className={s.root}>
       <div className={s.container}>

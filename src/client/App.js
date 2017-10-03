@@ -18,17 +18,17 @@ import Home from './components/home/Home.js';
 import LogIn from './components/authentication/LogIn.js';
 import RegisterForm from './components/authentication/RegisterForm.js';
 import SignUp from './components/authentication/SignUp.js';
-import foodwiki from './components/foodwiki/foodwiki.js';
-import feedback from './components/feedback/feedback.js';
-import community from './components/community/community.js';
-import about from './components/about/about.js';
-import faq from './components/about/faq.js';
+import FoodWiki from './components/foodwiki/FoodWiki.js';
+import Feedback from './components/feedback/Feedback.js';
+import Community from './components/community/Community.js';
+import About from './components/about/About.js';
+import Faq from './components/about/Faq.js';
 import Voting from './components/home/Voting.js';
 import Header from './components/header/Header.js';
 import Footer from './components/footer/Footer.js';
-import Terms from './components/legal/collectiveterms.js';
-import BFFTerms from './components/legal/BFFterms.js';
-import Privacy from './components/legal/privacypolicy.js';
+import CollectiveTerms from './components/legal/CollectiveTerms.js';
+import BffTerms from './components/legal/BffTerms.js';
+import PrivacyPolicy from './components/legal/PrivacyPolicy.js';
 import OrderInfo from './components/orderInfo/OrderInfo.js';
 import AdminDashboardContainer from './components/admin/AdminDashboardContainer.js';
 
@@ -207,6 +207,7 @@ class App extends React.Component {
     await this.props.setDeliveryEligibilityObj(initialDataLoadResults.deliveryEligibilityObj);
     if (initialDataLoadResults.isUserAdmin) {
       await this.props.setAdminData(initialDataLoadResults.adminData);
+      await this.props.setAdminFoodItems(initialDataLoadResults.adminFoodItems);
     }
   }
 
@@ -245,16 +246,14 @@ class App extends React.Component {
               <PrivateRoute userAuthorized={this.props.userAuthorized} path="/voting" component={Voting}/>
               <PrivateRoute userAuthorized={this.props.userAuthorized} path="/order-info" component={OrderInfo} />
               <AdminRoute userAuthorized={this.props.userAuthorized} adminAuthorized={this.props.adminReducers.adminAuthorized} path="/admin-dashboard" component={AdminDashboardContainer} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/foodwiki" component={foodwiki} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/community" component={community} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/terms" component={Terms} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/bff" component={BFFTerms} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/privacy" component={Privacy} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/about" component={about} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/faq" component={faq} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/foodwiki" component={foodwiki} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/community" component={community} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/feedback" component={feedback} />
+              <PublicRoute userAuthorized={this.props.userAuthorized} path="/foodwiki" component={FoodWiki} />
+              <PublicRoute userAuthorized={this.props.userAuthorized} path="/community" component={Community} />
+              <PublicRoute userAuthorized={this.props.userAuthorized} path="/terms" component={CollectiveTerms} />
+              <PublicRoute userAuthorized={this.props.userAuthorized} path="/bff" component={BffTerms} />
+              <PublicRoute userAuthorized={this.props.userAuthorized} path="/privacy" component={PrivacyPolicy} />
+              <PublicRoute userAuthorized={this.props.userAuthorized} path="/about" component={About} />
+              <PublicRoute userAuthorized={this.props.userAuthorized} path="/faq" component={Faq} />
+              <PublicRoute userAuthorized={this.props.userAuthorized} path="/feedback" component={Feedback} />
               <PublicRoute render={() => <h3>No Match</h3>} />
             </Switch>
             <Footer />

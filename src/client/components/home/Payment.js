@@ -28,7 +28,6 @@ class Payment extends React.Component {
 
   async componentWillMount() {
     const email = await firebaseAuth().currentUser.email;
-    console.log('Payment is mounting');
     await this.props.enterPaymentPage();
     await this.props.setPaymentEmail(email);
   }
