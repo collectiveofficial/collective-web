@@ -1,5 +1,6 @@
 const models = require('../../database/models/index');
 const ballotUtil = require('./ballot');
+const _ = require('lodash');
 
 module.exports.doesFoodItemExist = (id) => {
   return models.Food.findOne({
@@ -114,4 +115,23 @@ module.exports.findFoodNameByID = async (id) => {
   } catch (err) {
     console.log(err);
   }
+};
+
+module.exports.getAllFoodItems = async () => {
+  let foodItems = [];
+  try {
+    const food = await models.Food.findAll({
+      where: {},
+    });
+    for (let i = 0; i < food.length; i++) {
+      const foodItemInfo = {};
+      foodItemInfo.foodName = food[i].dataValues.name;
+      foodItemInfo.imageUrl = food[i].dataValues.imageUrl;
+      foodItems.push(foodItemInfo);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  foodItems = _.uniqBy(foodItems, 'foodName');
+  return foodItems;
 };

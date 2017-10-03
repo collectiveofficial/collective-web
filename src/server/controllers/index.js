@@ -507,8 +507,10 @@ module.exports = {
       const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(uid);
       const isUserAdmin = await userUtil.checkIfUserIsAdmin(uid);
       let adminData;
+      let adminFoodItems;
       if (isUserAdmin) {
         adminData = await dropoffUtil.getAdminData(uid);
+        adminFoodItems = await foodUtil.getAllFoodItems();
       }
       const responseObject = {
         ballotsAndVotes,
@@ -517,6 +519,7 @@ module.exports = {
         deliveryEligibilityObj,
         isUserAdmin,
         adminData,
+        adminFoodItems,
       };
       await res.json(responseObject);
     },
@@ -706,11 +709,29 @@ module.exports = {
         if (isUserAdmin && userAuthorized) {
           csv = await dropoffUtil.getDataFile(req.body);
         }
-        res.setHeader("content-type", "text/csv");
-        var s = new Readable();
-        s.push(csv);
-        s.push(null);
-        s.pipe(res);
+        res.setHeader('content-type', 'text/csv');
+        const stream = new Readable();
+        stream.push(csv);
+        stream.push(null);
+        stream.pipe(res);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+  },
+  submitNewBulkBuy: {
+    async post(req, res) {
+      try {
+        const decodedToken = await admin.auth().verifyIdToken(req.body.firebaseAccessToken);
+        const uid = decodedToken.uid;
+        req.body.uid = uid;
+        const userAuthorized = await userUtil.checkIfUserAuthorized(uid);
+        const isUserAdmin = await userUtil.checkIfUserIsAdmin(uid);
+        let bulkBuySaved = false;
+        if (isUserAdmin && userAuthorized) {
+          bulkBuySaved = await dropoffUtil.saveNewBulkBuy(req.body.newBulkBuyInfo);
+        }
+        res.json(bulkBuySaved);
       } catch (err) {
         console.log(err);
       }
@@ -741,11 +762,6 @@ module.exports = {
       'America/Los_Angeles'); /* Time zone of this job. */
 
     console.log('job1 status', job1.running); // job1 status undefined
-    },
-  },
-  dbtest: {
-    get(req, res) {
-
     },
   },
 };
