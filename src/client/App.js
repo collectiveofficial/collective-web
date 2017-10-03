@@ -22,6 +22,7 @@ import foodwiki from './components/foodwiki/foodwiki.js';
 import feedback from './components/feedback/feedback.js';
 import community from './components/community/community.js';
 import about from './components/about/about.js';
+import faq from './components/about/faq.js';
 import Voting from './components/home/Voting.js';
 import Header from './components/header/Header.js';
 import Footer from './components/footer/Footer.js';
@@ -251,6 +252,7 @@ class App extends React.Component {
               <PublicRoute userAuthorized={this.props.userAuthorized} path="/bff" component={BFFTerms} />
               <PublicRoute userAuthorized={this.props.userAuthorized} path="/privacy" component={Privacy} />
               <PublicRoute userAuthorized={this.props.userAuthorized} path="/about" component={about} />
+              <PublicRoute userAuthorized={this.props.userAuthorized} path="/faq" component={faq} />
               <PublicRoute userAuthorized={this.props.userAuthorized} path="/foodwiki" component={foodwiki} />
               <PublicRoute userAuthorized={this.props.userAuthorized} path="/community" component={community} />
               <PublicRoute userAuthorized={this.props.userAuthorized} path="/feedback" component={feedback} />
