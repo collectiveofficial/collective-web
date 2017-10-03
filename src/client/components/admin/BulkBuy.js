@@ -6,125 +6,149 @@ import {
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
-import { Sidebar, Segment, Button, Menu, Image, Icon, Header } from 'semantic-ui-react';
-import moment from 'moment';
+import FlatButton from 'material-ui/FlatButton';
+import {
+  Step,
+  Stepper,
+  StepLabel,
+} from 'material-ui/Stepper';
+import ArrowForwardIcon from 'material-ui/svg-icons/navigation/arrow-forward';
+import { Sidebar, Segment, Button, Menu, Image, Icon, Header, Transition } from 'semantic-ui-react';
 import InputMoment from 'input-moment';
-import AdminHome from './AdminHome.js';
-import BulkBuy from './BulkBuy.js';
-import './admin.css';
+import moment from 'moment';
+import momentTZ from 'moment-timezone';
+import SelectFoodItemsPageContainer from './SelectFoodItemsPageContainer.js';
+import './less/input-moment.less';
+import './less/app.less';
+import 'input-moment/dist/input-moment.css';
 
-class AdminDashboard extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      intendedPickupTimeStart: '',
-      intendedPickupTimeEnd: '',
-      voteDateTimeBeg: '',
-      voteDateTimeEnd: '',
-      foodItemsText: '',
-      m: moment(),
-    };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSave = this.handleSave.bind(this);
-  }
-
-
-  handleChange() {
-    this.setState({ m });
+const BulkBuy = (props) => {
+  const styles = {
+    field: {
+      textAlign: 'left',
+    },
+    bulkBuys: {
+      marginLeft: '35%',
+      marginBottom: '1.5%',
+    },
+    form: {
+      marginLeft: '1%',
+    },
+    button: {
+      marginLeft: '6%',
+    },
   };
 
-  handleSave() {
-    console.log('saved', this.state.m.format('llll'));
-  };
+  const stepProps = [
+    {
+      step: 'Select Pickup Start Time',
+      state: props.adminReducers.intendedPickupTimeStart,
+      action: props.setPickupTimeStart,
+    },
+    {
+      step: 'Select Pickup End Time',
+      state: props.adminReducers.intendedPickupTimeEnd,
+      action: props.setPickupTimeEnd,
+    },
+    {
+      step: 'Select Voting Start Time',
+      state: props.adminReducers.voteDateTimeBeg,
+      action: props.setVoteTimeBeg,
+    },
+    {
+      step: 'Select Voting End Time',
+      state: props.adminReducers.voteDateTimeEnd,
+      action: props.setVoteTimeEnd,
+    },
+    {
+      step: 'Select Food Items',
+      // state: props.adminReducers.voteDateTimeEnd,
+      // action: props.setVoteTimeEnd,
+    },
+  ];
 
-  render() {
-    const styles = {
-      field: {
-        textAlign: 'left',
-      },
-      bulkBuys: {
-        marginLeft: '35%',
-        marginBottom: '1.5%',
-      },
-      form: {
-        marginLeft: '1%',
-      },
-      button: {
-        marginLeft: '6%',
-      },
-    };
-    return (
+  return (
+    <div>
       <div style={styles.bulkBuys}>
         <Header as="h2" icon>
           <Icon name="truck" />
-          Bulk Buys
+          Add Bulk Buys
           <Header.Subheader>
-            Add new bulk buys for your members
+            Create new bulk buys for your members
           </Header.Subheader>
         </Header><br />
+      </div>
+      <Stepper activeStep={props.adminReducers.stepIndex} connector={<ArrowForwardIcon />}>
+        {stepProps.map(stepProp => (
+          <Step>
+            <StepLabel>{stepProp.step}</StepLabel>
+          </Step>
+        ))}
+      </Stepper>
+      <div style={styles.bulkBuys}>
         <div style={styles.form}>
-          <div className="app">
-            <form>
-              <div className="input">
-                <input type="text" value={this.state.m.format('llll')} readOnly />
+          {stepProps.map((stepProp, index) => (
+              <div>
+                {index === props.adminReducers.stepIndex && props.adminReducers.stepIndex !== stepProps.length - 1 ?
+                  <div>
+                    <div className="input">
+                      <TextField
+                        type="text"
+                        value={stepProp.state.format('llll')}
+                        readOnly
+                        floatingLabelText={stepProp.step}
+                        floatingLabelFixed={true}
+                      />
+                    </div>
+                    <br />
+                    <InputMoment
+                      moment={stepProp.state}
+                      onChange={async (dateTime) => {
+                        const tzLessDateTime = await momentTZ(dateTime).clone();
+                        const newDateTime = await tzLessDateTime.tz('America/New_York').add(dateTime.utcOffset() - tzLessDateTime.utcOffset(), 'minutes');
+                        stepProp.action(newDateTime);
+                      }}
+                    />
+                  </div>
+                  :
+                  <div />
+                }
               </div>
-              <InputMoment
-                moment={this.state.m}
-                onChange={this.handleChange}
-                onSave={this.handleSave}
-              />
-            </form>
+            ))}
+          {props.adminReducers.stepIndex === stepProps.length - 1 ?
+            <SelectFoodItemsPageContainer />
+            :
+            <div />
+          }
+          <div style={{ marginTop: '3%', marginBottom: '1%' }}>
+            <FlatButton
+              label="Back"
+              disabled={props.adminReducers.stepIndex === 0}
+              onClick={() => { props.handlePrev(props.adminReducers.stepIndex); }}
+              style={{ marginRight: '1%' }}
+            />
+            <RaisedButton
+              label={props.adminReducers.stepIndex === stepProps.length - 1 ? 'Finish' : 'Next'}
+              primary={true}
+              onClick={() => {
+                const newBulkBuyInfo = {
+                  intendedPickupTimeStart: props.adminReducers.intendedPickupTimeStart,
+                  intendedPickupTimeEnd: props.adminReducers.intendedPickupTimeEnd,
+                  voteDateTimeBeg: props.adminReducers.voteDateTimeBeg,
+                  voteDateTimeEnd: props.adminReducers.voteDateTimeEnd,
+                };
+                if (props.adminReducers.stepIndex === stepProps.length - 1) {
+                  props.handleNext(props.adminReducers.stepIndex, stepProps, newBulkBuyInfo);
+                } else {
+                  props.handleNext(props.adminReducers.stepIndex, stepProps);
+                }
+              }}
+            />
           </div>
-          <TextField
-            type="datetime-local"
-            value={this.state.intendedPickupTimeStart}
-            floatingLabelText="Starting Pickup Time"
-            floatingLabelFixed={true}
-            style={styles.field}
-            onChange={(event) => this.setState({ intendedPickupTimeStart: event.target.value })}
-            // errorText={this.state.isLastNameEmpty ? 'Last name is required' : ''}
-          /><br />
-          <TextField
-            type="datetime-local"
-            value={this.state.intendedPickupTimeEnd}
-            floatingLabelText="Ending Pickup Time"
-            floatingLabelFixed={true}
-            style={styles.field}
-            onChange={(event) => this.setState({ intendedPickupTimeEnd: event.target.value })}
-            // errorText={this.state.isLastNameEmpty ? 'Last name is required' : ''}
-          /><br />
-          <TextField
-            type="datetime-local"
-            value={this.state.voteDateTimeBeg}
-            floatingLabelText="Beginning Vote Time"
-            floatingLabelFixed={true}
-            style={styles.field}
-            onChange={(event) => this.setState({ voteDateTimeBeg: event.target.value })}
-            // errorText={this.state.isLastNameEmpty ? 'Last name is required' : ''}
-          /><br />
-          <TextField
-            type="datetime-local"
-            value={this.state.voteDateTimeEnd}
-            floatingLabelText="Ending Vote Time"
-            floatingLabelFixed={true}
-            style={styles.field}
-            onChange={(event) => this.setState({ voteDateTimeEnd: event.target.value })}
-            // errorText={this.state.isLastNameEmpty ? 'Last name is required' : ''}
-          /><br />
-          <TextField
-            type='text'
-            value={this.state.foodItemsText}
-            onChange={(event) => this.setState({ foodItemsText: event.target.value })}
-            hintText="Spinach, Apples, Lettuce"
-            floatingLabelText="Food Items, Limit 15 (seperated by a comma and a space)"
-            multiLine={true}
-            rows={3}
-          /><br /><br />
-          <Button positive style={styles.button}>Add Bulk Buy</Button>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
-export default AdminDashboard;
+export default BulkBuy;

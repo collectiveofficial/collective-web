@@ -6,6 +6,7 @@ const models = require('../../database/models/index');
 const userUtil = require('./user');
 const transactionUtil = require('./transaction');
 const ballotUtil = require('./ballot');
+const foodUtil = require('./food');
 
 module.exports.doesDropoffExist = async (id) => {
   try {
@@ -282,6 +283,7 @@ module.exports.getAdminData = async (uid) => {
       if (await currentDateTime.isAfter(intendedPickupDateTimeEnd)) {
         status = 'Complete';
       }
+
       const dropoff = {
         id,
         intendedShipDate,
@@ -377,4 +379,28 @@ module.exports.getDataFile = async (requestBody) => {
   } catch(err) {
     console.log(err);
   }
+};
+
+module.exports.saveNewBulkBuy = async (requestBody) => {
+  let bulkBuySaved = false;
+  try {
+    const groupID = await userUtil.findGroupIDByUID(requestBody.uid);
+    const intendedShipDate = requestBody.newBulkBuyInfo.intendedShipDate;
+    const intendedPickupTimeStart = requestBody.newBulkBuyInfo.intendedPickupTimeStart;
+    const intendedPickupTimeEnd = requestBody.newBulkBuyInfo.intendedPickupTimeEnd;
+    const voteDateTimeBeg = requestBody.newBulkBuyInfo.voteDateTimeBeg;
+    const voteDateTimeEnd = requestBody.newBulkBuyInfo.voteDateTimeEnd;
+    await models.Dropoff.create({
+      groupID,
+      intendedShipDate,
+      intendedPickupTimeStart,
+      intendedPickupTimeEnd,
+      voteDateTimeBeg,
+      voteDateTimeEnd,
+    });
+    bulkBuySaved = true;
+  } catch(err) {
+    console.log(err);
+  }
+  return bulkBuySaved;
 };
