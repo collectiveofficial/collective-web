@@ -21,10 +21,9 @@ const Orders = props => (
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {props.transactionHistory.map(async (transaction) => {
-          console.log('typeof transaction.date', typeof transaction.date);
-          const dropoffDate = await new Date(s.substring(0, s.indexOf('T')).split('-').join('/')).toDateString();
-          const date = await moment(transaction.date).format('LL');
+        {props.transactionHistory.map((transaction) => {
+          const dropoffDate = new Date(transaction.dropoffDate.substring(0, transaction.dropoffDate.indexOf('T')).split('-').join('/')).toDateString();
+          const date = moment(transaction.date).format('LL');
           return (
             <Table.Row>
               <Table.Cell>{dropoffDate}</Table.Cell>
