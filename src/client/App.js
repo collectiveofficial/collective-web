@@ -206,6 +206,7 @@ class App extends React.Component {
     await this.props.setDeliveryEligibilityObj(initialDataLoadResults.deliveryEligibilityObj);
     if (initialDataLoadResults.isUserAdmin) {
       await this.props.setAdminData(initialDataLoadResults.adminData);
+      await this.props.setAdminFoodItems(initialDataLoadResults.adminFoodItems);
     }
   }
 
