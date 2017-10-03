@@ -28,7 +28,6 @@ class Payment extends React.Component {
 
   async componentWillMount() {
     const email = await firebaseAuth().currentUser.email;
-    console.log('Payment is mounting');
     await this.props.enterPaymentPage();
     await this.props.setPaymentEmail(email);
   }
@@ -183,12 +182,12 @@ class Payment extends React.Component {
 
     return (
       <div>
-        <div className={s.cont}>
-          <div className={s.ballot}>
+        <div className={s.conte}>
+          <div className={s.plate}>
             {this.props.hasPaymentCompleted ?
               <PaymentConfirmation email={this.props.paymentEmail} />
               :
-              <Card>
+              <Card fluid>
                 <Card.Content>
                   <Card.Header>
                     Payment
@@ -199,23 +198,23 @@ class Payment extends React.Component {
                     <Feed.Event>
                       <Feed.Content>
                         <Feed.Summary>
-                          <span>
-                            I'd like {' '}
-                            <Dropdown inline options={dormNumOptions}
-                              onChange={this.handleDorm}
-                              defaultValue={dormNumOptions[0].value}
-                            /><Modal trigger={<a className={s.mode}>dorm packages ($6)</a>} basic size='small' closeIcon="close">
-                            <Modal.Header>Dorm package</Modal.Header>
-                            <Modal.Content image>
-                              <Modal.Description>
-                                <p>Our dorm package is $6 and made especially for college kids on the run.</p>
-                                <p>Everything is fresh and nothing needs preparation. Our past dorm packages</p>
-                                <p>included 6 apples, 1 pound of carrots, 4 bananas, 6 kiwis, 1.5 lbs of grapes,</p>
-                                <p>and 5 oranges.</p>
-                              </Modal.Description>
-                            </Modal.Content>
-                          </Modal>
-                        </span>
+                          <Card centered fluid>
+                            {/* <Image src='https://static1.squarespace.com/static/54b3f75ee4b0cdf625ece0b0/t/56a01d17fb36b1be191dd048/1453333785451/market+basket+blueberries+radishes+cropped.jpg?format=1500w' /> */}
+                            <Card.Content header='Dorm Package' />
+                            <Card.Content>
+                              Our dorm package is $6 and made especially for college kids on the run. Everything is fresh and nothing needs preparation.
+                            </Card.Content>
+                            <Card.Content extra>
+                              <Icon name="shop"/>
+                              <span>
+                                I'd like {' '}
+                                <Dropdown inline options={dormNumOptions}
+                                  onChange={this.handleDorm}
+                                  defaultValue={dormNumOptions[0].value}
+                                />dorm packages ($6)
+                              </span>
+                            </Card.Content>
+                          </Card>
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
@@ -223,23 +222,23 @@ class Payment extends React.Component {
                   <Feed.Event>
                     <Feed.Content>
                       <Feed.Summary>
-                        <span>
-                          I'd like {' '}
-                          <Dropdown inline options={cookNumOptions}
-                            onChange={this.handleCook}
-                            defaultValue={cookNumOptions[0].value}
-                          /><Modal trigger={<a className={s.mode}>cooking packages ($6)</a>} basic size='small' closeIcon="close">
-                          <Modal.Header>Cooking package</Modal.Header>
-                          <Modal.Content image>
-                            <Modal.Description>
-                              <p>Our cooking package is $6 and includes food that, well...can be cooked! (:</p>
-                                <p>To give you an idea, a package in the past has included 3 sweet potatoes,</p>
-                                <p>1 lb mini peppers, 1 lb tomatoes, 2 onions, 2 potatoes, 2 limes,</p>
-                                <p>0.5 lb of spinach, 1 lb baby carrots.</p>
-                              </Modal.Description>
-                            </Modal.Content>
-                          </Modal>
-                        </span>
+                        <Card centered fluid>
+                          {/* <Image src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_Q8v5MrzTAwShGf4JIT57AswNzO3wqaUWMFYRLTDxgdhGti5r' /> */}
+                          <Card.Content header='Cooking Package' />
+                          <Card.Content>
+                            Our cooking package is $6 and includes food that, well...can be cooked! It is heavy on vegetables and has none of the items in the dorm package.
+                          </Card.Content>
+                          <Card.Content extra>
+                            <Icon name="shop"/>
+                            <span>
+                              I'd like {' '}
+                              <Dropdown inline options={cookNumOptions}
+                                onChange={this.handleCook}
+                                defaultValue={cookNumOptions[0].value}
+                              />cooking packages ($6)
+                            </span>
+                          </Card.Content>
+                        </Card>
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
@@ -294,43 +293,49 @@ class Payment extends React.Component {
                     </Feed.Summary>
                   </Feed.Content>
                 </Feed.Event>
-                <Checkbox inline checked={this.props.hasAllergies} onClick={this.handleAllergies} />
-                <Modal trigger={<a className={s.mode}>I am allergic to one or more of the produces from this bulk buy</a>} basic size='small' closeIcon="close">
-                <Modal.Header>Safety Is Our Top Priority</Modal.Header>
-                <Modal.Content image>
-                  <Modal.Description>
-                    <p>Best Food Forward and Collective are committed to meeting the food safety requirements of all of our members.</p>
-                    <h5>Allergies</h5>
-                    <p style={styles.allergiesModal}>We will accommodate the needs of all of our members with allergies.</p>
-                    <p style={styles.allergiesModal}>All produce will be stored and processed separately with special consideration for cross-contamination.</p>
-                    <p style={styles.allergiesModal}>On the day of the event, we will specially prepare all allergy-affected packages separately.</p>
-                    <p style={styles.allergiesModal}>If you have any suggestions for how we can better meet the needs of those with health considerations,</p>
-                    <p style={styles.allergiesModal}>please provide feedback at the form at the bottom of the page.</p>
-                    </Modal.Description>
-                  </Modal.Content>
-                </Modal>
-                {this.props.hasAllergies ?
-                  <div style={styles.allergiesBox}>
-                    <br />
-                    <p>Which of these produces are you allergic to?</p>
-                    <Grid columns={2}>
-                      {this.props.ballotsAndVotes.map((ballotAndVote) => {
-                        return (
-                          <Grid.Column key={ballotAndVote.name}>
-                            <Checkbox
-                              label={ballotAndVote.name}
-                              value={ballotAndVote.name}
-                              onChange={this.handleAllergiesChange}
-                            />
-                          </Grid.Column>
-                        );
-                      })}
-                    </Grid>
-                    <br />
-                  </div>
-                  :
-                  <div></div>
-                }
+                <Feed.Event>
+                  <Feed.Content>
+                    <Feed.Summary>
+                      <Checkbox inline checked={this.props.hasAllergies} onClick={this.handleAllergies} />
+                      <Modal trigger={<a className={s.mode}>I am allergic to one or more of the produces from this bulk buy</a>} basic size='small' closeIcon="close">
+                      <Modal.Header>Safety Is Our Top Priority</Modal.Header>
+                      <Modal.Content image>
+                        <Modal.Description>
+                          <p>Best Food Forward and Collective are committed to meeting the food safety requirements of all of our members.</p>
+                          <h5>Allergies</h5>
+                          <p style={styles.allergiesModal}>We will accommodate the needs of all of our members with allergies.</p>
+                          <p style={styles.allergiesModal}>All produce will be stored and processed separately with special consideration for cross-contamination.</p>
+                          <p style={styles.allergiesModal}>On the day of the event, we will specially prepare all allergy-affected packages separately.</p>
+                          <p style={styles.allergiesModal}>If you have any suggestions for how we can better meet the needs of those with health considerations,</p>
+                          <p style={styles.allergiesModal}>please provide feedback at the form at the bottom of the page.</p>
+                          </Modal.Description>
+                        </Modal.Content>
+                      </Modal>
+                      {this.props.hasAllergies ?
+                        <div style={styles.allergiesBox}>
+                          <br />
+                          <p>Which of these produces are you allergic to?</p>
+                          <Grid columns={2}>
+                            {this.props.ballotsAndVotes.map((ballotAndVote) => {
+                              return (
+                                <Grid.Column key={ballotAndVote.name}>
+                                  <Checkbox
+                                    label={ballotAndVote.name}
+                                    value={ballotAndVote.name}
+                                    onChange={this.handleAllergiesChange}
+                                  />
+                                </Grid.Column>
+                              );
+                            })}
+                          </Grid>
+                          <br />
+                        </div>
+                        :
+                        <div></div>
+                      }
+                    </Feed.Summary>
+                  </Feed.Content>
+                </Feed.Event>
                 <Popup
                   trigger={<Feed.Event onClick={this.handlePayment}>
                   <Feed.Content>

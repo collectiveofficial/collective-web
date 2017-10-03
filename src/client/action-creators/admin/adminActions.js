@@ -24,11 +24,18 @@ export function setAdminData(dataArr) {
   };
 }
 
+export function setAdminFoodItems(dataArr) {
+  return {
+    type: actionTypes.SET_ADMIN_FOOD_ITEMS,
+    dataArr,
+  };
+}
+
 export function setDownloadFile(dropoffID, dataType) {
-  return async dispatch => {
+  return async (dispatch) => {
     try {
       const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
-      const response = await fetch('/admin/download/data-file', {
+      const response = await fetch('/admin/data-file/download', {
         method: 'POST',
         headers: {
           Accept: 'application/octet-stream',
@@ -40,8 +47,9 @@ export function setDownloadFile(dropoffID, dataType) {
           dataType,
         }),
       });
-
-      fileSaver.saveAs(new Blob([await response.blob()], {type: "text/csv"}), `${dataType}${momentTZ.tz(new Date(), 'America/New_York').format('MM_DD_YYYY_hhmm')}.csv`);
+      const blob = await response.blob();
+      const formattedCurrentDate = momentTZ.tz(new Date(), 'America/New_York').format('MM_DD_YYYY_hhmm');
+      await fileSaver.saveAs(new Blob([blob], { type: 'text/csv' }), `${dataType}${formattedCurrentDate}.csv`);
       return await dispatch({
         type: actionTypes.DOWNLOAD_DATA_FILE,
       });
@@ -49,4 +57,87 @@ export function setDownloadFile(dropoffID, dataType) {
       console.log(err);
     }
   };
+}
+
+export function setPickupTimeStart(dateTime) {
+  return {
+    type: actionTypes.SET_PICKUP_TIME_START,
+    dateTime,
+  };
+}
+
+export function setPickupTimeEnd(dateTime) {
+  return {
+    type: actionTypes.SET_PICKUP_TIME_END,
+    dateTime,
+  };
+}
+
+export function setVoteTimeBeg(dateTime) {
+  return {
+    type: actionTypes.SET_VOTE_TIME_BEG,
+    dateTime,
+  };
+}
+
+export function setVoteTimeEnd(dateTime) {
+  return {
+    type: actionTypes.SET_VOTE_TIME_END,
+    dateTime,
+  };
+}
+
+// export function setFoodItems(dateTime) {
+//   return {
+//     type: actionTypes.SET_FOOD_ITEMS,
+//     dateTime,
+//   };
+// }
+
+export function handlePrev(index) {
+  if (index > 0) {
+    return {
+      type: actionTypes.SET_PREV_STEP,
+      index: index - 1,
+    };
+  }
+}
+
+export function handleNext(index, stepProps, newBulkBuyInfo) {
+  if (index < stepProps.length - 1) {
+    return {
+      type: actionTypes.SET_NEXT_STEP,
+      index: index + 1,
+    };
+  } else if (index === stepProps.length - 1) {
+    return async (dispatch) => {
+      let bulkBuySaved = false;
+      try {
+        const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
+        newBulkBuyInfo.intendedShipDate = newBulkBuyInfo.intendedPickupTimeStart.format('YYYY-MM-DD');
+        const response = await fetch('/admin/new-bulk-buy/submit', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
+          },
+          body: JSON.stringify({
+            firebaseAccessToken,
+            newBulkBuyInfo,
+          }),
+        });
+        const responseData = response.json();
+        if (responseData.bulkBuySaved) {
+          bulkBuySaved = true;
+          console.log('-----> bulkBuySaved: ', bulkBuySaved);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+      return dispatch({
+        type: actionTypes.SUBMIT_NEW_BULK_BUY,
+        bulkBuySaved,
+      });
+    };
+  }
 }

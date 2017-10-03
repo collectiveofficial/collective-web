@@ -5,7 +5,7 @@ import {
 } from 'react-router-dom';
 import s from './foodwiki.css';
 
-const FoodWiki = () => (
+const FoodWiki = props => (
   <div>
     <div className={s.root}>
       <div className={s.container}>
