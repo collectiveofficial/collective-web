@@ -18,7 +18,7 @@ const Header = (props) => (
       {props.userAuthorized ?
         <div>
           {props.adminReducers.adminAuthorized === true ?
-            <Link className={s.link, s.highlight} to="/admin-dashboard">Admin Dashboard</Link>
+            <Link className={s.link, s.highlight} to="/admin-dashboard/home">Admin Dashboard</Link>
             :
             <div />
           }

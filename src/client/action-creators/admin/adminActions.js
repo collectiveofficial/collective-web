@@ -2,6 +2,7 @@ import actionTypes from './adminActionTypes';
 import fileSaver from 'file-saver';
 import { firebaseAuth } from '../../config';
 import momentTZ from 'moment-timezone';
+import _ from 'lodash';
 
 export function selectDashboardPage(text) {
   return {
@@ -140,4 +141,31 @@ export function handleNext(index, stepProps, newBulkBuyInfo) {
       });
     };
   }
+}
+
+export function setSelectedFoodItems(dataArr, foodItem) {
+  const hasItemAlready = _.some(dataArr, { name: foodItem.name });
+  if (!hasItemAlready) {
+    dataArr.push(foodItem);
+  } else {
+    _.remove(dataArr, item =>  JSON.stringify(item) === JSON.stringify(foodItem));
+  }
+  return {
+    type: actionTypes.SET_SELECTED_FOOD_ITEMS,
+    dataArr,
+  };
+}
+
+export function setNewItem(text) {
+  return {
+    type: actionTypes.SET_NEW_ITEM,
+    text,
+  };
+}
+
+export function setNewImageUrl(text) {
+  return {
+    type: actionTypes.SET_NEW_IMAGE_URL,
+    text,
+  };
 }
