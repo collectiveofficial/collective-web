@@ -1,5 +1,7 @@
 const models = require('../../database/models/index');
 const momentTZ = require('moment-timezone');
+const dropoffUtil = require('./dropoff');
+const cron = require('cron');
 
 module.exports.doesFirstGroupExist = async () => {
   let findGroupResult;
@@ -58,29 +60,62 @@ module.exports.findGroupIDbyName = async (name) => {
   return findGroupResult.dataValues.id;
 };
 
-module.exports.updateCurrentDropoffID = async (currentDropoffID, groupID) => {
-  await models.Group.update({
-    currentDropoffID,
-  }, {
-    where: {
-      id: groupID,
-    },
-  });
-  // const dateNowInEST = momentTZ.tz(new Date(), 'America/New_York');
-  // const intendedPickupTimeEnd = await dropoffUtil.findIntendedPickupTimeEnd(currentDropoffID, groupID);
-  // if (dateNowInEST > intendedPickupTimeEnd) {
-  //   await models.Group.update({
-  //     currentDropoffID,
-  //   }, {
-  //     where: {
-  //       id: groupID,
-  //     },
-  //   });
-  // }
-};
+module.exports.updateCurrentDropoffID = async () => {
+  try {
+    const dropoffs = await dropoffUtil.getAllDropoffs();
+    for (let i = 0; i < dropoffs.length; i++) {
+      const voteDateTimeBeg = dropoffs[i].dataValues.voteDateTimeBeg;
+      const intendedPickupTimeEnd = dropoffs[i].dataValues.intendedPickupTimeEnd;
+      const dropoffID = dropoffs[i].dataValues.id;
+      const groupID = dropoffs[i].dataValues.groupID;
 
-module.exports.updateCurrentVotingDropoffID = async () => {
-  // await dropoffUtil.
+      const changeCurrentVotingDropoffJob = new cron.CronJob(new Date(voteDateTimeBeg), async () => {
+        /* runs once at the specified date. */
+        console.log('changeCurrentVotingDropoffJob ticked');
+        await models.Group.update({
+          currentVotingDropoffID: dropoffID,
+        }, {
+          where: {
+            id: groupID,
+          },
+        });
+
+      }, () => {
+        /* This function is executed when the job stops */
+        console.log('mission accomplished');
+      },
+      true, /* Start the job right now */
+      'America/New_York'); /* Time zone of this job. */
+
+      console.log(`changeCurrentVotingDropoffJob status at dropoffID ${dropoffID} and voteDateTimeBeg of ${voteDateTimeBeg}: ${changeCurrentVotingDropoffJob.running}`); // changeCurrentVotingDropoffJob status undefined
+
+      if (i < dropoffs.length - 1) {
+        const nextDropoffID = dropoffs[i+1].dataValues.id;
+        const changeCurrentDropoffJob = new cron.CronJob(new Date(intendedPickupTimeEnd), async () => {
+          /* runs once at the specified date. */
+          console.log('changeCurrentDropoffJob ticked');
+          await models.Group.update({
+            currentVotingDropoffID: nextDropoffID,
+          }, {
+            where: {
+              id: groupID,
+            },
+          });
+
+        }, () => {
+          /* This function is executed when the job stops */
+          console.log('mission accomplished');
+        },
+        true, /* Start the job right now */
+        'America/New_York'); /* Time zone of this job. */
+
+        console.log(`changeCurrentDropoffJob status at dropoffID ${dropoffID} and intendedPickupTimeEnd of ${intendedPickupTimeEnd}: ${changeCurrentDropoffJob.running}`); // changeCurrentDropoffJob status undefined
+      }
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 module.exports.findDeliveryAddressFromGroupID = async (id) => {

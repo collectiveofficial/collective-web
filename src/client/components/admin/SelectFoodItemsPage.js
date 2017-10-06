@@ -40,7 +40,7 @@ const SelectFoodItemsPage = (props) => {
           <Subheader>Selected Items</Subheader>
         </div>
         :
-        <Message color='blue'>Please add new items by selecting from previous items or inputting new items</Message>
+        <Message color='blue'>Please add items by selecting from previous items or inputting new items</Message>
       }
       <div style={styles.root}>
         <GridList

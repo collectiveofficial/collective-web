@@ -10,11 +10,13 @@ const initialState = {
   intendedPickupTimeEnd: moment(),
   voteDateTimeBeg: moment(),
   voteDateTimeEnd: moment(),
+  newLocation: '',
   foodItems: [],
   selectedFoodItems: [],
   bulkBuySaved: false,
   newItem: '',
   newImageUrl: '',
+  isValidAddress: false,
 };
 
 const adminReducers = (state = initialState, action) => {
@@ -33,6 +35,8 @@ const adminReducers = (state = initialState, action) => {
       return { ...state, voteDateTimeBeg: action.dateTime };
     case actionTypes.SET_VOTE_TIME_END:
       return { ...state, voteDateTimeEnd: action.dateTime };
+    case actionTypes.SET_NEW_LOCATION:
+      return { ...state, newLocation: action.text };
     case actionTypes.SET_PREV_STEP:
       return { ...state, stepIndex: action.index };
     case actionTypes.SET_NEXT_STEP:

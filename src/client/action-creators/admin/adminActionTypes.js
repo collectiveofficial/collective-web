@@ -16,6 +16,7 @@ const actionTypes = {
   SET_NEW_ITEM: 'SET_NEW_ITEM',
   SET_NEW_IMAGE_URL: 'SET_NEW_IMAGE_URL',
   SET_CHECK_CIRCLE_COLOR: 'SET_CHECK_CIRCLE_COLOR',
+  SET_NEW_LOCATION: 'SET_NEW_LOCATION',
 };
 
 export default actionTypes;

@@ -169,3 +169,14 @@ export function setNewImageUrl(text) {
     text,
   };
 }
+
+export function setNewLocation(text) {
+  return {
+    type: actionTypes.SET_NEW_LOCATION,
+    text,
+  };
+}
+
+export function validateNewLocation(address) {
+  
+}

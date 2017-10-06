@@ -53,13 +53,6 @@ const initializeData = async () => {
     }
   };
 
-  const updateCurrentDropoffID = async () => {
-    // TODO: dynamic voting dropoff ID (current datetime)
-    const currentDropoffID = 3;
-    const groupID = 1;
-    await groupUtil.updateCurrentDropoffID(currentDropoffID, groupID);
-  };
-
   const initializeFirstDropoff = async () => {
     const dropoffID = 1;
     // initialize dropoff
@@ -140,9 +133,9 @@ const initializeData = async () => {
     }
   };
 
-  // const updateCurrentVotingDropoffID = async () => {
-  //   await groupUtil.updateCurrentVotingDropoffID();
-  // };
+  const updateCurrentDropoffID = async () => {
+    await groupUtil.updateCurrentDropoffID();
+  };
 
   // const updateDropoffIDonRestrictedAddresses = async () => {
   //    // TODO: Remove this function after merge to master
@@ -235,8 +228,7 @@ const initializeData = async () => {
   };
 
   await initializeFirstGroup();
-  await updateCurrentDropoffID();
-  // await updateCurrentVotingDropoffID();
+  // await updateCurrentDropoffID();
   await initializeFirstDropoff();
   await initializeFirstDropFoodItemsBallots();
   await initializeSecondDropoff();

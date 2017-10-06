@@ -17,6 +17,7 @@ import { Sidebar, Segment, Button, Menu, Image, Icon, Header, Transition } from 
 import InputMoment from 'input-moment';
 import momentTZ from 'moment-timezone';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import SelectLocationContainer from './SelectLocationContainer.js';
 import SelectFoodItemsPageContainer from './SelectFoodItemsPageContainer.js';
 import './less/input-moment.less';
 import './less/app.less';
@@ -66,9 +67,10 @@ const BulkBuy = (props) => {
       action: props.setVoteTimeEnd,
     },
     {
+      step: 'Select Location',
+    },
+    {
       step: 'Select Food Items',
-      // state: props.adminReducers.voteDateTimeEnd,
-      // action: props.setVoteTimeEnd,
     },
   ];
 
@@ -96,7 +98,7 @@ const BulkBuy = (props) => {
         <div style={styles.form}>
           {stepProps.map((stepProp, index) => (
             <div>
-              {index === props.adminReducers.stepIndex && props.adminReducers.stepIndex !== stepProps.length - 1 ?
+              {index === props.adminReducers.stepIndex && props.adminReducers.stepIndex < 4 ?
                 <div>
                   <div className="input">
                     <TextField
@@ -118,7 +120,10 @@ const BulkBuy = (props) => {
                   />
                 </div>
                 :
-                <div />
+                index === props.adminReducers.stepIndex && props.adminReducers.stepIndex === stepProps.length - 2 ?
+                  <SelectLocationContainer />
+                  :
+                  <div />
               }
             </div>
             ))}
