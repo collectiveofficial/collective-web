@@ -125,7 +125,7 @@ const initializeData = async () => {
 
   const initializeRestrictedAddresses = async () => {
     const groupID = 1;
-    const dropoffID = 5;
+    const dropoffID = 11;
     const restrictedAddressesID = 1;
     const doesRestrictedAddressExist = await restrictedAddressUtil.checkIfRestrictedAddressExist(restrictedAddressesID);
     if (doesRestrictedAddressExist === false) {
@@ -139,13 +139,13 @@ const initializeData = async () => {
 
   const updateDropoffIDonRestrictedAddresses = async () => {
      // TODO: Remove this function after merge to master
-     const dropoffID = 5;
+     const dropoffID = 11;
      await restrictedAddressUtil.updateDropoffIDonRestrictedAddresses(dropoffID);
    };
 
   const testConfirmationEmail = async () => {
     try {
-      const dropoffID = 4;
+      const dropoffID = 11;
       // get rid of later
       const userID = 1;
       const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, null, userID);
@@ -430,7 +430,7 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 5;
+      req.body.dropoffID = 11;
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
       const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
       const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
@@ -461,7 +461,7 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 5;
+      req.body.dropoffID = 11;
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.updateVotes(req.body);
       res.json({ votesSaved: true });
@@ -474,7 +474,7 @@ module.exports = {
         let uid = decodedToken.uid;
         req.body.uid = uid;
         // TODO: dynamic dropoffID
-        const dropoffID = 5;
+        const dropoffID = 11;
         // declare variable called errorMessage
         let errorMessage = '';
         const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(dropoffID);
@@ -617,7 +617,7 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 5;
+      req.body.dropoffID = 11;
       const checkTransactionResult = await transactionUtil.checkTransaction(req.body);
       res.json(checkTransactionResult);
     },
