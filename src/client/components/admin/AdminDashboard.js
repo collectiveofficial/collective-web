@@ -16,17 +16,16 @@ const AdminDashboard = (props) => {
   let menuComponent;
   if (props.adminReducers.dashboardPageSelected === 'home') {
     menuComponent = <AdminHomeContainer />;
+  } else if (props.adminReducers.dashboardPageSelected === 'bulk buys') {
+    menuComponent = <BulkBuyContainer />;
   }
-  // else if (props.adminReducers.dashboardPageSelected === 'bulk buys') {
-  //   menuComponent = <BulkBuyContainer />;
-  // }
   return (
     <div>
       <Grid>
         <Grid.Column stetched width={2}>
           <Menu inverted vertical>
             <Menu.Item name='Home' active={props.adminReducers.dashboardPageSelected === 'home'} onClick={() => { props.selectDashboardPage('home'); }} />
-            {/* <Menu.Item name='Add Bulk Buys' active={props.adminReducers.dashboardPageSelected === 'bulk buys'} onClick={() => { props.selectDashboardPage('bulk buys'); }} /> */}
+            <Menu.Item name='Add Bulk Buys' active={props.adminReducers.dashboardPageSelected === 'bulk buys'} onClick={() => { props.selectDashboardPage('bulk buys'); }} />
           </Menu>
         </Grid.Column>
         <Grid.Column stetched width={12}>

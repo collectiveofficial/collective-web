@@ -10,8 +10,13 @@ const initialState = {
   intendedPickupTimeEnd: moment(),
   voteDateTimeBeg: moment(),
   voteDateTimeEnd: moment(),
+  newLocation: '',
   foodItems: [],
+  selectedFoodItems: [],
   bulkBuySaved: false,
+  newItem: '',
+  newImageUrl: '',
+  isValidAddress: false,
 };
 
 const adminReducers = (state = initialState, action) => {
@@ -30,6 +35,8 @@ const adminReducers = (state = initialState, action) => {
       return { ...state, voteDateTimeBeg: action.dateTime };
     case actionTypes.SET_VOTE_TIME_END:
       return { ...state, voteDateTimeEnd: action.dateTime };
+    case actionTypes.SET_NEW_LOCATION:
+      return { ...state, newLocation: action.text };
     case actionTypes.SET_PREV_STEP:
       return { ...state, stepIndex: action.index };
     case actionTypes.SET_NEXT_STEP:
@@ -38,6 +45,12 @@ const adminReducers = (state = initialState, action) => {
       return { ...state, bulkBuySaved: action.bulkBuySaved };
     case actionTypes.SET_ADMIN_FOOD_ITEMS:
       return { ...state, foodItems: action.dataArr };
+    case actionTypes.SET_SELECTED_FOOD_ITEMS:
+      return { ...state, selectedFoodItems: action.dataArr };
+    case actionTypes.SET_NEW_ITEM:
+      return { ...state, newItem: action.text };
+    case actionTypes.SET_NEW_IMAGE_URL:
+      return { ...state, newImageUrl: action.text };
     default:
       return state;
   }

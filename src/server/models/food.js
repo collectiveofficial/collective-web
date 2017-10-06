@@ -125,13 +125,13 @@ module.exports.getAllFoodItems = async () => {
     });
     for (let i = 0; i < food.length; i++) {
       const foodItemInfo = {};
-      foodItemInfo.foodName = food[i].dataValues.name;
+      foodItemInfo.name = food[i].dataValues.name;
       foodItemInfo.imageUrl = food[i].dataValues.imageUrl;
       foodItems.push(foodItemInfo);
     }
   } catch (err) {
     console.log(err);
   }
-  foodItems = _.uniqBy(foodItems, 'foodName');
+  foodItems = _.uniqBy(foodItems, 'name');
   return foodItems;
 };

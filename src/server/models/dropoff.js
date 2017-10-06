@@ -390,17 +390,45 @@ module.exports.saveNewBulkBuy = async (requestBody) => {
     const intendedPickupTimeEnd = requestBody.newBulkBuyInfo.intendedPickupTimeEnd;
     const voteDateTimeBeg = requestBody.newBulkBuyInfo.voteDateTimeBeg;
     const voteDateTimeEnd = requestBody.newBulkBuyInfo.voteDateTimeEnd;
-    await models.Dropoff.create({
+    const selectedFoodItems = requestBody.newBulkBuyInfo.selectedFoodItems;
+    const pricePerDormPackage = requestBody.newBulkBuyInfo.pricePerDormPackage;
+    const pricePerCookingPackage = requestBody.newBulkBuyInfo.pricePerCookingPackage;
+    const totalDormPackagesOrdered = requestBody.newBulkBuyInfo.totalDormPackagesOrdered;
+    const totalCookingPackagesOrdered = requestBody.newBulkBuyInfo.totalCookingPackagesOrdered;
+    const totalDollarAmount = requestBody.newBulkBuyInfo.totalDollarAmount;
+    const pctFeePerPackage = requestBody.newBulkBuyInfo.pctFeePerPackage;
+    const totalRevenueBeforeStripe = requestBody.newBulkBuyInfo.totalRevenueBeforeStripe;
+    const totalRevenueAftereStripe = requestBody.newBulkBuyInfo.totalRevenueAftereStripe;
+    const dropoff = await models.Dropoff.create({
       groupID,
       intendedShipDate,
       intendedPickupTimeStart,
       intendedPickupTimeEnd,
       voteDateTimeBeg,
       voteDateTimeEnd,
+      pricePerDormPackage,
+      pricePerCookingPackage,
+      totalDormPackagesOrdered,
+      totalCookingPackagesOrdered,
+      totalDollarAmount,
+      pctFeePerPackage,
+      totalRevenueBeforeStripe,
+      totalRevenueAftereStripe,
     });
+    await foodUtil.populateFoodItemsBallots(selectedFoodItems, null, dropoff)
     bulkBuySaved = true;
   } catch(err) {
     console.log(err);
   }
   return bulkBuySaved;
+};
+
+module.exports.getAllDropoffs = async () => {
+  let dropoffs;
+  try {
+    dropoffs = models.Dropoff.findAll();
+  } catch (err) {
+    console.log(err);
+  }
+  return dropoffs;
 };
