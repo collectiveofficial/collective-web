@@ -15,12 +15,15 @@ import {
 import ArrowForwardIcon from 'material-ui/svg-icons/navigation/arrow-forward';
 import { Sidebar, Segment, Button, Menu, Image, Icon, Header, Transition } from 'semantic-ui-react';
 import InputMoment from 'input-moment';
-import moment from 'moment';
 import momentTZ from 'moment-timezone';
+import injectTapEventPlugin from 'react-tap-event-plugin';
+import SelectLocationContainer from './SelectLocationContainer.js';
 import SelectFoodItemsPageContainer from './SelectFoodItemsPageContainer.js';
 import './less/input-moment.less';
 import './less/app.less';
 import 'input-moment/dist/input-moment.css';
+
+injectTapEventPlugin();
 
 const BulkBuy = (props) => {
   const styles = {
@@ -28,14 +31,17 @@ const BulkBuy = (props) => {
       textAlign: 'left',
     },
     bulkBuys: {
-      marginLeft: '35%',
       marginBottom: '1.5%',
     },
-    form: {
-      marginLeft: '1%',
+    topHeader: {
+      marginLeft: '35%',
     },
-    button: {
-      marginLeft: '6%',
+    form: {
+      marginLeft: '35%',
+      // marginLeft: '1%',
+    },
+    timeControl: {
+      margin: '3% 0 1% 35%',
     },
   };
 
@@ -61,22 +67,25 @@ const BulkBuy = (props) => {
       action: props.setVoteTimeEnd,
     },
     {
+      step: 'Select Location',
+    },
+    {
       step: 'Select Food Items',
-      // state: props.adminReducers.voteDateTimeEnd,
-      // action: props.setVoteTimeEnd,
     },
   ];
 
   return (
     <div>
       <div style={styles.bulkBuys}>
-        <Header as="h2" icon>
-          <Icon name="truck" />
-          Add Bulk Buys
-          <Header.Subheader>
-            Create new bulk buys for your members
-          </Header.Subheader>
-        </Header><br />
+        <div style={styles.topHeader}>
+          <Header as="h2" icon>
+            <Icon name="truck" />
+            Add Bulk Buys
+            <Header.Subheader>
+              Create new bulk buys for your members
+            </Header.Subheader>
+          </Header><br />
+        </div>
       </div>
       <Stepper activeStep={props.adminReducers.stepIndex} connector={<ArrowForwardIcon />}>
         {stepProps.map(stepProp => (
@@ -88,54 +97,69 @@ const BulkBuy = (props) => {
       <div style={styles.bulkBuys}>
         <div style={styles.form}>
           {stepProps.map((stepProp, index) => (
-              <div>
-                {index === props.adminReducers.stepIndex && props.adminReducers.stepIndex !== stepProps.length - 1 ?
-                  <div>
-                    <div className="input">
-                      <TextField
-                        type="text"
-                        value={stepProp.state.format('llll')}
-                        readOnly
-                        floatingLabelText={stepProp.step}
-                        floatingLabelFixed={true}
-                      />
-                    </div>
-                    <br />
-                    <InputMoment
-                      moment={stepProp.state}
-                      onChange={async (dateTime) => {
-                        const tzLessDateTime = await momentTZ(dateTime).clone();
-                        const newDateTime = await tzLessDateTime.tz('America/New_York').add(dateTime.utcOffset() - tzLessDateTime.utcOffset(), 'minutes');
-                        stepProp.action(newDateTime);
-                      }}
+            <div>
+              {index === props.adminReducers.stepIndex && props.adminReducers.stepIndex < 4 ?
+                <div>
+                  <div className="input">
+                    <TextField
+                      type="text"
+                      value={stepProp.state.format('llll')}
+                      readOnly
+                      floatingLabelText={stepProp.step}
+                      floatingLabelFixed={true}
                     />
                   </div>
+                  <br />
+                  <InputMoment
+                    moment={stepProp.state}
+                    onChange={async (dateTime) => {
+                      const tzLessDateTime = await momentTZ(dateTime).clone();
+                      const newDateTime = await tzLessDateTime.tz('America/New_York').add(dateTime.utcOffset() - tzLessDateTime.utcOffset(), 'minutes');
+                      stepProp.action(newDateTime);
+                    }}
+                  />
+                </div>
+                :
+                index === props.adminReducers.stepIndex && props.adminReducers.stepIndex === stepProps.length - 2 ?
+                  <SelectLocationContainer />
                   :
                   <div />
-                }
-              </div>
+              }
+            </div>
             ))}
+        </div>
+        <div>
           {props.adminReducers.stepIndex === stepProps.length - 1 ?
             <SelectFoodItemsPageContainer />
             :
             <div />
           }
-          <div style={{ marginTop: '3%', marginBottom: '1%' }}>
+          <div style={styles.timeControl}>
             <FlatButton
               label="Back"
               disabled={props.adminReducers.stepIndex === 0}
-              onClick={() => { props.handlePrev(props.adminReducers.stepIndex); }}
+              onTouchTap={() => { props.handlePrev(props.adminReducers.stepIndex); }}
               style={{ marginRight: '1%' }}
             />
             <RaisedButton
               label={props.adminReducers.stepIndex === stepProps.length - 1 ? 'Finish' : 'Next'}
               primary={true}
-              onClick={() => {
+              onTouchTap={() => {
                 const newBulkBuyInfo = {
                   intendedPickupTimeStart: props.adminReducers.intendedPickupTimeStart,
                   intendedPickupTimeEnd: props.adminReducers.intendedPickupTimeEnd,
                   voteDateTimeBeg: props.adminReducers.voteDateTimeBeg,
                   voteDateTimeEnd: props.adminReducers.voteDateTimeEnd,
+                  shipDate: null,
+                  selectedFoodItems: props.adminReducers.selectedFoodItems,
+                  pricePerDormPackage: 6,
+                  pricePerCookingPackage: 6,
+                  totalDormPackagesOrdered: 0,
+                  totalCookingPackagesOrdered: 0,
+                  totalDollarAmount: 0,
+                  pctFeePerPackage: 0,
+                  totalRevenueBeforeStripe: 0,
+                  totalRevenueAftereStripe: 0,
                 };
                 if (props.adminReducers.stepIndex === stepProps.length - 1) {
                   props.handleNext(props.adminReducers.stepIndex, stepProps, newBulkBuyInfo);

@@ -11,7 +11,7 @@ const Faq = props => (
           <List.Item>
             <List.Content>
               <List.Header>How do I vote?</List.Header>
-              <List.Description>After agreeing to our user agreement when you create an account with us, you will be directed to our home page that has all of your local organization’s dates for the upcoming bulk buys. To vote for that week, just hit the “Vote” button on top of the page. Place your votes on that page then pay on the page after.</List.Description>
+              <List.Description>After agreeing to our user agreement when you create an account with us, you will be directed to our home page that has all of your local organization’s dates for the upcoming bulk buys. To vote for that week, just hit the “Vote Now” button on top of the page. Place your votes on that page then pay on the page after.</List.Description>
             </List.Content>
           </List.Item>
         </List>

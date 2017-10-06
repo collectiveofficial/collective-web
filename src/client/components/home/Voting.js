@@ -119,7 +119,7 @@ class Voting extends React.Component {
           <div className={s.cont}>
             <h1 className={s.top}>You have {this.props.votes} votes left</h1>
             <div className={s.flexcontainer}>
-              {this.props.ballotsAndVotes.map((ballotAndVote) => (
+              {this.props.ballotsAndVotes.map(ballotAndVote => (
                 <div className={s.ballot}>
                   <Card>
                     <Image src={ballotAndVote.imageUrl} />

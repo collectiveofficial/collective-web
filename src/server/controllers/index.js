@@ -53,20 +53,6 @@ const initializeData = async () => {
     }
   };
 
-  const updateCurrentDropoffID = async () => {
-    // TODO: dynamic voting dropoff ID (current datetime)
-    const currentDropoffID = 3;
-    const groupID = 1;
-    await groupUtil.updateCurrentDropoffID(currentDropoffID, groupID);
-  };
-  //
-  // const updateCurrentVotingDropoffID = async () => {
-  //   // TODO: dynamic voting dropoff ID (current datetime)
-  //   const currentVotingDropoffID = 1;
-  //   const groupID = 1;
-  //   await groupUtil.updateCurrentVotingDropoffID(currentVotingDropoffID, groupID);
-  // };
-
   const initializeFirstDropoff = async () => {
     const dropoffID = 1;
     // initialize dropoff
@@ -147,68 +133,15 @@ const initializeData = async () => {
     }
   };
 
+  const updateCurrentDropoffID = async () => {
+    await groupUtil.updateCurrentDropoffID();
+  };
+
   // const updateDropoffIDonRestrictedAddresses = async () => {
   //    // TODO: Remove this function after merge to master
   //    const dropoffID = 4;
   //    await restrictedAddressUtil.updateDropoffIDonRestrictedAddresses(dropoffID);
   //  };
-
-  const sendNightlyCSVupdates = async () => {
-    // TODO: dynamic dropoffID
-    const dropoffID = 4;
-    let fields;
-    let csv;
-    let fileName;
-
-    const sendFoodNamesAndVoteCounts = async () => {
-      // just food name and vote count for now
-      fields = ['Food Name', 'Vote Count'];
-      const foodNamesAndVoteCounts = await ballotUtil.getFoodNamesAndVoteCounts(dropoffID);
-      csv = json2csv({ data: foodNamesAndVoteCounts, fields });
-      fileName = 'foodNamesAndVoteCounts.csv';
-      await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
-        if (err) {
-          console.log('file failed to create');
-          throw err;
-        }
-        console.log('file created');
-      });
-    };
-
-    const sendUserNamesAndPackagesOrdered = async () => {
-      fields = ['Last Name', 'First Name', 'Date of Birth', 'Email', 'Phone Number', 'Dorm Packages Ordered', 'Cooking Packages Ordered', 'Allergies', 'Delivery Address'];
-      // csv in ascending alphabetical order
-      const userInfoAndPackagesOrdered = await transactionUtil.getUserInfoAndPackagesOrdered(dropoffID);
-      csv = json2csv({ data: userInfoAndPackagesOrdered, fields });
-      fileName = 'userNamesAndPackagesOrdered.csv';
-      await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
-        if (err) {
-          console.log('file failed to create');
-          throw err;
-        }
-        console.log('file created');
-      });
-    };
-    await sendFoodNamesAndVoteCounts();
-    await sendUserNamesAndPackagesOrdered();
-  };
-
-  const sendVotingReminderCSVupdates = async () => {
-    const fields = ['Last Name', 'First Name', 'Email'];
-    // TODO: dynamic groupID
-    const groupID = 1;
-    const dropoffID = 4;
-    const usersWhoHaveNotPaid = await transactionUtil.getUsersWhoHaveNotPaid(dropoffID, groupID);
-    const csv = json2csv({ data: usersWhoHaveNotPaid, fields });
-    const fileName = 'usersWhoHaveNotPaid.csv';
-    await fs.writeFile(__dirname + `/../adminData/${fileName}`, csv, (err) => {
-      if (err) {
-        console.log('file failed to create');
-        throw err;
-      }
-      console.log('file created');
-    });
-  };
 
   const testConfirmationEmail = async () => {
     try {
@@ -295,8 +228,7 @@ const initializeData = async () => {
   };
 
   await initializeFirstGroup();
-  await updateCurrentDropoffID();
-  // await updateCurrentVotingDropoffID();
+  // await updateCurrentDropoffID();
   await initializeFirstDropoff();
   await initializeFirstDropFoodItemsBallots();
   await initializeSecondDropoff();
@@ -307,7 +239,6 @@ const initializeData = async () => {
   await initializeFourthDropFoodItemsBallots();
   await initializeRestrictedAddresses();
   // await updateDropoffIDonRestrictedAddresses();
-  // await sendNightlyCSVupdates();
   // await sendVotingReminderCSVupdates();
   // await testConfirmationEmail();
 };
@@ -729,7 +660,7 @@ module.exports = {
         const isUserAdmin = await userUtil.checkIfUserIsAdmin(uid);
         let bulkBuySaved = false;
         if (isUserAdmin && userAuthorized) {
-          bulkBuySaved = await dropoffUtil.saveNewBulkBuy(req.body.newBulkBuyInfo);
+          bulkBuySaved = await dropoffUtil.saveNewBulkBuy(req.body);
         }
         res.json(bulkBuySaved);
       } catch (err) {
