@@ -33,7 +33,7 @@ const Home = (props) => {
             </div>
             <h1 className={s.banner}>Upcoming Bulk Buys</h1>
           </div>
-          <Message color='blue'>Next pickup: 8 October 2017 from 12:00 PM to 4:00 PM at Scott House</Message>
+          {/* <Message color='blue'>Next pickup: 8 October 2017 from 12:00 PM to 4:00 PM at Scott House</Message> */}
           <Card style={{ width: "800px", margin: "0 0 30px 0" }}>
             <Icon name="truck" size="huge" style={styles.foodTruckIcon} />
             <Header as="h2" style={styles.header}>Food Truck Bulk Buy</Header>
