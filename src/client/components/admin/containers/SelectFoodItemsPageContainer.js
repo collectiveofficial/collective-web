@@ -1,8 +1,8 @@
 import React from 'react';
+import SelectFoodItemsPage from '../SelectFoodItemsPage.js';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import AddBulkBuyConfirmation from './AddBulkBuyConfirmation.js';
-import * as adminActionCreators from '../../action-creators/admin/adminActions.js';
+import * as adminActionCreators from '../../../action-creators/admin/adminActions.js';
 
 const mapStateToProps = (state) => {
   return {
@@ -16,4 +16,4 @@ const bundledActionCreators = Object.assign({},
 
 const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddBulkBuyConfirmation);
+export default connect(mapStateToProps, mapDispatchToProps)(SelectFoodItemsPage);

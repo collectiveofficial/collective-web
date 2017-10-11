@@ -13,13 +13,13 @@ import {
   StepLabel,
 } from 'material-ui/Stepper';
 import ArrowForwardIcon from 'material-ui/svg-icons/navigation/arrow-forward';
-import { Sidebar, Segment, Button, Menu, Image, Icon, Header, Transition } from 'semantic-ui-react';
+import { Icon, Header, Transition } from 'semantic-ui-react';
 import InputMoment from 'input-moment';
 import momentTZ from 'moment-timezone';
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import SelectLocationContainer from './SelectLocationContainer.js';
-import SelectFoodItemsPageContainer from './SelectFoodItemsPageContainer.js';
-import AddBulkBuyConfirmationContainer from './AddBulkBuyConfirmationContainer.js';
+import SelectLocationContainer from './containers/SelectLocationContainer.js';
+import SelectFoodItemsPageContainer from './containers/SelectFoodItemsPageContainer.js';
+import AddBulkBuyConfirmationContainer from './containers/AddBulkBuyConfirmationContainer.js';
 import './less/input-moment.less';
 import './less/app.less';
 import 'input-moment/dist/input-moment.css';

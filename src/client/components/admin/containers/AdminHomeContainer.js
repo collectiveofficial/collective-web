@@ -1,8 +1,8 @@
 import React from 'react';
-import AdminDashboard from './AdminDashboard.js';
+import AdminHome from '../AdminHome.js';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as adminActionCreators from '../../action-creators/admin/adminActions.js';
+import * as adminActionCreators from '../../../action-creators/admin/adminActions.js';
 
 const mapStateToProps = (state) => {
   return {
@@ -16,4 +16,4 @@ const bundledActionCreators = Object.assign({},
 
 const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(AdminDashboard);
+export default connect(mapStateToProps, mapDispatchToProps)(AdminHome);
