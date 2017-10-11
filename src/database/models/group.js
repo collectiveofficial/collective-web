@@ -18,6 +18,7 @@ module.exports = function(sequelize, DataTypes) {
     deliveryState: DataTypes.STRING,
     deliveryZipCode: DataTypes.STRING,
     deliveryFullAddress: DataTypes.STRING,
+    locationID: DataTypes.INTEGER,
   }, {
     classMethods: {
       associate: function(models) {

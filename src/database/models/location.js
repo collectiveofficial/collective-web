@@ -1,8 +1,7 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
-  var RestrictedAddress = sequelize.define('RestrictedAddress', {
-    name: DataTypes.STRING,
-    restrictionType: DataTypes.STRING,
+  var Location = sequelize.define('Location', {
+    groupID: DataTypes.INTEGER,
     streetAddress: DataTypes.STRING,
     aptSuite: DataTypes.STRING,
     city: DataTypes.STRING,
@@ -10,9 +9,7 @@ module.exports = function(sequelize, DataTypes) {
     zipCode: DataTypes.INTEGER,
     fullAddress: DataTypes.STRING,
     latitude: DataTypes.STRING,
-    longitude: DataTypes.STRING,
-    dropoffID: DataTypes.INTEGER,
-    groupID: DataTypes.INTEGER,
+    longitude: DataTypes.STRING
   }, {
     classMethods: {
       associate: function(models) {
@@ -20,5 +17,5 @@ module.exports = function(sequelize, DataTypes) {
       }
     }
   });
-  return RestrictedAddress;
+  return Location;
 };
