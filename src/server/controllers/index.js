@@ -125,7 +125,7 @@ const initializeData = async () => {
 
   const initializeRestrictedAddresses = async () => {
     const groupID = 1;
-    const dropoffID = 5; //TODO: Address server start dropoffID
+    const dropoffID = 4; //TODO: Address server start dropoffID
     const restrictedAddressesID = 1;
     const doesRestrictedAddressExist = await restrictedAddressUtil.checkIfRestrictedAddressExist(restrictedAddressesID);
     if (doesRestrictedAddressExist === false) {
@@ -133,15 +133,9 @@ const initializeData = async () => {
     }
   };
 
-  const updateDropoffIDonRestrictedAddresses = async () => {
-     // TODO: Remove this function after merge to master
-     const dropoffID = 5; //TODO: Address server start dropoffID
-     await restrictedAddressUtil.updateDropoffIDonRestrictedAddresses(dropoffID);
-   };
-
   const testConfirmationEmail = async () => {
     try {
-      const dropoffID = 5; //TODO: Address server start dropoffID
+      const dropoffID = 4; //TODO: Address server start dropoffID
       // get rid of later
       const userID = 1;
       const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, null, userID);
@@ -233,7 +227,6 @@ const initializeData = async () => {
   await initializeFourthDropoff();
   await initializeFourthDropFoodItemsBallots();
   await initializeRestrictedAddresses();
-  // await updateDropoffIDonRestrictedAddresses();
   // await sendVotingReminderCSVupdates();
   // await testConfirmationEmail();
 };

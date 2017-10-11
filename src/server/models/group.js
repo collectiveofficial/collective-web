@@ -1,7 +1,5 @@
 const models = require('../../database/models/index');
-const momentTZ = require('moment-timezone');
-const dropoffUtil = require('./dropoff');
-const userUtil = require('./user');
+const restrictedAddressUtils = require('./restricted-address');
 const cron = require('cron');
 
 module.exports.doesFirstGroupExist = async () => {
@@ -90,7 +88,7 @@ module.exports.scheduleVotingDropoffSwitch = async (newBulkBuyData) => {
         id: groupID,
       },
     });
-
+    await restrictedAddressUtils.updateDropoffID(dropoffID, groupID);
   }, () => {
     /* This function is executed when the job stops */
     console.log('mission accomplished');
