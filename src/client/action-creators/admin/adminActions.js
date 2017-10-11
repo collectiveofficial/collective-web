@@ -115,7 +115,7 @@ export function handleNext(index, stepProps, newBulkBuyInfo) {
       let bulkBuySaved = false;
       try {
         const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
-        newBulkBuyInfo.intendedShipDate = newBulkBuyInfo.intendedPickupTimeStart.format('YYYY-MM-DD');
+        newBulkBuyInfo.intendedShipDate = await newBulkBuyInfo.intendedPickupTimeStart.format('YYYY-MM-DD');
         const response = await fetch('/admin/new-bulk-buy/submit', {
           method: 'POST',
           headers: {
@@ -127,15 +127,14 @@ export function handleNext(index, stepProps, newBulkBuyInfo) {
             newBulkBuyInfo,
           }),
         });
-        const responseData = response.json();
+        const responseData = await response.json();
         if (responseData.bulkBuySaved) {
           bulkBuySaved = true;
-          console.log('-----> bulkBuySaved: ', bulkBuySaved);
         }
       } catch (err) {
         console.log(err);
       }
-      return dispatch({
+      return await dispatch({
         type: actionTypes.SUBMIT_NEW_BULK_BUY,
         bulkBuySaved,
       });
@@ -178,5 +177,5 @@ export function setNewLocation(text) {
 }
 
 export function validateNewLocation(address) {
-  
+
 }

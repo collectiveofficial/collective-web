@@ -7,6 +7,7 @@ const userUtil = require('./user');
 const transactionUtil = require('./transaction');
 const ballotUtil = require('./ballot');
 const foodUtil = require('./food');
+const groupUtil = require('./group');
 
 module.exports.doesDropoffExist = async (id) => {
   try {
@@ -399,7 +400,7 @@ module.exports.saveNewBulkBuy = async (requestBody) => {
     const pctFeePerPackage = requestBody.newBulkBuyInfo.pctFeePerPackage;
     const totalRevenueBeforeStripe = requestBody.newBulkBuyInfo.totalRevenueBeforeStripe;
     const totalRevenueAftereStripe = requestBody.newBulkBuyInfo.totalRevenueAftereStripe;
-    const dropoff = await models.Dropoff.create({
+    const newBulkBuyData = {
       groupID,
       intendedShipDate,
       intendedPickupTimeStart,
@@ -414,8 +415,11 @@ module.exports.saveNewBulkBuy = async (requestBody) => {
       pctFeePerPackage,
       totalRevenueBeforeStripe,
       totalRevenueAftereStripe,
-    });
-    await foodUtil.populateFoodItemsBallots(selectedFoodItems, null, dropoff)
+    };
+    const dropoff = await models.Dropoff.create(newBulkBuyData);
+    await foodUtil.populateFoodItemsBallots(selectedFoodItems, null, dropoff);
+    newBulkBuyData.dropoffID = dropoff.dataValues.id;
+    groupUtil.scheduleVotingDropoffSwitch(newBulkBuyData);
     bulkBuySaved = true;
   } catch(err) {
     console.log(err);

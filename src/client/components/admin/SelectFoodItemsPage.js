@@ -12,6 +12,7 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Header, Message } from 'semantic-ui-react';
 import _ from 'lodash';
+import AddBulkBuyConfirmationContainer from './AddBulkBuyConfirmationContainer.js';
 
 const SelectFoodItemsPage = (props) => {
 
@@ -56,11 +57,12 @@ const SelectFoodItemsPage = (props) => {
                   <Cancel
                     color="rgb(162, 153, 158)"
                     onClick={() => {
-                    props.setSelectedFoodItems(props.adminReducers.selectedFoodItems, { name: foodItem.name, imageUrl: foodItem.imageUrl });
-                  }}
+                      props.setSelectedFoodItems(props.adminReducers.selectedFoodItems, { name: foodItem.name, imageUrl: foodItem.imageUrl });
+                    }}
                   />
-                </IconButton>}
-            >
+                </IconButton>
+               }
+              >
               <img src={foodItem.imageUrl} />
             </GridTile>
           ))}
@@ -107,15 +109,15 @@ const SelectFoodItemsPage = (props) => {
                     :
                     'rgb(162, 153, 158)'
                   }
-                  />
-                </IconButton>}
+                />
+              </IconButton>}
               onClick={() => {
                 props.setSelectedFoodItems(props.adminReducers.selectedFoodItems, { name: foodItem.name, imageUrl: foodItem.imageUrl });
               }}
-            >
+              >
               <img src={foodItem.imageUrl} />
             </GridTile>
-          ))}
+            ))}
         </GridList>
       </div>
     </div>

@@ -125,7 +125,7 @@ const initializeData = async () => {
 
   const initializeRestrictedAddresses = async () => {
     const groupID = 1;
-    const dropoffID = 11;
+    const dropoffID = 5; //TODO: Address server start dropoffID
     const restrictedAddressesID = 1;
     const doesRestrictedAddressExist = await restrictedAddressUtil.checkIfRestrictedAddressExist(restrictedAddressesID);
     if (doesRestrictedAddressExist === false) {
@@ -133,19 +133,15 @@ const initializeData = async () => {
     }
   };
 
-  const updateCurrentDropoffID = async () => {
-    await groupUtil.updateCurrentDropoffID();
-  };
-
   const updateDropoffIDonRestrictedAddresses = async () => {
      // TODO: Remove this function after merge to master
-     const dropoffID = 11;
+     const dropoffID = 5; //TODO: Address server start dropoffID
      await restrictedAddressUtil.updateDropoffIDonRestrictedAddresses(dropoffID);
    };
 
   const testConfirmationEmail = async () => {
     try {
-      const dropoffID = 11;
+      const dropoffID = 5; //TODO: Address server start dropoffID
       // get rid of later
       const userID = 1;
       const userInfoForPickup = await transactionUtil.getUserInfoForPickup(dropoffID, null, userID);
@@ -228,7 +224,6 @@ const initializeData = async () => {
   };
 
   await initializeFirstGroup();
-  // await updateCurrentDropoffID();
   await initializeFirstDropoff();
   await initializeFirstDropFoodItemsBallots();
   await initializeSecondDropoff();
@@ -238,7 +233,7 @@ const initializeData = async () => {
   await initializeFourthDropoff();
   await initializeFourthDropFoodItemsBallots();
   await initializeRestrictedAddresses();
-  await updateDropoffIDonRestrictedAddresses();
+  // await updateDropoffIDonRestrictedAddresses();
   // await sendVotingReminderCSVupdates();
   // await testConfirmationEmail();
 };
@@ -430,7 +425,8 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 11;
+      const groupID = await userUtil.findGroupIDByUID(uid);
+      req.body.dropoffID = await groupUtil.getCurrentVotingDropoffID(groupID);
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
       const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
       const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
@@ -461,7 +457,8 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 11;
+      const groupID = await userUtil.findGroupIDByUID(uid);
+      req.body.dropoffID = await groupUtil.getCurrentVotingDropoffID(groupID);
       // invoke vote util function that takes in the request body as an argument
       await voteUtil.updateVotes(req.body);
       res.json({ votesSaved: true });
@@ -474,7 +471,8 @@ module.exports = {
         let uid = decodedToken.uid;
         req.body.uid = uid;
         // TODO: dynamic dropoffID
-        const dropoffID = 11;
+        const groupID = await userUtil.findGroupIDByUID(uid);
+        const dropoffID = await groupUtil.getCurrentVotingDropoffID(groupID);
         // declare variable called errorMessage
         let errorMessage = '';
         const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(dropoffID);
@@ -617,7 +615,8 @@ module.exports = {
       let uid = decodedToken.uid;
       req.body.uid = uid;
       // TODO: Implement dynamic dropoffID
-      req.body.dropoffID = 11;
+      const groupID = await userUtil.findGroupIDByUID(uid);
+      req.body.dropoffID = await groupUtil.getCurrentVotingDropoffID(groupID);
       const checkTransactionResult = await transactionUtil.checkTransaction(req.body);
       res.json(checkTransactionResult);
     },
@@ -662,7 +661,7 @@ module.exports = {
         if (isUserAdmin && userAuthorized) {
           bulkBuySaved = await dropoffUtil.saveNewBulkBuy(req.body);
         }
-        res.json(bulkBuySaved);
+        res.json({ bulkBuySaved });
       } catch (err) {
         console.log(err);
       }

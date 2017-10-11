@@ -19,6 +19,7 @@ import momentTZ from 'moment-timezone';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import SelectLocationContainer from './SelectLocationContainer.js';
 import SelectFoodItemsPageContainer from './SelectFoodItemsPageContainer.js';
+import AddBulkBuyConfirmationContainer from './AddBulkBuyConfirmationContainer.js';
 import './less/input-moment.less';
 import './less/app.less';
 import 'input-moment/dist/input-moment.css';
@@ -76,101 +77,107 @@ const BulkBuy = (props) => {
 
   return (
     <div>
-      <div style={styles.bulkBuys}>
-        <div style={styles.topHeader}>
-          <Header as="h2" icon>
-            <Icon name="truck" />
-            Add Bulk Buys
-            <Header.Subheader>
-              Create new bulk buys for your members
-            </Header.Subheader>
-          </Header><br />
-        </div>
-      </div>
-      <Stepper activeStep={props.adminReducers.stepIndex} connector={<ArrowForwardIcon />}>
-        {stepProps.map(stepProp => (
-          <Step>
-            <StepLabel>{stepProp.step}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
-      <div style={styles.bulkBuys}>
-        <div style={styles.form}>
-          {stepProps.map((stepProp, index) => (
-            <div>
-              {index === props.adminReducers.stepIndex && props.adminReducers.stepIndex < 4 ?
-                <div>
-                  <div className="input">
-                    <TextField
-                      type="text"
-                      value={stepProp.state.format('llll')}
-                      readOnly
-                      floatingLabelText={stepProp.step}
-                      floatingLabelFixed={true}
-                    />
-                  </div>
-                  <br />
-                  <InputMoment
-                    moment={stepProp.state}
-                    onChange={async (dateTime) => {
-                      const tzLessDateTime = await momentTZ(dateTime).clone();
-                      const newDateTime = await tzLessDateTime.tz('America/New_York').add(dateTime.utcOffset() - tzLessDateTime.utcOffset(), 'minutes');
-                      stepProp.action(newDateTime);
-                    }}
-                  />
-                </div>
-                :
-                index === props.adminReducers.stepIndex && props.adminReducers.stepIndex === stepProps.length - 2 ?
-                  <SelectLocationContainer />
-                  :
-                  <div />
-              }
-            </div>
-            ))}
-        </div>
+      {props.adminReducers.bulkBuySaved ?
+        <AddBulkBuyConfirmationContainer />
+        :
         <div>
-          {props.adminReducers.stepIndex === stepProps.length - 1 ?
-            <SelectFoodItemsPageContainer />
-            :
-            <div />
-          }
-          <div style={styles.timeControl}>
-            <FlatButton
-              label="Back"
-              disabled={props.adminReducers.stepIndex === 0}
-              onTouchTap={() => { props.handlePrev(props.adminReducers.stepIndex); }}
-              style={{ marginRight: '1%' }}
-            />
-            <RaisedButton
-              label={props.adminReducers.stepIndex === stepProps.length - 1 ? 'Finish' : 'Next'}
-              primary={true}
-              onTouchTap={() => {
-                const newBulkBuyInfo = {
-                  intendedPickupTimeStart: props.adminReducers.intendedPickupTimeStart,
-                  intendedPickupTimeEnd: props.adminReducers.intendedPickupTimeEnd,
-                  voteDateTimeBeg: props.adminReducers.voteDateTimeBeg,
-                  voteDateTimeEnd: props.adminReducers.voteDateTimeEnd,
-                  shipDate: null,
-                  selectedFoodItems: props.adminReducers.selectedFoodItems,
-                  pricePerDormPackage: 6,
-                  pricePerCookingPackage: 6,
-                  totalDormPackagesOrdered: 0,
-                  totalCookingPackagesOrdered: 0,
-                  totalDollarAmount: 0,
-                  pctFeePerPackage: 0,
-                  totalRevenueBeforeStripe: 0,
-                  totalRevenueAftereStripe: 0,
-                };
-                if (props.adminReducers.stepIndex === stepProps.length - 1) {
-                  props.handleNext(props.adminReducers.stepIndex, stepProps, newBulkBuyInfo);
-                } else {
-                  props.handleNext(props.adminReducers.stepIndex, stepProps);
-                }
-              }}
-            />
+          <div style={styles.bulkBuys}>
+            <div style={styles.topHeader}>
+              <Header as="h2" icon>
+                <Icon name="truck" />
+                Add Bulk Buys
+                <Header.Subheader>
+                  Create new bulk buys for your members
+                </Header.Subheader>
+              </Header><br />
+            </div>
+          </div>
+          <Stepper activeStep={props.adminReducers.stepIndex} connector={<ArrowForwardIcon />}>
+            {stepProps.map(stepProp => (
+              <Step>
+                <StepLabel>{stepProp.step}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+          <div style={styles.bulkBuys}>
+            <div style={styles.form}>
+              {stepProps.map((stepProp, index) => (
+                <div>
+                  {index === props.adminReducers.stepIndex && props.adminReducers.stepIndex < 4 ?
+                    <div>
+                      <div className="input">
+                        <TextField
+                          type="text"
+                          value={stepProp.state.format('llll')}
+                          readOnly
+                          floatingLabelText={stepProp.step}
+                          floatingLabelFixed={true}
+                        />
+                      </div>
+                      <br />
+                      <InputMoment
+                        moment={stepProp.state}
+                        onChange={async (dateTime) => {
+                          const tzLessDateTime = await momentTZ(dateTime).clone();
+                          const newDateTime = await tzLessDateTime.tz('America/New_York').add(dateTime.utcOffset() - tzLessDateTime.utcOffset(), 'minutes');
+                          stepProp.action(newDateTime);
+                        }}
+                      />
+                    </div>
+                    :
+                    index === props.adminReducers.stepIndex && props.adminReducers.stepIndex === stepProps.length - 2 ?
+                    <SelectLocationContainer />
+                    :
+                    <div></div>
+                  }
+                </div>
+              ))}
+            </div>
+            <div>
+              {props.adminReducers.stepIndex === stepProps.length - 1 ?
+                <SelectFoodItemsPageContainer />
+                :
+                <div></div>
+              }
+              <div style={styles.timeControl}>
+                <FlatButton
+                  label="Back"
+                  disabled={props.adminReducers.stepIndex === 0}
+                  onTouchTap={() => { props.handlePrev(props.adminReducers.stepIndex); }}
+                  style={{ marginRight: '1%' }}
+                />
+                <RaisedButton
+                  label={props.adminReducers.stepIndex === stepProps.length - 1 ? 'Finish' : 'Next'}
+                  primary={true}
+                  onTouchTap={() => {
+                    const newBulkBuyInfo = {
+                      intendedPickupTimeStart: props.adminReducers.intendedPickupTimeStart,
+                      intendedPickupTimeEnd: props.adminReducers.intendedPickupTimeEnd,
+                      voteDateTimeBeg: props.adminReducers.voteDateTimeBeg,
+                      voteDateTimeEnd: props.adminReducers.voteDateTimeEnd,
+                      shipDate: null,
+                      selectedFoodItems: props.adminReducers.selectedFoodItems,
+                      pricePerDormPackage: 6,
+                      pricePerCookingPackage: 6,
+                      totalDormPackagesOrdered: 0,
+                      totalCookingPackagesOrdered: 0,
+                      totalDollarAmount: 0,
+                      pctFeePerPackage: 0,
+                      totalRevenueBeforeStripe: 0,
+                      totalRevenueAftereStripe: 0,
+                    };
+                    if (props.adminReducers.stepIndex === stepProps.length - 1) {
+                      props.handleNext(props.adminReducers.stepIndex, stepProps, newBulkBuyInfo);
+                    } else {
+                      props.handleNext(props.adminReducers.stepIndex, stepProps);
+                    }
+                  }}
+                />
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+    }
     </div>
   );
 };

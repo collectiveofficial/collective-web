@@ -1,12 +1,5 @@
 import React, { Component } from 'react';
-import {
-  Route,
-  Link
-} from 'react-router-dom';
-import TextField from 'material-ui/TextField';
-import AutoComplete from 'material-ui/AutoComplete';
-import RaisedButton from 'material-ui/RaisedButton';
-import { Sidebar, Segment, Button, Menu, Image, Icon, Header, Table } from 'semantic-ui-react'
+import { Icon, Header, Table } from 'semantic-ui-react'
 
 const AdminHome = (props) => {
   const styles = {
