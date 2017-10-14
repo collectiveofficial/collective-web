@@ -28,6 +28,12 @@ injectTapEventPlugin();
 
 const BulkBuy = (props) => {
   const styles = {
+    confirmation: {
+      display: 'flex',
+      'flex-direction': 'column',
+      'justify-content': 'center',
+      'align-items': 'center',
+    },
     field: {
       textAlign: 'left',
     },
@@ -125,15 +131,17 @@ const BulkBuy = (props) => {
                       />
                     </div>
                     :
-                    index === props.adminReducers.stepIndex && props.adminReducers.stepIndex === stepProps.length - 2 ?
-                    <SelectLocationContainer />
-                    :
                     <div></div>
                   }
                 </div>
               ))}
             </div>
             <div>
+              {props.adminReducers.stepIndex === stepProps.length - 2 ?
+                <SelectLocationContainer />
+                :
+                <div></div>
+              }
               {props.adminReducers.stepIndex === stepProps.length - 1 ?
                 <SelectFoodItemsPageContainer />
                 :
@@ -151,6 +159,14 @@ const BulkBuy = (props) => {
                   primary={true}
                   onTouchTap={() => {
                     const newBulkBuyInfo = {
+                      locationObj: {
+                        formattedAddress: props.adminReducers.formattedAddress,
+                        streetNumber: props.adminReducers.locationStreetNumber,
+                        streetName: props.adminReducers.locationStreetName,
+                        city: props.adminReducers.locationCity,
+                        state: props.adminReducers.locationState,
+                        zipCode: props.adminReducers.locationZipCode,
+                      },
                       intendedPickupTimeStart: props.adminReducers.intendedPickupTimeStart,
                       intendedPickupTimeEnd: props.adminReducers.intendedPickupTimeEnd,
                       voteDateTimeBeg: props.adminReducers.voteDateTimeBeg,

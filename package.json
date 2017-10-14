@@ -73,6 +73,7 @@
     "react-cookie": "^2.0.8",
     "react-dom": "^16.0.0",
     "react-fastclick": "^3.0.2",
+    "react-google-maps": "^8.5.0",
     "react-modal": "^1.9.7",
     "react-redux": "^5.0.6",
     "react-router": "^4.1.2",
@@ -90,6 +91,7 @@
     "sequelize-cli": "^2.7.0",
     "stripe": "^4.24.0",
     "style-loader": "^0.18.2",
+    "svg-react-loader": "^0.4.5",
     "twilio": "^3.6.1",
     "webpack": "^2.6.1"
   },

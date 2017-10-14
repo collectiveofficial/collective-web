@@ -14,6 +14,7 @@ const voteUtil = require('../models/vote');
 const transactionUtil = require('../models/transaction');
 const groupUtil = require('../models/group');
 const restrictedAddressUtil = require('../models/restricted-address');
+const locationUtil = require('../models/location');
 const admin = require('firebase-admin');
 const json2csv = require('json2csv');
 const configureStripe = require('stripe');
@@ -133,6 +134,31 @@ const initializeData = async () => {
     }
   };
 
+  const initializeLocations = async () => {
+    const doesLocationExist = await locationUtil.findDoesLocationExist();
+    if (doesLocationExist === false) {
+      const locations = [
+        {
+          groupID: 1,
+          streetAddress: '160 W Woodruff Ave',
+          aptSuite: 'Building 1108',
+          city: 'Columbus',
+          state: 'OH',
+          zipCode: 43210,
+        },
+        {
+          groupID: 1,
+          streetAddress: '2724 Defiance Dr',
+          aptSuite: '',
+          city: 'Columbus',
+          state: 'OH',
+          zipCode: 43210,
+        },
+      ];
+      await locationUtil.initializeLocations(locations);
+    }
+  };
+
   const testConfirmationEmail = async () => {
     try {
       const dropoffID = 4; //TODO: Address server start dropoffID
@@ -227,6 +253,7 @@ const initializeData = async () => {
   await initializeFourthDropoff();
   await initializeFourthDropFoodItemsBallots();
   await initializeRestrictedAddresses();
+  await initializeLocations();
   // await sendVotingReminderCSVupdates();
   // await testConfirmationEmail();
 };

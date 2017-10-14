@@ -1,6 +1,7 @@
+const cron = require('cron');
+const momentTZ = require('moment-timezone');
 const models = require('../../database/models/index');
 const restrictedAddressUtils = require('./restricted-address');
-const cron = require('cron');
 
 module.exports.doesFirstGroupExist = async () => {
   let findGroupResult;
@@ -76,11 +77,11 @@ module.exports.getCurrentVotingDropoffID = async (groupID) => {
 
 module.exports.scheduleVotingDropoffSwitch = async (newBulkBuyData) => {
   const voteDateTimeBeg = newBulkBuyData.voteDateTimeBeg;
+  const voteDateTimeEnd = newBulkBuyData.voteDateTimeEnd;
   const dropoffID = newBulkBuyData.dropoffID;
   const groupID = newBulkBuyData.groupID;
-  const changeCurrentVotingDropoffJob = new cron.CronJob(new Date(voteDateTimeBeg), async () => {
-    /* runs once at the specified date. */
-    console.log('changeCurrentVotingDropoffJob ticked');
+  const currentDateTime = await momentTZ.tz(new Date(), 'America/New_York');
+  const changeCurrentVotingDropoffID = async () => {
     await models.Group.update({
       currentVotingDropoffID: dropoffID,
     }, {
@@ -89,14 +90,23 @@ module.exports.scheduleVotingDropoffSwitch = async (newBulkBuyData) => {
       },
     });
     await restrictedAddressUtils.updateDropoffID(dropoffID, groupID);
-  }, () => {
-    /* This function is executed when the job stops */
-    console.log('mission accomplished');
-  },
-  true, /* Start the job right now */
-  'America/New_York'); /* Time zone of this job. */
+  };
+  if (await currentDateTime.isBetween(voteDateTimeBeg, voteDateTimeEnd)) {
+    await changeCurrentVotingDropoffID();
+  } else if (await currentDateTime.isBefore(voteDateTimeBeg)) {
+    const changeCurrentVotingDropoffJob = new cron.CronJob(new Date(voteDateTimeBeg), async () => {
+      /* runs once at the specified date. */
+      console.log('changeCurrentVotingDropoffJob ticked');
+      await changeCurrentVotingDropoffID();
+    }, () => {
+      /* This function is executed when the job stops */
+      console.log('mission accomplished');
+    },
+    true, /* Start the job right now */
+    'America/New_York'); /* Time zone of this job. */
 
-  console.log(`changeCurrentVotingDropoffJob status at dropoffID ${dropoffID} and voteDateTimeBeg of ${voteDateTimeBeg}: ${changeCurrentVotingDropoffJob.running}`); // changeCurrentVotingDropoffJob status undefined
+    console.log(`changeCurrentVotingDropoffJob status at dropoffID ${dropoffID} and voteDateTimeBeg of ${voteDateTimeBeg}: ${changeCurrentVotingDropoffJob.running}`); // changeCurrentVotingDropoffJob status undefined
+  }
 };
 
 module.exports.findDeliveryAddressFromGroupID = async (id) => {

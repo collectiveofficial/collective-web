@@ -169,13 +169,51 @@ export function setNewImageUrl(text) {
   };
 }
 
-export function setNewLocation(text) {
+export function setLocationStreetNumber(text) {
   return {
-    type: actionTypes.SET_NEW_LOCATION,
+    type: actionTypes.SET_LOCATION_STREET_NUMBER,
     text,
   };
 }
 
-export function validateNewLocation(address) {
+export function setLocationStreetName(text) {
+  return {
+    type: actionTypes.SET_LOCATION_STREET_NAME,
+    text,
+  };
+}
 
+export function setLocationCity(text) {
+  return {
+    type: actionTypes.SET_LOCATION_CITY,
+    text,
+  };
+}
+
+export function setLocationState(text) {
+  return {
+    type: actionTypes.SET_LOCATION_STATE,
+    text,
+  };
+}
+
+export function setLocationZipCode(text) {
+  return {
+    type: actionTypes.SET_LOCATION_ZIP_CODE,
+    text,
+  };
+}
+
+export function setFormattedAddress(text) {
+  return {
+    type: actionTypes.SET_FORMATTED_ADDRESS,
+    text,
+  };
+}
+
+export function setMarkerAddress(text) {
+  return {
+    type: actionTypes.SET_MARKER_ADDRESS,
+    text,
+  };
 }
