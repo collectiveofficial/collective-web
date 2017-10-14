@@ -1,12 +1,5 @@
 import React, { Component } from 'react';
-import {
-  Route,
-  Link
-} from 'react-router-dom';
-import TextField from 'material-ui/TextField';
-import AutoComplete from 'material-ui/AutoComplete';
-import RaisedButton from 'material-ui/RaisedButton';
-import { Sidebar, Segment, Button, Menu, Image, Icon, Header, Table } from 'semantic-ui-react'
+import { Icon, Header, Table } from 'semantic-ui-react'
 
 const AdminHome = (props) => {
   const styles = {
@@ -36,6 +29,7 @@ const AdminHome = (props) => {
           <Table.Row>
             <Table.HeaderCell>Date</Table.HeaderCell>
             <Table.HeaderCell>Voting Window</Table.HeaderCell>
+            <Table.HeaderCell>Location</Table.HeaderCell>
             <Table.HeaderCell>Dorm Packages Ordered</Table.HeaderCell>
             <Table.HeaderCell>Cooking Packages Ordered</Table.HeaderCell>
             <Table.HeaderCell>Total Packages Ordered</Table.HeaderCell>
@@ -53,6 +47,7 @@ const AdminHome = (props) => {
               <Table.Row>
                 <Table.Cell>{data.formattedIntendedPickupDateTimeStart} - {data.formattedIntendedPickupTimeEnd}</Table.Cell>
                 <Table.Cell>{data.formattedVoteDateTimeBeg} - {data.formattedVoteDateTimeEnd}</Table.Cell>
+                <Table.Cell>{data.location}</Table.Cell>
                 <Table.Cell>{data.totalDormPackagesOrdered}</Table.Cell>
                 <Table.Cell>{data.totalCookingPackagesOrdered}</Table.Cell>
                 <Table.Cell>{data.totalDormPackagesOrdered + data.totalCookingPackagesOrdered}</Table.Cell>

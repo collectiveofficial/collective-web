@@ -3,7 +3,7 @@ import {
   Route,
   Link
 } from 'react-router-dom';
-import {GridList, GridTile} from 'material-ui/GridList';
+import { GridList, GridTile} from 'material-ui/GridList';
 import IconButton from 'material-ui/IconButton';
 import Subheader from 'material-ui/Subheader';
 import CheckCircle from 'material-ui/svg-icons/action/check-circle';
@@ -56,11 +56,12 @@ const SelectFoodItemsPage = (props) => {
                   <Cancel
                     color="rgb(162, 153, 158)"
                     onClick={() => {
-                    props.setSelectedFoodItems(props.adminReducers.selectedFoodItems, { name: foodItem.name, imageUrl: foodItem.imageUrl });
-                  }}
+                      props.setSelectedFoodItems(props.adminReducers.selectedFoodItems, { name: foodItem.name, imageUrl: foodItem.imageUrl });
+                    }}
                   />
-                </IconButton>}
-            >
+                </IconButton>
+               }
+              >
               <img src={foodItem.imageUrl} />
             </GridTile>
           ))}
@@ -75,7 +76,7 @@ const SelectFoodItemsPage = (props) => {
           floatingLabelFixed={true}
           // style={styles.field}
           onChange={event => props.setNewItem(event.target.value)}
-          // errorText={this.props.isZipcodeEmpty ? 'Zip code is required' : ''}
+          // errorText={this.props.isZipCodeEmpty ? 'Zip code is required' : ''}
         /><br />
         <TextField
           style={styles.addNewItem}
@@ -84,7 +85,7 @@ const SelectFoodItemsPage = (props) => {
           floatingLabelFixed={true}
           // style={styles.field}
           onChange={event => props.setNewImageUrl(event.target.value)}
-          // errorText={this.props.isZipcodeEmpty ? 'Zip code is required' : ''}
+          // errorText={this.props.isZipCodeEmpty ? 'Zip code is required' : ''}
         /><br />
         <RaisedButton style={styles.addNewItem} label="Add Item" primary={true} onClick={() => { props.setSelectedFoodItems(props.adminReducers.selectedFoodItems, { name: props.adminReducers.newItem, imageUrl: props.adminReducers.newImageUrl }); }} /><br /><br />
       </div>
@@ -107,15 +108,15 @@ const SelectFoodItemsPage = (props) => {
                     :
                     'rgb(162, 153, 158)'
                   }
-                  />
-                </IconButton>}
+                />
+              </IconButton>}
               onClick={() => {
                 props.setSelectedFoodItems(props.adminReducers.selectedFoodItems, { name: foodItem.name, imageUrl: foodItem.imageUrl });
               }}
-            >
+              >
               <img src={foodItem.imageUrl} />
             </GridTile>
-          ))}
+            ))}
         </GridList>
       </div>
     </div>

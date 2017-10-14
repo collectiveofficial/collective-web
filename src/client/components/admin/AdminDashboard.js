@@ -7,8 +7,8 @@ import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Sidebar, Segment, Button, Menu, Image, Icon, Header, Grid } from 'semantic-ui-react';
-import AdminHomeContainer from './AdminHomeContainer.js';
-import BulkBuyContainer from './BulkBuyContainer.js';
+import AdminHomeContainer from './containers/AdminHomeContainer.js';
+import BulkBuyContainer from './containers/BulkBuyContainer.js';
 
 const AdminDashboard = (props) => {
   // const styles = {

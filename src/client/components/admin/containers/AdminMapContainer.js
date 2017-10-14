@@ -1,8 +1,8 @@
 import React from 'react';
-import SelectLocationPage from './SelectLocationPage.js';
+import AdminMap from '../AdminMap.js';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as adminActionCreators from '../../action-creators/admin/adminActions.js';
+import * as adminActionCreators from '../../../action-creators/admin/adminActions.js';
 
 const mapStateToProps = (state) => {
   return {
@@ -16,4 +16,4 @@ const bundledActionCreators = Object.assign({},
 
 const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(SelectLocationPage);
+export default connect(mapStateToProps, mapDispatchToProps)(AdminMap);

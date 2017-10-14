@@ -115,7 +115,7 @@ export function handleNext(index, stepProps, newBulkBuyInfo) {
       let bulkBuySaved = false;
       try {
         const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
-        newBulkBuyInfo.intendedShipDate = newBulkBuyInfo.intendedPickupTimeStart.format('YYYY-MM-DD');
+        newBulkBuyInfo.intendedShipDate = await newBulkBuyInfo.intendedPickupTimeStart.format('YYYY-MM-DD');
         const response = await fetch('/admin/new-bulk-buy/submit', {
           method: 'POST',
           headers: {
@@ -127,15 +127,14 @@ export function handleNext(index, stepProps, newBulkBuyInfo) {
             newBulkBuyInfo,
           }),
         });
-        const responseData = response.json();
+        const responseData = await response.json();
         if (responseData.bulkBuySaved) {
           bulkBuySaved = true;
-          console.log('-----> bulkBuySaved: ', bulkBuySaved);
         }
       } catch (err) {
         console.log(err);
       }
-      return dispatch({
+      return await dispatch({
         type: actionTypes.SUBMIT_NEW_BULK_BUY,
         bulkBuySaved,
       });
@@ -170,13 +169,51 @@ export function setNewImageUrl(text) {
   };
 }
 
-export function setNewLocation(text) {
+export function setLocationStreetNumber(text) {
   return {
-    type: actionTypes.SET_NEW_LOCATION,
+    type: actionTypes.SET_LOCATION_STREET_NUMBER,
     text,
   };
 }
 
-export function validateNewLocation(address) {
-  
+export function setLocationStreetName(text) {
+  return {
+    type: actionTypes.SET_LOCATION_STREET_NAME,
+    text,
+  };
+}
+
+export function setLocationCity(text) {
+  return {
+    type: actionTypes.SET_LOCATION_CITY,
+    text,
+  };
+}
+
+export function setLocationState(text) {
+  return {
+    type: actionTypes.SET_LOCATION_STATE,
+    text,
+  };
+}
+
+export function setLocationZipCode(text) {
+  return {
+    type: actionTypes.SET_LOCATION_ZIP_CODE,
+    text,
+  };
+}
+
+export function setFormattedAddress(text) {
+  return {
+    type: actionTypes.SET_FORMATTED_ADDRESS,
+    text,
+  };
+}
+
+export function setMarkerAddress(text) {
+  return {
+    type: actionTypes.SET_MARKER_ADDRESS,
+    text,
+  };
 }

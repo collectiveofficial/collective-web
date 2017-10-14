@@ -6,11 +6,20 @@ const initialState = {
   adminAuthorized: 'false',
   adminData: [],
   stepIndex: 0,
+  // Add time
   intendedPickupTimeStart: moment(),
   intendedPickupTimeEnd: moment(),
   voteDateTimeBeg: moment(),
   voteDateTimeEnd: moment(),
-  newLocation: '',
+  // Add location
+  locationStreetNumber: '',
+  locationStreetName: '',
+  locationCity: '',
+  locationState: '',
+  locationZipCode: '',
+  formattedAddress: '',
+  markerAddress: '',
+  // Add food items
   foodItems: [],
   selectedFoodItems: [],
   bulkBuySaved: false,
@@ -35,8 +44,20 @@ const adminReducers = (state = initialState, action) => {
       return { ...state, voteDateTimeBeg: action.dateTime };
     case actionTypes.SET_VOTE_TIME_END:
       return { ...state, voteDateTimeEnd: action.dateTime };
-    case actionTypes.SET_NEW_LOCATION:
-      return { ...state, newLocation: action.text };
+    case actionTypes.SET_LOCATION_STREET_NUMBER:
+      return { ...state, locationStreetNumber: action.text };
+      case actionTypes.SET_LOCATION_STREET_NAME:
+      return { ...state, locationStreetName: action.text };
+    case actionTypes.SET_LOCATION_CITY:
+      return { ...state, locationCity: action.text };
+    case actionTypes.SET_LOCATION_STATE:
+      return { ...state, locationState: action.text };
+    case actionTypes.SET_LOCATION_ZIP_CODE:
+      return { ...state, locationZipCode: action.text };
+    case actionTypes.SET_FORMATTED_ADDRESS:
+      return { ...state, formattedAddress: action.text };
+    case actionTypes.SET_MARKER_ADDRESS:
+      return { ...state, markerAddress: action.text };
     case actionTypes.SET_PREV_STEP:
       return { ...state, stepIndex: action.index };
     case actionTypes.SET_NEXT_STEP:
