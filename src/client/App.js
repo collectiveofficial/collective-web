@@ -30,7 +30,7 @@ import CollectiveTerms from './components/legal/CollectiveTerms.js';
 import BffTerms from './components/legal/BffTerms.js';
 import PrivacyPolicy from './components/legal/PrivacyPolicy.js';
 import OrderInfo from './components/orderInfo/OrderInfo.js';
-import AdminDashboardContainer from './components/admin/AdminDashboardContainer.js';
+import AdminDashboardContainer from './components/admin/containers/AdminDashboardContainer.js';
 
 initReactFastclick();
 

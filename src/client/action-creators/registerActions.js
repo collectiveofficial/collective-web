@@ -7,7 +7,7 @@ export const SET_STREET_ADDRESS = 'SET_STREET_ADDRESS';
 export const SET_APT_SUITE = 'SET_APT_SUITE';
 export const SET_CITY = 'SET_CITY';
 export const SET_STATE = 'SET_STATE';
-export const SET_ZIPCODE = 'SET_ZIPCODE';
+export const SET_ZIP_CODE = 'SET_ZIP_CODE';
 export const SET_IS_FIRST_NAME_EMPTY = 'SET_IS_FIRST_NAME_EMPTY';
 export const SET_IS_LAST_NAME_EMPTY = 'SET_IS_LAST_NAME_EMPTY';
 export const SET_IS_PHONE_NUMBER_EMPTY = 'SET_IS_PHONE_NUMBER_EMPTY';
@@ -15,7 +15,7 @@ export const SET_IS_BIRTHDAY_EMPTY = 'SET_IS_BIRTHDAY_EMPTY';
 export const SET_IS_STREET_ADDRESS_EMPTY = 'SET_IS_STREET_ADDRESS_EMPTY';
 export const SET_IS_CITY_EMPTY = 'SET_IS_CITY_EMPTY';
 export const SET_IS_STATE_EMPTY = 'SET_IS_STATE_EMPTY';
-export const SET_IS_ZIPCODE_EMPTY = 'SET_IS_ZIPCODE_EMPTY';
+export const SET_IS_ZIP_CODE_EMPTY = 'SET_IS_ZIP_CODE_EMPTY';
 export const SET_ARE_THERE_EMPTY_FIELDS = 'SET_ARE_THERE_EMPTY_FIELDS';
 export const SET_IS_INVALID_STATE = 'SET_IS_INVALID_STATE';
 export const SET_VALUE = 'SET_VALUE';
@@ -57,8 +57,8 @@ export function setState(text) {
   return { type: SET_STATE, text }
 }
 
-export function setZipcode(text) {
-  return { type: SET_ZIPCODE, text }
+export function setZipCode(text) {
+  return { type: SET_ZIP_CODE, text }
 }
 
 export function setIsFirstNameEmpty(bool) {
@@ -89,8 +89,8 @@ export function setIsStateEmpty(bool) {
   return { type: SET_IS_STATE_EMPTY, bool }
 }
 
-export function setIsZipcodeEmpty(bool) {
-  return { type: SET_IS_ZIPCODE_EMPTY, bool }
+export function setIsZipCodeEmpty(bool) {
+  return { type: SET_IS_ZIP_CODE_EMPTY, bool }
 }
 
 export function setAreThereEmptyFields(text) {

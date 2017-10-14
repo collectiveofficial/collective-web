@@ -8,7 +8,7 @@ module.exports = {
   entry: ['babel-polyfill', `${SRC_DIR}/index.js`],
   output: {
     path: DIST_DIR,
-    filename: 'bundle.js'
+    filename: 'bundle.js',
   },
   module: {
     loaders: [
@@ -18,8 +18,8 @@ module.exports = {
         include: SRC_DIR,
         loader: 'babel-loader',
         query: {
-          presets: ['es2015', 'stage-0', 'react']
-        }
+          presets: ['es2015', 'stage-0', 'react'],
+        },
       },
       // CSS
       // {
@@ -29,13 +29,18 @@ module.exports = {
       // },
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader?modules&localIdentName=[name]---[local]---[hash:base64:5]'
+        loader: 'style-loader!css-loader?modules&localIdentName=[name]---[local]---[hash:base64:5]',
       },
       {
         test: /\.less$/,
-        loader: 'style-loader!css-loader!less-loader?modules&localIdentName=[name]---[local]---[hash:base64:5]'
-      }
-    ]
+        loader: 'style-loader!css-loader!less-loader?modules&localIdentName=[name]---[local]---[hash:base64:5]',
+      },
+      {
+        test: /\.svg$/,
+        exclude: /node_modules/,
+        loader: 'svg-react-loader',
+      },
+    ],
   },
-  devtool: 'source-map'
+  devtool: 'source-map',
 };

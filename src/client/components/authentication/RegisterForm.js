@@ -15,11 +15,12 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { Modal, Message } from 'semantic-ui-react';
 import schools from './universities_list.js';
 
-const usStates = ['AK','AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','GU','HI',
-'IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MH','MI','MN','MO',
-'MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA',
-'PR','PW','RI','SC','SD','TN','TX','UT','VA','VI','VT','WA','WI',
-'WV','WY'];
+const usStates = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'GU', 'HI',
+  'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MH', 'MI', 'MN', 'MO',
+  'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA',
+  'PR', 'PW', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VI', 'VT', 'WA', 'WI',
+  'WV', 'WY',
+];
 
 class RegisterForm extends React.Component {
   constructor(props) {
@@ -68,7 +69,7 @@ class RegisterForm extends React.Component {
     await this.props.setIsStreetAddressEmpty(this.props.streetAddress.length === 0);
     await this.props.setIsCityEmpty(this.props.city.length === 0);
     await this.props.setIsStateEmpty(this.props.state.length === 0);
-    await this.props.setIsZipcodeEmpty(this.props.zipcode.length === 0);
+    await this.props.setIsZipCodeEmpty(this.props.zipCode.length === 0);
     await this.props.setIsInvalidState(usStates.indexOf(this.props.state) < 0);
     await this.props.setIsSchoolEmpty(this.props.school.length === 0);
     await this.props.setIsInvalidSchool(schools.universities.indexOf(this.props.school) < 0);
@@ -76,7 +77,7 @@ class RegisterForm extends React.Component {
       this.props.isFirstNameEmpty || this.props.isLastNameEmpty ||
       this.props.isPhoneNumberEmpty || this.props.isBirthdayEmpty ||
       this.props.isStreetAddressEmpty || this.props.isCityEmpty ||
-      this.props.isStateEmpty || this.props.isZipcodeEmpty ||
+      this.props.isStateEmpty || this.props.isZipCodeEmpty ||
       this.props.isInvalidState || this.props.isSchoolEmpty ||
       this.props.isInvalidSchool);
     //TODO REFACTOR ^^
@@ -101,7 +102,7 @@ class RegisterForm extends React.Component {
           aptSuite: this.props.aptSuite,
           city: this.props.city,
           state: this.props.state,
-          zipCode: this.props.zipcode,
+          zipCode: this.props.zipCode,
           school: this.props.school,
           firebaseAccessToken: this.props.firebaseAccessToken
         }),
@@ -207,8 +208,8 @@ class RegisterForm extends React.Component {
          floatingLabelText="Zip Code"
          floatingLabelFixed={true}
          style={styles.field}
-         onChange={(event) => this.props.setZipcode(event.target.value)}
-         errorText={this.props.isZipcodeEmpty ? 'Zip code is required' : ''}
+         onChange={(event) => this.props.setZipCode(event.target.value)}
+         errorText={this.props.isZipCodeEmpty ? 'Zip code is required' : ''}
         /><br />
        <div>
          <RaisedButton label="Submit" primary={true} onClick={this.areThereEmptyFields} /><br /><br />
@@ -256,7 +257,7 @@ const mapStateToProps = (state) => {
     aptSuite: state.registerReducer._aptSuite,
     city: state.registerReducer._city,
     state: state.registerReducer._state,
-    zipcode: state.registerReducer._zipcode,
+    zipCode: state.registerReducer._zipCode,
     isFirstNameEmpty: state.registerReducer._isFirstNameEmpty,
     isLastNameEmpty: state.registerReducer._isLastNameEmpty,
     isPhoneNumberEmpty: state.registerReducer._isPhoneNumberEmpty,
@@ -264,7 +265,7 @@ const mapStateToProps = (state) => {
     isStreetAddressEmpty: state.registerReducer._isStreetAddressEmpty,
     isCityEmpty: state.registerReducer._isCityEmpty,
     isStateEmpty: state.registerReducer._isStateEmpty,
-    isZipcodeEmpty: state.registerReducer._isZipcodeEmpty,
+    isZipCodeEmpty: state.registerReducer._isZipCodeEmpty,
     areThereEmptyFields: state.registerReducer._areThereEmptyFields,
     isInvalidState: state.registerReducer._isInvalidState,
     isInvalidSchool: state.registerReducer._isInvalidSchool,

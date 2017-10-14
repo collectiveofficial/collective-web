@@ -1,8 +1,8 @@
 import React from 'react';
-import BulkBuy from './BulkBuy.js';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as adminActionCreators from '../../action-creators/admin/adminActions.js';
+import AddBulkBuyConfirmation from '../AddBulkBuyConfirmation.js';
+import * as adminActionCreators from '../../../action-creators/admin/adminActions.js';
 
 const mapStateToProps = (state) => {
   return {
@@ -16,4 +16,4 @@ const bundledActionCreators = Object.assign({},
 
 const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(BulkBuy);
+export default connect(mapStateToProps, mapDispatchToProps)(AddBulkBuyConfirmation);

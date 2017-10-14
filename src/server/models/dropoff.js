@@ -7,6 +7,8 @@ const userUtil = require('./user');
 const transactionUtil = require('./transaction');
 const ballotUtil = require('./ballot');
 const foodUtil = require('./food');
+const groupUtil = require('./group');
+const locationUtil = require('./location');
 
 module.exports.doesDropoffExist = async (id) => {
   try {
@@ -252,6 +254,8 @@ module.exports.getAdminData = async (uid) => {
     });
     for (let i = 0; i < dropoffData.length; i++) {
       const id = dropoffData[i].dataValues.id;
+      const locationID = dropoffData[i].dataValues.locationID;
+      const locationObj = await locationUtil.findLocationByID(locationID);
       const intendedShipDate = dropoffData[i].dataValues.intendedShipDate;
       const intendedPickupDateTimeStart = await momentTZ.tz(dropoffData[i].dataValues.intendedPickupTimeStart, 'America/New_York');
       const intendedPickupDateTimeEnd = await momentTZ.tz(dropoffData[i].dataValues.intendedPickupTimeEnd, 'America/New_York');
@@ -286,6 +290,7 @@ module.exports.getAdminData = async (uid) => {
 
       const dropoff = {
         id,
+        locationObj,
         intendedShipDate,
         formattedIntendedPickupDateTimeStart,
         formattedIntendedPickupTimeEnd,
@@ -310,7 +315,7 @@ module.exports.getDataFile = async (requestBody) => {
     let fields;
     let data;
     if (requestBody.dataType === 'summary') {
-      fields = ['Date', 'Voting Window', 'Dorm Packages Ordered', 'Cooking Packages Ordered', 'Total Packages Ordered', 'Total Participants', 'Net Volume from Sales', 'Status'];
+      fields = ['Date', 'Voting Window', 'Location','Dorm Packages Ordered', 'Cooking Packages Ordered', 'Total Packages Ordered', 'Total Participants', 'Net Volume from Sales', 'Status'];
       let summaryData = [];
       const groupID = await userUtil.findGroupIDByUID(requestBody.uid);
       const dropoffData = await models.Dropoff.findAll({
@@ -320,6 +325,9 @@ module.exports.getDataFile = async (requestBody) => {
       });
       for (let i = 0; i < dropoffData.length; i++) {
         const id = dropoffData[i].dataValues.id;
+        const locationID = dropoffData[i].dataValues.locationID;
+        const locationObj = await locationUtil.findLocationByID(locationID);
+        const location = locationObj.fullAddress;
         const intendedShipDate = dropoffData[i].dataValues.intendedShipDate;
         const intendedPickupDateTimeStart = await momentTZ.tz(dropoffData[i].dataValues.intendedPickupTimeStart, 'America/New_York');
         const intendedPickupDateTimeEnd = await momentTZ.tz(dropoffData[i].dataValues.intendedPickupTimeEnd, 'America/New_York');
@@ -354,6 +362,7 @@ module.exports.getDataFile = async (requestBody) => {
         const dropoff = {
           Date: `${formattedIntendedPickupDateTimeStart} - ${formattedIntendedPickupTimeEnd}`,
           'Voting Window': `${formattedVoteDateTimeBeg} - ${formattedVoteDateTimeEnd}`,
+          Location: location,
           'Dorm Packages Ordered': totalDormPackagesOrdered,
           'Cooking Packages Ordered': totalCookingPackagesOrdered,
           'Total Packages Ordered': totalDormPackagesOrdered + totalCookingPackagesOrdered,
@@ -390,6 +399,7 @@ module.exports.saveNewBulkBuy = async (requestBody) => {
     const intendedPickupTimeEnd = requestBody.newBulkBuyInfo.intendedPickupTimeEnd;
     const voteDateTimeBeg = requestBody.newBulkBuyInfo.voteDateTimeBeg;
     const voteDateTimeEnd = requestBody.newBulkBuyInfo.voteDateTimeEnd;
+    const locationID = await locationUtil.getLocationIdByFindOrCreate(requestBody.newBulkBuyInfo.locationObj);
     const selectedFoodItems = requestBody.newBulkBuyInfo.selectedFoodItems;
     const pricePerDormPackage = requestBody.newBulkBuyInfo.pricePerDormPackage;
     const pricePerCookingPackage = requestBody.newBulkBuyInfo.pricePerCookingPackage;
@@ -399,13 +409,14 @@ module.exports.saveNewBulkBuy = async (requestBody) => {
     const pctFeePerPackage = requestBody.newBulkBuyInfo.pctFeePerPackage;
     const totalRevenueBeforeStripe = requestBody.newBulkBuyInfo.totalRevenueBeforeStripe;
     const totalRevenueAftereStripe = requestBody.newBulkBuyInfo.totalRevenueAftereStripe;
-    const dropoff = await models.Dropoff.create({
+    const newBulkBuyData = {
       groupID,
       intendedShipDate,
       intendedPickupTimeStart,
       intendedPickupTimeEnd,
       voteDateTimeBeg,
       voteDateTimeEnd,
+      locationID,
       pricePerDormPackage,
       pricePerCookingPackage,
       totalDormPackagesOrdered,
@@ -414,8 +425,11 @@ module.exports.saveNewBulkBuy = async (requestBody) => {
       pctFeePerPackage,
       totalRevenueBeforeStripe,
       totalRevenueAftereStripe,
-    });
-    await foodUtil.populateFoodItemsBallots(selectedFoodItems, null, dropoff)
+    };
+    const dropoff = await models.Dropoff.create(newBulkBuyData);
+    await foodUtil.populateFoodItemsBallots(selectedFoodItems, null, dropoff);
+    newBulkBuyData.dropoffID = dropoff.dataValues.id;
+    groupUtil.scheduleVotingDropoffSwitch(newBulkBuyData);
     bulkBuySaved = true;
   } catch(err) {
     console.log(err);

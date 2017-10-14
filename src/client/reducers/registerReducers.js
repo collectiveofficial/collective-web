@@ -6,7 +6,7 @@ var initialStreetAddressState = '';
 var initialAptSuiteState = '';
 var initialCityState = '';
 var initialStateState = '';
-var initialZipcodeState = '';
+var initialZipCodeState = '';
 var initialIsFirstNameEmptyState = false;
 var initialIsLastNameEmptyState = false;
 var initialIsPhoneNumberEmptyState = false;
@@ -14,7 +14,7 @@ var initialIsBirthdayEmptyState = false;
 var initialIsStreetAddressEmptyState = false;
 var initialIsCityEmptyState = false;
 var initialIsStateEmptyState = false;
-var initialIsZipcodeEmptyState = false;
+var initialIsZipCodeEmptyState = false;
 var initialAreThereEmptyFieldsState = '';
 var initialIsInvalidStateState = false;
 var initialIsInvalidSchoolState = false;
@@ -134,13 +134,13 @@ export function _state(state=initialStateState, action) {
   }
 }
 
-export function _zipcode(state=initialZipcodeState, action) {
+export function _zipCode(state=initialZipCodeState, action) {
   if (['LOGOUT','ENTER_REGISTRATION_PAGE'].includes(action.type)) {
-      return initialZipcodeState;
+      return initialZipCodeState;
     }
   switch (action.type) {
 
-    case 'SET_ZIPCODE':
+    case 'SET_ZIP_CODE':
       return action.text;
 
     default:
@@ -246,13 +246,13 @@ export function _isStateEmpty(state=initialIsStateEmptyState, action) {
   }
 }
 
-export function _isZipcodeEmpty(state=initialIsZipcodeEmptyState, action) {
+export function _isZipCodeEmpty(state=initialIsZipCodeEmptyState, action) {
   if (['LOGOUT','ENTER_REGISTRATION_PAGE'].includes(action.type)) {
-      return initialIsZipcodeEmptyState;
+      return initialIsZipCodeEmptyState;
     }
   switch (action.type) {
 
-    case 'SET_IS_ZIPCODE_EMPTY':
+    case 'SET_IS_ZIP_CODE_EMPTY':
       return action.bool;
 
     default:
