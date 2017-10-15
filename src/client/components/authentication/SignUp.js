@@ -230,7 +230,7 @@ class SignUp extends React.Component {
                     /><br />
                   </div>
                   <br />
-                  <RaisedButton label="Continue" primary={true} onClick={this.handleEmailContinue} /><br /><br />
+                  <RaisedButton label="Continue" primary={true} onTouchTap={this.handleEmailContinue} /><br /><br />
                 </div>
                 <button
                   className={s.loginBtn}

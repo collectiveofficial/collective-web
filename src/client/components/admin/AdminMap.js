@@ -177,7 +177,7 @@ const AdminMap = compose(
                 />
               }
               style={styles.button}
-              onClick={() => {
+              onTouchTap={() => {
                 if (place.formatted_address === props.adminReducers.formattedAddress) {
                   props.setFormattedAddress('');
                   props.setLocationStreetNumber('');
@@ -245,7 +245,7 @@ const AdminMap = compose(
                 />
               }
               style={styles.button}
-              onClick={() => {
+              onTouchTap={() => {
                 if (data.locationObj.fullAddress === props.adminReducers.formattedAddress) {
                   props.setFormattedAddress('');
                   props.setLocationStreetNumber('');

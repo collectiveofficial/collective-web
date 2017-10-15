@@ -87,7 +87,7 @@ const SelectFoodItemsPage = (props) => {
           onChange={event => props.setNewImageUrl(event.target.value)}
           // errorText={this.props.isZipCodeEmpty ? 'Zip code is required' : ''}
         /><br />
-        <RaisedButton style={styles.addNewItem} label="Add Item" primary={true} onClick={() => { props.setSelectedFoodItems(props.adminReducers.selectedFoodItems, { name: props.adminReducers.newItem, imageUrl: props.adminReducers.newImageUrl }); }} /><br /><br />
+        <RaisedButton style={styles.addNewItem} label="Add Item" primary={true} onTouchTap={() => { props.setSelectedFoodItems(props.adminReducers.selectedFoodItems, { name: props.adminReducers.newItem, imageUrl: props.adminReducers.newImageUrl }); }} /><br /><br />
       </div>
       <div>Or</div>
       <Subheader>Select from Previous Items</Subheader>

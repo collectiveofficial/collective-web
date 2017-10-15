@@ -144,7 +144,7 @@ class Voting extends React.Component {
                     <RaisedButton
                       label="Update Votes"
                       primary={true}
-                      onClick={this.handleSubmitUpdateVotes}
+                      onTouchTap={this.handleSubmitUpdateVotes}
                     />
                   }
                   content={this.props.voteErrorMessage}

@@ -212,7 +212,7 @@ class RegisterForm extends React.Component {
          errorText={this.props.isZipCodeEmpty ? 'Zip code is required' : ''}
         /><br />
        <div>
-         <RaisedButton label="Submit" primary={true} onClick={this.areThereEmptyFields} /><br /><br />
+         <RaisedButton label="Submit" primary={true} onTouchTap={this.areThereEmptyFields} /><br /><br />
          <Modal open={this.props.areThereEmptyFields === false}>
            <Modal.Content>
              <p>By clicking continue I have read and agreed to Collective's <Link to="terms">terms of use</Link> and <Link to="privacy">privacy policy</Link> as well as Best Food Forward's <Link to="bff">terms of use</Link>, and I agree to not hold any involved individuals or entities liable for anything related to the use, consumption, storage, or purchasing of food within this site.</p>
@@ -226,8 +226,8 @@ class RegisterForm extends React.Component {
              }
            </Modal.Content>
            <Modal.Actions>
-             <RaisedButton label="Cancel" secondary={true} onClick={() => { this.props.setAreThereEmptyFields(''); }} />
-             <RaisedButton label="Continue" primary={true} onClick={this.submitUserInfo} /><br /><br />
+             <RaisedButton label="Cancel" secondary={true} onTouchTap={() => { this.props.setAreThereEmptyFields(''); }} />
+             <RaisedButton label="Continue" primary={true} onTouchTap={this.submitUserInfo} /><br /><br />
            </Modal.Actions>
          </Modal>
       </div>
