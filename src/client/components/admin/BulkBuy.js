@@ -16,15 +16,12 @@ import ArrowForwardIcon from 'material-ui/svg-icons/navigation/arrow-forward';
 import { Icon, Header, Transition } from 'semantic-ui-react';
 import InputMoment from 'input-moment';
 import momentTZ from 'moment-timezone';
-import injectTapEventPlugin from 'react-tap-event-plugin';
 import SelectLocationContainer from './containers/SelectLocationContainer.js';
 import SelectFoodItemsPageContainer from './containers/SelectFoodItemsPageContainer.js';
 import AddBulkBuyConfirmationContainer from './containers/AddBulkBuyConfirmationContainer.js';
 import './less/input-moment.less';
 import './less/app.less';
 import 'input-moment/dist/input-moment.css';
-
-injectTapEventPlugin();
 
 const BulkBuy = (props) => {
   const styles = {

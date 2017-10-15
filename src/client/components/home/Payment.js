@@ -371,7 +371,7 @@ class Payment extends React.Component {
                           >
                           </StripeCheckout>
                         ) : (
-                          <RaisedButton label="Pay With Card" primary={true} onClick={this.handlePayment} />
+                          <RaisedButton label="Pay With Card" primary={true} onTouchTap={this.handlePayment} />
                         )}
                       </Feed.Summary>
                     </Feed.Content>
