@@ -191,7 +191,7 @@ class Login extends React.Component {
                 position="right center"
               /><br />
             </div>
-            <RaisedButton label="Log in" type="submit" primary={true} onClick={this.handleEmailContinue} />
+            <RaisedButton label="Log in" type="submit" primary={true} onTouchTap={this.handleEmailContinue} />
             <br /> <br />
             <button
               className={s.loginBtn}
