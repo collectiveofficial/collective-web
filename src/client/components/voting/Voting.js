@@ -6,13 +6,11 @@ import {
 } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as appActionCreators from '../../action-creators/appActions'
-import * as votingActionCreators from '../../action-creators/votingActions' // TODO RENAME 2 VOTE
-import s from './Home.css';
+import s from './Voting.css';
 import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
 import RaisedButton from 'material-ui/RaisedButton';
-import Payment from './Payment.js';
+import PaymentContainer from '../payment/containers/PaymentContainer.js';
 
 class Voting extends React.Component {
   constructor(props) {
@@ -24,10 +22,10 @@ class Voting extends React.Component {
   }
 
   async componentWillMount() {
-    if (this.props.ballotsAndVotes.length > 0) {
+    if (this.props.appReducers.ballotsAndVotes.length > 0) {
       let votes = 6;
-      for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
-        if (this.props.ballotsAndVotes[i].isCurrent) {
+      for (let i = 0; i < this.props.appReducers.ballotsAndVotes.length; i++) {
+        if (this.props.appReducers.ballotsAndVotes[i].isCurrent) {
           votes--;
         }
       }
@@ -39,7 +37,7 @@ class Voting extends React.Component {
           'Content-Type': 'application/json; charset=utf-8',
         },
         body: JSON.stringify({
-          firebaseAccessToken: this.props.firebaseAccessToken,
+          firebaseAccessToken: this.props.appReducers.firebaseAccessToken,
         }),
       });
       const checkIfUserHasPaidResultData = await checkIfUserHasPaidResult.json();
@@ -53,7 +51,7 @@ class Voting extends React.Component {
       checked = false;
       return;
     }
-    const newBallotsAndVotes = this.props.ballotsAndVotes;
+    const newBallotsAndVotes = this.props.appReducers.ballotsAndVotes;
     for (let i = 0; i < newBallotsAndVotes.length; i++) {
       if (newBallotsAndVotes[i].name === value) {
         newBallotsAndVotes[i].isCurrent = checked;
@@ -86,8 +84,8 @@ class Voting extends React.Component {
     }
     if (this.props.votes === 0) {
       const foodObj = {};
-      for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
-        foodObj[this.props.ballotsAndVotes[i].name] = this.props.ballotsAndVotes[i].isCurrent;
+      for (let i = 0; i < this.props.appReducers.ballotsAndVotes.length; i++) {
+        foodObj[this.props.appReducers.ballotsAndVotes[i].name] = this.props.appReducers.ballotsAndVotes[i].isCurrent;
       }
       // save votes to DB and allow to continue to payment
       const response = await fetch('/vote/update', {
@@ -97,7 +95,7 @@ class Voting extends React.Component {
           'Content-Type': 'application/json; charset=utf-8',
         },
         body: JSON.stringify({
-          firebaseAccessToken: this.props.firebaseAccessToken,
+          firebaseAccessToken: this.props.appReducers.firebaseAccessToken,
           foodObj,
         }),
       });
@@ -114,12 +112,12 @@ class Voting extends React.Component {
     return (
       <div>
         {this.props.allowContinueToPayment ?
-          <Payment/>
+          <PaymentContainer />
           :
           <div className={s.cont}>
             <h1 className={s.top}>You have {this.props.votes} votes left</h1>
             <div className={s.flexcontainer}>
-              {this.props.ballotsAndVotes.map(ballotAndVote => (
+              {this.props.appReducers.ballotsAndVotes.map(ballotAndVote => (
                 <div className={s.ballot}>
                   <Card>
                     <Image src={ballotAndVote.imageUrl} />
@@ -181,28 +179,4 @@ class Voting extends React.Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
-  console.log('Voting: ',state, props);
-  return {
-    // App Reducers
-    ballotsAndVotes: state.appReducer._ballotsAndVotes,
-    firebaseAccessToken: state.appReducer._firebaseAccessToken,
-
-    // Voting Reducers
-    votes: state.votingReducer._votes,
-    price: state.votingReducer._price,
-    voteErrorMessage: state.votingReducer._voteErrorMessage,
-    allowContinueToPayment: state.votingReducer._allowContinueToPayment,
-    hasUserPaid: state.votingReducer._hasUserPaid,
-    votesHaveFinishedUpdating: state.votingReducer._votesHaveFinishedUpdating
-  }
-};
-
-const bundledActionCreators = Object.assign({},
-  appActionCreators,
-  votingActionCreators,
-);
-
-const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);
-
-export default connect(mapStateToProps, mapDispatchToProps)(Voting);
+export default Voting;

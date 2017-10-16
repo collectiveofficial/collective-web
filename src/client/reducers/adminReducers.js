@@ -46,7 +46,7 @@ const adminReducers = (state = initialState, action) => {
       return { ...state, voteDateTimeEnd: action.dateTime };
     case actionTypes.SET_LOCATION_STREET_NUMBER:
       return { ...state, locationStreetNumber: action.text };
-      case actionTypes.SET_LOCATION_STREET_NAME:
+    case actionTypes.SET_LOCATION_STREET_NAME:
       return { ...state, locationStreetName: action.text };
     case actionTypes.SET_LOCATION_CITY:
       return { ...state, locationCity: action.text };

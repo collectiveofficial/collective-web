@@ -14,17 +14,17 @@ import { nativeLogout } from './utils/auth.js';
 import { ref, firebaseAuth } from './config';
 // Component imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import Home from './components/home/Home.js';
-import LogIn from './components/authentication/LogIn.js';
-import RegisterForm from './components/authentication/RegisterForm.js';
-import SignUp from './components/authentication/SignUp.js';
+import HomeContainer from './components/home/containers/HomeContainer.js';
+import LoginContainer from './components/authentication/containers/LoginContainer.js';
+import RegisterFormContainer from './components/authentication/containers/RegisterFormContainer.js';
+import SignUpContainer from './components/authentication/containers/SignUpContainer.js';
 import FoodWiki from './components/foodwiki/FoodWiki.js';
 import Feedback from './components/feedback/Feedback.js';
 import Community from './components/community/Community.js';
 import About from './components/about/About.js';
 import Faq from './components/about/Faq.js';
-import Voting from './components/home/Voting.js';
-import Header from './components/header/Header.js';
+import VotingContainer from './components/voting/containers/VotingContainer.js';
+import HeaderContainer from './components/header/containers/HeaderContainer.js';
 import Footer from './components/footer/Footer.js';
 import CollectiveTerms from './components/legal/CollectiveTerms.js';
 import BffTerms from './components/legal/BffTerms.js';
@@ -79,9 +79,7 @@ const AdminRoute = ({ component: Component, userAuthorized, adminAuthorized, ...
 class App extends React.Component {
   constructor(props) {
     super(props);
-
     this.logOut = this.logOut.bind(this);
-    this.showUser = this.showUser.bind(this);
     this.handleFacebookAuth = this.handleFacebookAuth.bind(this);
     this.authorizeUser = this.authorizeUser.bind(this);
   }
@@ -132,11 +130,6 @@ class App extends React.Component {
     await console.log('User after log out', firebaseAuth().currentUser);
   }
 
-  async showUser() {
-    console.log(this.props);
-    await console.log(await firebaseAuth().currentUser);
-  }
-
   async handleFacebookAuth() {
     const provider = await new firebaseAuth.FacebookAuthProvider();
     await provider.addScope('email, public_profile, user_friends');
@@ -166,10 +159,10 @@ class App extends React.Component {
       },
       body: JSON.stringify({
         firebaseAccessToken,
-        firstName: this.props.facebookData.first_name,
-        lastName: this.props.facebookData.last_name,
-        email: this.props.facebookData.email,
-        pictureUrl: this.props.facebookData.picture.data.url,
+        firstName: this.props.appReducers.facebookData.first_name,
+        lastName: this.props.appReducers.facebookData.last_name,
+        email: this.props.appReducers.facebookData.email,
+        pictureUrl: this.props.appReducers.facebookData.picture.data.url,
       }),
     });
     const facebookCheckResponseData = await facebookCheckResponse.json();
@@ -197,7 +190,7 @@ class App extends React.Component {
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify({
-        firebaseAccessToken: this.props.firebaseAccessToken,
+        firebaseAccessToken: this.props.appReducers.firebaseAccessToken,
       }),
     });
     const initialDataLoadResults = await initialDataLoad.json();
@@ -215,45 +208,45 @@ class App extends React.Component {
     return (
         <MuiThemeProvider>
           <div>
-            <Header logOut={this.logOut} showUser={this.showUser} />
+            <HeaderContainer logOut={this.logOut}/>
             <Switch>
-              <DenyAuthorizedRoute userAuthorized={this.props.userAuthorized} path='/' exact component={() =>
-                (<SignUp
+              <DenyAuthorizedRoute userAuthorized={this.props.appReducers.userAuthorized} path='/' exact component={() =>
+                (<SignUpContainer
                   handleFacebookAuth={this.handleFacebookAuth}
                   authorizeUser={this.authorizeUser}
                 />)}
               />
-              <DenyAuthorizedRoute userAuthorized={this.props.userAuthorized} path="/login" component={() =>
-                (<LogIn
+              <DenyAuthorizedRoute userAuthorized={this.props.appReducers.userAuthorized} path="/login" component={() =>
+                (<LoginContainer
                   nativeLogin={this.nativeLogin}
                   handleFacebookAuth={this.handleFacebookAuth}
                   authorizeUser={this.authorizeUser}
                 />)}
               />
-              <DenyAuthorizedRoute userAuthorized={this.props.userAuthorized} path="/signup" component={() =>
-                (<SignUp
+              <DenyAuthorizedRoute userAuthorized={this.props.appReducers.userAuthorized} path="/signup" component={() =>
+                (<SignUpContainer
                   handleFacebookAuth={this.handleFacebookAuth}
                   authorizeUser={this.authorizeUser}
                 />)}
               />
-              <DenyAuthorizedRoute userAuthorized={this.props.userAuthorized} path="/register-form" component={() =>
-                (<RegisterForm
+              <DenyAuthorizedRoute userAuthorized={this.props.appReducers.userAuthorized} path="/register-form" component={() =>
+                (<RegisterFormContainer
                   authenticated={this.authenticated}
                   authorizeUser={this.authorizeUser}
                 />)}
               />
-              <PrivateRoute userAuthorized={this.props.userAuthorized} path="/home" component={Home} />
-              <PrivateRoute userAuthorized={this.props.userAuthorized} path="/voting" component={Voting}/>
-              <PrivateRoute userAuthorized={this.props.userAuthorized} path="/order-info" component={OrderInfo} />
-              <AdminRoute userAuthorized={this.props.userAuthorized} adminAuthorized={this.props.adminReducers.adminAuthorized} path="/admin-dashboard" component={AdminDashboardContainer} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/foodwiki" component={FoodWiki} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/community" component={Community} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/terms" component={CollectiveTerms} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/bff" component={BffTerms} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/privacy" component={PrivacyPolicy} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/about" component={About} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/faq" component={Faq} />
-              <PublicRoute userAuthorized={this.props.userAuthorized} path="/feedback" component={Feedback} />
+              <PrivateRoute userAuthorized={this.props.appReducers.userAuthorized} path="/home" component={HomeContainer} />
+              <PrivateRoute userAuthorized={this.props.appReducers.userAuthorized} path="/voting" component={VotingContainer}/>
+              <PrivateRoute userAuthorized={this.props.appReducers.userAuthorized} path="/order-info" component={OrderInfo} />
+              <AdminRoute userAuthorized={this.props.appReducers.userAuthorized} adminAuthorized={this.props.adminReducers.adminAuthorized} path="/admin-dashboard" component={AdminDashboardContainer} />
+              <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/foodwiki" component={FoodWiki} />
+              <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/community" component={Community} />
+              <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/terms" component={CollectiveTerms} />
+              <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/bff" component={BffTerms} />
+              <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/privacy" component={PrivacyPolicy} />
+              <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/about" component={About} />
+              <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/faq" component={Faq} />
+              <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/feedback" component={Feedback} />
               <PublicRoute render={() => <h3>No Match</h3>} />
             </Switch>
             <Footer />

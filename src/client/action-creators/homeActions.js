@@ -26,7 +26,6 @@ export function setProvider(text) {
   return { type: SET_PROVIDER, text }
 }
 
-
 export function setLocation(text) {
   return { type: SET_LOCATION, text }
 }
