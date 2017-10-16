@@ -15,7 +15,7 @@ const OrderInfo = props => {
         <Icon name="shopping basket" />
         Order Info
       </Header>
-      {props.transactionHistory.length === 0 ?
+      {props.appReducers.transactionHistory.length === 0 ?
         <Message color="yellow">If you recently ordered a package, please refresh your page to see the most recent order.</Message>
         :
         <div />
@@ -28,7 +28,8 @@ const OrderInfo = props => {
 const mapStateToProps = (state) => {
   return {
     // App Reducers
-    transactionHistory: state.appReducer._transactionHistory,
+    appReducers: state.appReducers,
+    // transactionHistory: state.appReducer._transactionHistory,
   };
 };
 

@@ -6,8 +6,7 @@ import {
 } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as paymentActionCreators from '../../action-creators/paymentActions';
-import s from './Home.css';
+import s from './Payment.css';
 import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label, Message, Grid } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -59,11 +58,11 @@ class Payment extends React.Component {
     if (this.props.availableDeliveriesLeft === 0) {
       this.props.setServerPaymentErrorMessage('There are no more available deliveries left for this round of bulk buy. We apologize for any inconvenience. We promise we\'ll be back with more deliveries in the future.');
     } else {
-      if (!this.props.deliveryEligibilityObj.isUserEligibleForDelivery) {
-        if (this.props.deliveryEligibilityObj.isAddressDorm) {
+      if (!this.props.appReducers.deliveryEligibilityObj.isUserEligibleForDelivery) {
+        if (this.props.appReducers.deliveryEligibilityObj.isAddressDorm) {
           this.props.setServerPaymentErrorMessage('It looks like your address is a dorm address. Our pickup location is not far away.');
         }
-        if (this.props.deliveryEligibilityObj.isAddressBeyondDeliveryReach) {
+        if (this.props.appReducers.deliveryEligibilityObj.isAddressBeyondDeliveryReach) {
           this.props.setServerPaymentErrorMessage('It looks like your address is beyond our 5 mile delivery boundaries. We will try our best to extend our delivery boundaries in our next bulk buy. Thank you for your patience.');
         }
       } else {
@@ -95,10 +94,10 @@ class Payment extends React.Component {
   async onToken(token) {
     this.props.setHasPaymentCompleted(false);
     const foodObj = {};
-    for (let i = 0; i < this.props.ballotsAndVotes.length; i++) {
-      foodObj[this.props.ballotsAndVotes[i].name] = {
-        isCurrent: this.props.ballotsAndVotes[i].isCurrent,
-        isAllergic: this.props.allergiesList.indexOf(this.props.ballotsAndVotes[i].name) > -1 ? true : false,
+    for (let i = 0; i < this.props.appReducers.ballotsAndVotes.length; i++) {
+      foodObj[this.props.appReducers.ballotsAndVotes[i].name] = {
+        isCurrent: this.props.appReducers.ballotsAndVotes[i].isCurrent,
+        isAllergic: this.props.allergiesList.indexOf(this.props.appReducers.ballotsAndVotes[i].name) > -1 ? true : false,
       };
     }
     const submitPaymentResult = await fetch('/payment-votes/save', {
@@ -108,7 +107,7 @@ class Payment extends React.Component {
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify({
-        firebaseAccessToken: this.props.firebaseAccessToken,
+        firebaseAccessToken: this.props.appReducers.firebaseAccessToken,
         token,
         email: this.props.paymentEmail,
         dormPackagesOrdered: this.props.dorm,
@@ -272,7 +271,7 @@ class Payment extends React.Component {
                       </Modal.Content>
                     </Modal>
                     <p>Limit 50 participants</p>
-                    <p>Available deliveries left: {this.props.availableDeliveriesLeft}</p>
+                    <p>Available deliveries left: {this.props.appReducers.availableDeliveriesLeft}</p>
                   </Segment> */}
                   <Feed.Event>
                     <Feed.Content>
@@ -316,7 +315,7 @@ class Payment extends React.Component {
                           <br />
                           <p>Which of these produces are you allergic to?</p>
                           <Grid columns={2}>
-                            {this.props.ballotsAndVotes.map((ballotAndVote) => {
+                            {this.props.appReducers.ballotsAndVotes.map((ballotAndVote) => {
                               return (
                                 <Grid.Column key={ballotAndVote.name}>
                                   <Checkbox
@@ -401,35 +400,4 @@ class Payment extends React.Component {
   }
 }
 
-
-const mapStateToProps = (state) => {
-  return {
-    // App Reducers
-    ballotsAndVotes: state.appReducer._ballotsAndVotes,
-    firebaseAccessToken: state.appReducer._firebaseAccessToken,
-    availableDeliveriesLeft: state.appReducer._availableDeliveriesLeft,
-    deliveryEligibilityObj: state.appReducer._deliveryEligibilityObj,
-    // Payment reducers
-    modalIsOpen: state.paymentReducer._modalIsOpenState,
-    price: state.paymentReducer._price,
-    paymentErrorMessage: state.paymentReducer._paymentErrorMessage,
-    dorm: state.paymentReducer._dorm,
-    cook: state.paymentReducer._cook,
-    hasPaymentCompleted: state.paymentReducer._hasPaymentCompleted,
-    votesSaved: state.paymentReducer._votesSaved,
-    hasAllergies: state.paymentReducer._hasAllergies,
-    paymentEmail: state.paymentReducer._paymentEmail,
-    userWantsDelivery: state.paymentReducer._userWantsDelivery,
-    serverPaymentErrorMessage: state.paymentReducer._serverPaymentErrorMessage,
-    deliveryPriceImpact: state.paymentReducer._deliveryPriceImpact,
-    allergiesList: state.paymentReducer._allergiesList
-  }
-};
-
-const bundledActionCreators = Object.assign({},
-  paymentActionCreators,
-);
-
-const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);
-
-export default connect(mapStateToProps, mapDispatchToProps)(Payment);
+export default Payment;
