@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 // Redux actions imports
 import * as appActionCreators from '../../../action-creators/app/appActions.js';
 import * as loginActionCreators from '../../../action-creators/loginActions';
-import Login from '../../authentication/Login.js';
+import Login from '../../../components/authentication/Login.js';
 
 const mapStateToProps = (state) => {
   return {
