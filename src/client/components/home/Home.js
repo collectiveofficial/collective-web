@@ -31,8 +31,8 @@ const Home = (props) => {
           </div>
           <Message color='blue'>Next pickup: 17 October 2017 from 4:00 PM to 7:00 PM at Buckeye Village Family Housing</Message>
           <Card style={{ width: "800px", margin: "0 0 30px 0" }}>
-            <Icon name="truck" size="huge" style={styles.foodTruckIcon} />
-            <Header as="h2" style={styles.header}>Food Truck Bulk Buy</Header>
+            {/* <Icon name="truck" size="huge" style={styles.foodTruckIcon} />
+            <Header as="h2" style={styles.header}>Food Truck Bulk Buy</Header> */}
             <CardTitle
               title={props.date}
               subtitle={props.vote}
