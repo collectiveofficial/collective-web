@@ -3,14 +3,10 @@ import {
   Route,
   Link
 } from 'react-router-dom';
-import { connect } from 'react-redux';
-import * as homeActionCreators from '../../action-creators/homeActions'
 import { Image, Modal } from 'semantic-ui-react';
 import s from './Home.css';
-import Voting from './Voting.js';
 import { Card, CardMedia, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
 import { Message, Icon, Header } from 'semantic-ui-react'
-
 
 const Home = (props) => {
   const styles = {
@@ -33,7 +29,7 @@ const Home = (props) => {
             </div>
             <h1 className={s.banner}>Upcoming Bulk Buys</h1>
           </div>
-          {/* <Message color='blue'>Next pickup: 8 October 2017 from 12:00 PM to 4:00 PM at Scott House</Message> */}
+          <Message color='blue'>Next pickup: 17 October 2017 from 4:00 PM to 7:00 PM at Buckeye Village Family Housing</Message>
           <Card style={{ width: "800px", margin: "0 0 30px 0" }}>
             <Icon name="truck" size="huge" style={styles.foodTruckIcon} />
             <Header as="h2" style={styles.header}>Food Truck Bulk Buy</Header>
@@ -76,16 +72,4 @@ const Home = (props) => {
     </div>
 )};
 
-const mapStateToProps = (state) => {
-  return {
-    authenticated: state.appReducer._userAuthenticated, // TODO RENAME
-    date: state.homeReducer._date,
-    vote: state.homeReducer._vote,
-    remainingCalendar: state.homeReducer._remainingCalendar,
-    items: state.homeReducer._items,
-    provider: state.homeReducer._provider,
-    location: state.homeReducer._location,
-  }
-};
-
-export default connect(mapStateToProps)(Home);
+export default Home;

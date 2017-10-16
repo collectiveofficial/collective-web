@@ -6,9 +6,6 @@ import {
 } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as appActionCreators from '../../action-creators/appActions';
-import * as loginActionCreators from '../../action-creators/loginActions';
-import * as signUpActionCreators from '../../action-creators/signUpActions';
 import TextField from 'material-ui/TextField';
 import MailOutline from 'material-ui/svg-icons/communication/mail-outline';
 import LockOutline from 'material-ui/svg-icons/action/lock-outline';
@@ -16,7 +13,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import { Icon, Popup, List, Image } from 'semantic-ui-react';
 import s from './Register.css';
-import RegisterForm from './RegisterForm.js';
+import RegisterFormContainer from './containers/RegisterFormContainer.js';
 import { ref, firebaseAuth } from '../../config';
 
 class SignUp extends React.Component {
@@ -176,15 +173,15 @@ class SignUp extends React.Component {
       <div>
         <div className={s.root}>
           <div className={s.container}>
-            {this.props.routeToRegisterForm ?
-              <RegisterForm
+            {this.props.appReducers.routeToRegisterForm ?
+              <RegisterFormContainer
                 authorizeUser={this.props.authorizeUser}
-                userWantsEmailSignup={this.props.userWantsEmailSignup}
+                userWantsEmailSignup={this.props.appReducers.userWantsEmailSignup}
                 emailInput={this.props.emailInput}
                 passwordInput={this.props.passwordInput}
-                facebookData={this.props.facebookData}
-                firebaseAccessToken={this.props.firebaseAccessToken}
-                userAuthorized={this.props.userAuthorized}
+                facebookData={this.props.appReducers.facebookData}
+                firebaseAccessToken={this.props.appReducers.firebaseAccessToken}
+                userAuthorized={this.props.appReducers.userAuthorized}
               />
               :
               <div>
@@ -248,36 +245,4 @@ class SignUp extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    // appReducers
-    userAuthorized: state.appReducer._userAuthorized,
-    firebaseAccessToken: state.appReducer._firebaseAccessToken,
-    routeToRegisterForm: state.appReducer._routeToRegisterForm,
-    userWantsEmailSignup: state.appReducer._userWantsEmailSignup,
-    facebookData: state.appReducer._facebookData,
-
-    // loginReducers
-    emailInput: state.loginReducer._emailInput,
-    passwordInput: state.loginReducer._passwordInput,
-    isEmailValidated: state.loginReducer._isEmailValidated, // TODO RENAME
-    isPasswordValidated: state.loginReducer._isPasswordValidated,
-    emailErrorMessage: state.loginReducer._emailErrorMessage,
-    passwordErrorMessage: state.loginReducer._passwordErrorMessage,
-
-    // signUpReducers
-    isWeakPassword: state.signUpReducer._isWeakPassword,
-    isEmailAlreadyInUse: state.signUpReducer._isEmailAlreadyInUse,
-    isExistingUserFBAuth: state.signUpReducer._isExistingUserFBAuth,
-  }
-};
-
-const bundledActionCreators = Object.assign({},
-  appActionCreators,
-  loginActionCreators,
-  signUpActionCreators,
-);
-
-const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);
-
-export default connect(mapStateToProps, mapDispatchToProps)(SignUp);
+export default SignUp;

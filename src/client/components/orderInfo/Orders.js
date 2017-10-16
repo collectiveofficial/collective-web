@@ -21,7 +21,7 @@ const Orders = props => (
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {props.transactionHistory.map((transaction) => {
+        {props.appReducers.transactionHistory.map((transaction) => {
           const dropoffDate = new Date(transaction.dropoffDate.substring(0, transaction.dropoffDate.indexOf('T')).split('-').join('/')).toDateString();
           const date = moment(transaction.date).format('LL');
           return (
@@ -54,10 +54,9 @@ const Orders = props => (
   </div>
 );
 
-const mapStateToProps = (state, props) => {
+const mapStateToProps = (state) => {
   return {
-    // App Reducers
-    transactionHistory: state.appReducer._transactionHistory,
+    appReducers: state.appReducers,
   };
 };
 

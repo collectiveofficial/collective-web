@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 import thunk from 'redux-thunk';
-import * as appReducers from './reducers/appReducers' // TODO CHANGE;
+import appReducers from './reducers/appReducers.js';
 import * as loginReducers from './reducers/loginReducers';
 import * as registerReducers from './reducers/registerReducers';
 import * as signUpReducers from './reducers/signUpReducers';
@@ -10,7 +10,7 @@ import * as votingReducers from './reducers/votingReducers';
 import adminReducers from './reducers/adminReducers.js';
 
 export default function (data) {
-  const appReducer = combineReducers(appReducers);
+  // const appReducer = combineReducers(appReducers);
   const loginReducer = combineReducers(loginReducers);
   const registerReducer = combineReducers(registerReducers);
   const signUpReducer = combineReducers(signUpReducers);
@@ -18,7 +18,7 @@ export default function (data) {
   const paymentReducer = combineReducers(paymentReducers);
   const votingReducer = combineReducers(votingReducers);
   const reducers = {
-    appReducer,
+    appReducers,
     loginReducer,
     registerReducer,
     signUpReducer,

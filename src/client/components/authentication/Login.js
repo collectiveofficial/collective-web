@@ -6,14 +6,12 @@ import {
 } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as appActionCreators from '../../action-creators/appActions';
-import * as loginActionCreators from '../../action-creators/loginActions'
 import TextField from 'material-ui/TextField';
 import MailOutline from 'material-ui/svg-icons/communication/mail-outline';
 import LockOutline from 'material-ui/svg-icons/action/lock-outline';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Icon, Popup } from 'semantic-ui-react';
-import RegisterForm from './RegisterForm.js';
+import RegisterFormContainer from './containers/RegisterFormContainer.js';
 import { ref, firebaseAuth } from '../../config';
 import s from './Login.css';
 
@@ -143,14 +141,14 @@ class Login extends React.Component {
       <div>
         <div className={s.root}>
           <div className={s.container}>
-            {this.props.routeToRegisterForm ?
-              <RegisterForm
+            {this.props.appReducers.routeToRegisterForm ?
+              <RegisterFormContainer
                 authorizeUser={this.props.authorizeUser}
-                userWantsEmailSignup={this.props.userWantsEmailSignup}
+                userWantsEmailSignup={this.props.appReducers.userWantsEmailSignup}
                 emailInput={this.props.emailInput}
                 passwordInput={this.props.passwordInput}
-                facebookData={this.props.facebookData}
-                firebaseAccessToken={this.props.firebaseAccessToken}
+                facebookData={this.props.appReducers.facebookData}
+                firebaseAccessToken={this.props.appReducers.firebaseAccessToken}
               />
               :
               <div>
@@ -208,33 +206,4 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    // appReducers
-    userAuthorized: state.appReducer._userAuthorized,
-    firebaseAccessToken: state.appReducer._firebaseAccessToken,
-    routeToRegisterForm: state.appReducer._routeToRegisterForm,
-    userWantsEmailSignup: state.appReducer._userWantsEmailSignup,
-    facebookData: state.appReducer._facebookData,
-
-    // loginReducers
-    emailInput: state.loginReducer._emailInput,
-    passwordInput: state.loginReducer._passwordInput,
-    isEmailValidated: state.loginReducer._isEmailValidated,
-    isPasswordValidated: state.loginReducer._isPasswordValidated,
-    isWrongPassword: state.loginReducer._isWrongPassword,
-    emailErrorMessage: state.loginReducer._emailErrorMessage,
-    isUserDisabled:state.loginReducer._isUserDisabled,
-    isUserNotFound:state.loginReducer._isUserNotFound,
-    passwordErrorMessage: state.loginReducer._passwordErrorMessage,
-  }
-};
-
-const bundledActionCreators = Object.assign({},
-  appActionCreators,
-  loginActionCreators,
-);
-
-const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);
-
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default Login;
