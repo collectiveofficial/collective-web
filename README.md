@@ -2,7 +2,7 @@
 An app that allows individuals and organizations to purchase local fresh produces at an affordable price
 
 ## Deployed Node Server
-[Collective](https://collective-web.herokuapp.com/)
+[Collective](https://www.collectivefoods.com/#/)
 
 ## Instructions for Starting Development
 To start developing the app, make sure to install dependencies:
