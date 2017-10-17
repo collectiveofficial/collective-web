@@ -1,10 +1,6 @@
-import React, { Component } from 'react';
-import {
-  Route,
-  Link
-} from 'react-router-dom';
+// @flow
+import React from 'react';
 import TextField from 'material-ui/TextField';
-import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import {
@@ -13,7 +9,7 @@ import {
   StepLabel,
 } from 'material-ui/Stepper';
 import ArrowForwardIcon from 'material-ui/svg-icons/navigation/arrow-forward';
-import { Icon, Header, Transition } from 'semantic-ui-react';
+import { Icon, Header } from 'semantic-ui-react';
 import InputMoment from 'input-moment';
 import momentTZ from 'moment-timezone';
 import SelectLocationContainer from './containers/SelectLocationContainer.js';
@@ -23,7 +19,65 @@ import './less/input-moment.less';
 import './less/app.less';
 import 'input-moment/dist/input-moment.css';
 
-const BulkBuy = (props) => {
+type Props = {
+  adminReducers: {
+    intendedPickupTimeStart: string,
+    intendedPickupTimeEnd: string,
+    voteDateTimeBeg: string,
+    voteDateTimeEnd: string,
+    stepIndex: number,
+    formattedAddress: string,
+    locationStreetNumber: string,
+    locationStreetName: string,
+    locationCity: string,
+    locationState: string,
+    locationZipCode: string,
+    selectedFoodItems: Array<{
+      name: string,
+      imageUrl: string,
+    }>,
+  },
+  setPickupTimeStart: (string) => void,
+  setPickupTimeEnd: (string) => void,
+  setVoteTimeBeg: (string) => void,
+  setVoteTimeEnd: (string) => void,
+  handlePrev: (number) => void,
+  handleNext: (number,
+    Array<{
+      step: string,
+      state?: string,
+      action?: (string) => void
+    }>,
+    object?: {
+      locationObj: {
+        formattedAddress: string,
+        streetNumber: string,
+        streetName: string,
+        city: string,
+        state: string,
+        zipCode: string,
+      },
+      intendedPickupTimeStart: string,
+      intendedPickupTimeEnd: string,
+      voteDateTimeBeg: string,
+      voteDateTimeEnd: string,
+      shipDate: any,
+      selectedFoodItems: Array<{
+        name: string,
+        imageUrl: string,
+      }>,
+      pricePerDormPackage: number,
+      pricePerCookingPackage: number,
+      totalDormPackagesOrdered: number,
+      totalCookingPackagesOrdered: number,
+      totalDollarAmount: number,
+      pctFeePerPackage: number,
+      totalRevenueBeforeStripe: number,
+      totalRevenueAftereStripe: number,
+    }) => void,
+};
+
+const BulkBuy = (props: Props) => {
   const styles = {
     confirmation: {
       display: 'flex',

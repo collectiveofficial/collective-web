@@ -1,0 +1,10 @@
+const actionTypes = {
+  SET_DATE: 'SET_DATE',
+  SET_VOTE: 'SET_VOTE',
+  SET_REMAINING_CALENDAR: 'SET_REMAINING_CALENDAR',
+  SET_PROVIDER: 'SET_PROVIDER',
+  SET_LOCATION: 'SET_LOCATION',
+  LOGOUT: 'LOGOUT',
+};
+
+export default actionTypes;

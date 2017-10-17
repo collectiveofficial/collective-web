@@ -34,17 +34,17 @@ const Home = (props) => {
             {/* <Icon name="truck" size="huge" style={styles.foodTruckIcon} />
             <Header as="h2" style={styles.header}>Food Truck Bulk Buy</Header> */}
             <CardTitle
-              title={props.date}
-              subtitle={props.vote}
+              title={props.homeReducers.date}
+              subtitle={props.homeReducers.vote}
             />
             <iframe
               className={s.map}
-              src={props.location}
+              src={props.homeReducers.location}
             />
             <div className={s.links}>
               <Link className={s.link} to="/voting">Vote and Pay</Link>
               <Modal trigger={<a className={s.link} href="javascript:void(0)">Provider info</a>} closeIcon="close">
-                <Modal.Header>{props.provider}</Modal.Header>
+                <Modal.Header>{props.homeReducers.provider}</Modal.Header>
                 <Modal.Content image>
                   <Image wrapped size='medium' src='https://static1.squarespace.com/static/560d50c5e4b0f68fd092a78f/t/577cfee7893fc03a12adcedb/1495464043705/?format=1500w' />
                   <Modal.Description>
@@ -59,7 +59,7 @@ const Home = (props) => {
               </Modal>
             </div>
           </Card>
-          {props.remainingCalendar.map(x => (
+          {props.homeReducers.remainingCalendar.map(x => (
             <Card style={{width: "800px", margin: "0 0 30px 0"}}>
             <CardTitle
               title={x[0]}

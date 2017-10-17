@@ -1,6 +1,42 @@
 import moment from 'moment';
 import actionTypes from '../action-creators/admin/adminActionTypes.js';
 
+// type State = {
+//   dashboardPageSelected: string,
+//   adminAuthorized: boolean,
+//   adminData: Array<{
+//     id: number,
+//     locationObj: {
+//       streetNumber: string,
+//       streetName: string,
+//       city: string,
+//       state: string,
+//       zipCode: string,
+//       fullAddress: string,
+//       latitude: string,
+//       longitude: string,
+//     },
+//     intendedShipDate: string,
+//     formattedIntendedPickupDateTimeStart: string,
+//     formattedIntendedPickupTimeEnd: string,
+//     formattedVoteDateTimeBeg: string,
+//     formattedVoteDateTimeEnd: string,
+//     totalDormPackagesOrdered: number,
+//     totalCookingPackagesOrdered: number,
+//     totalParticipants: number,
+//     netVolumeFromSalesAfterFees: number,
+//     status: string,
+//   }>,
+//   // users: Array<{
+//   //   id: string,
+//   //   name: string,
+//   //   age: number,
+//   //   phoneNumber: string,
+//   // }>,
+//   // activeUserID: string,
+//   // ...
+// }
+
 const initialState = {
   dashboardPageSelected: 'home',
   adminAuthorized: 'false',
@@ -28,7 +64,8 @@ const initialState = {
   isValidAddress: false,
 };
 
-const adminReducers = (state = initialState, action) => {
+// const adminReducers = (state: State = initialState, action) => {
+const adminReducers = (state: State = initialState, action) => {
   switch (action.type) {
     case actionTypes.SELECT_DASHBOARD_PAGE:
       return { ...state, dashboardPageSelected: action.text };

@@ -1,7 +1,37 @@
-import React, { Component } from 'react';
+// @flow
+import React from 'react';
 import { Icon, Header, Table } from 'semantic-ui-react'
 
-const AdminHome = (props) => {
+type Props = {
+  adminReducers: {
+    adminData: Array<{
+      id: number,
+      locationObj: {
+        streetNumber: string,
+        streetName: string,
+        city: string,
+        state: string,
+        zipCode: string,
+        fullAddress: string,
+        latitude: string,
+        longitude: string,
+      },
+      intendedShipDate: string,
+      formattedIntendedPickupDateTimeStart: string,
+      formattedIntendedPickupTimeEnd: string,
+      formattedVoteDateTimeBeg: string,
+      formattedVoteDateTimeEnd: string,
+      totalDormPackagesOrdered: number,
+      totalCookingPackagesOrdered: number,
+      totalParticipants: number,
+      netVolumeFromSalesAfterFees: number,
+      status: string,
+    }>,
+  },
+  setDownloadFile: (number, string) => void,
+};
+
+const AdminHome = (props: Props) => {
   const styles = {
     home: {
       marginBottom: '1.5%',
@@ -47,7 +77,7 @@ const AdminHome = (props) => {
               <Table.Row>
                 <Table.Cell>{data.formattedIntendedPickupDateTimeStart} - {data.formattedIntendedPickupTimeEnd}</Table.Cell>
                 <Table.Cell>{data.formattedVoteDateTimeBeg} - {data.formattedVoteDateTimeEnd}</Table.Cell>
-                <Table.Cell>{data.location}</Table.Cell>
+                <Table.Cell>{data.locationObj.fullAddress}</Table.Cell>
                 <Table.Cell>{data.totalDormPackagesOrdered}</Table.Cell>
                 <Table.Cell>{data.totalCookingPackagesOrdered}</Table.Cell>
                 <Table.Cell>{data.totalDormPackagesOrdered + data.totalCookingPackagesOrdered}</Table.Cell>
@@ -55,17 +85,17 @@ const AdminHome = (props) => {
                 <Table.Cell>${data.netVolumeFromSalesAfterFees}</Table.Cell>
                 <Table.Cell>{data.status}</Table.Cell>
                 <Table.Cell>
-                  <a onClick={async () => { await props.setDownloadFile(data.id, 'summary'); }} href="javascript:void(0)" target="_blank">
+                  <a onClick={async () => { await props.setDownloadFile(data.id, 'summary'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
                     Export as CSV
                   </a>
                 </Table.Cell>
                 <Table.Cell>
-                  <a onClick={() => { props.setDownloadFile(data.id, 'ballot'); }} href="javascript:void(0)" target="_blank">
+                  <a onClick={() => { props.setDownloadFile(data.id, 'ballot'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
                     Export as CSV
                   </a>
                 </Table.Cell>
                 <Table.Cell>
-                  <a onClick={() => { props.setDownloadFile(data.id, 'participant'); }} href="javascript:void(0)" target="_blank">
+                  <a onClick={() => { props.setDownloadFile(data.id, 'participant'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
                     Export as CSV
                   </a>
                 </Table.Cell>

@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import {
   Redirect,
@@ -6,7 +7,17 @@ import { Button } from 'semantic-ui-react';
 import { Message } from 'semantic-ui-react';
 import momentTZ from 'moment-timezone';
 
-const AddBulkBuyConfirmation = (props) => {
+type Props = {
+  adminReducers: {
+    intendedPickupTimeStart: string,
+    intendedPickupTimeEnd: string,
+    voteDateTimeBeg: string,
+    voteDateTimeEnd: string,
+  },
+  selectDashboardPage: (string) => void,
+};
+
+const AddBulkBuyConfirmation = (props: Props) => {
   const styles = {
     confirmation: {
       display: 'flex',

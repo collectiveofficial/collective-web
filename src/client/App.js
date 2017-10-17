@@ -82,10 +82,19 @@ class App extends React.Component {
     this.logOut = this.logOut.bind(this);
     this.handleFacebookAuth = this.handleFacebookAuth.bind(this);
     this.authorizeUser = this.authorizeUser.bind(this);
+    this.firebaseListener = this.firebaseListener.bind(this);
   }
 
   componentWillMount() {
-    this.firebaseListener = firebaseAuth().onAuthStateChanged(async (user) => {
+    this.firebaseListener();
+  }
+
+  componentWillUnmount() {
+    this.firebaseListener();
+  }
+
+  async firebaseListener() {
+    await firebaseAuth().onAuthStateChanged(async (user) => {
       if (user) { // is signed in
         await console.log('Logged in');
         const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
@@ -117,10 +126,6 @@ class App extends React.Component {
         await this.props.setUserAuthorized(false);
       }
     });
-  }
-
-  componentWillUnmount() {
-    this.firebaseListener();
   }
 
   async logOut() {
@@ -218,7 +223,6 @@ class App extends React.Component {
               />
               <DenyAuthorizedRoute userAuthorized={this.props.appReducers.userAuthorized} path="/login" component={() =>
                 (<LoginContainer
-                  nativeLogin={this.nativeLogin}
                   handleFacebookAuth={this.handleFacebookAuth}
                   authorizeUser={this.authorizeUser}
                 />)}
@@ -231,7 +235,6 @@ class App extends React.Component {
               />
               <DenyAuthorizedRoute userAuthorized={this.props.appReducers.userAuthorized} path="/register-form" component={() =>
                 (<RegisterFormContainer
-                  authenticated={this.authenticated}
                   authorizeUser={this.authorizeUser}
                 />)}
               />
