@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'lodash';
-import { compose, withProps, withStateHandlers, lifecycle } from 'recompose';
+import { compose, withProps, lifecycle } from 'recompose';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow } from 'react-google-maps';
 import SearchBox from "react-google-maps/lib/components/places/SearchBox";
 import RaisedButton from 'material-ui/RaisedButton';
@@ -204,15 +204,6 @@ const AdminMap = compose(
                 }
               }}
             />
-            {/* <RaisedButton
-              label="Deselect location"
-              labelPosition="before"
-              primary={true}
-              icon={<Clear
-                color={'rgb(232, 16, 16)'}
-              />}
-              style={styles.button}
-            /> */}
           </div>
         </InfoWindow>}
       </Marker>

@@ -446,3 +446,40 @@ module.exports.getAllDropoffs = async () => {
   }
   return dropoffs;
 };
+
+module.exports.getCurrentFutureDropoffs = async (groupID) => {
+  const currentFutureDropoffs = [];
+  try {
+    const dropoffs = await models.Dropoff.findAll({
+      where: {
+        groupID,
+      },
+    });
+    for (let i = 0; i < dropoffs.length; i++) {
+      const dropoff = dropoffs[i].dataValues;
+      const voteDateTimeEnd = dropoff.voteDateTimeEnd;
+      const currentTzVoteDateTimeEnd = momentTZ.tz(voteDateTimeEnd, 'America/New_York');
+      console.log('------> currentTzVoteDateTimeEnd: ', currentTzVoteDateTimeEnd);
+      const currentTzDate = momentTZ.tz(new Date(), 'America/New_York');
+      if (currentTzVoteDateTimeEnd.isAfter(currentTzDate)) {
+        const currentFutureDropoff = {};
+        const id = dropoff.id;
+        const voteDateTimeBeg = dropoff.voteDateTimeBeg;
+        const intendedPickupTimeStart = dropoff.intendedPickupTimeStart;
+        const intendedPickupTimeEnd = dropoff.intendedPickupTimeEnd;
+        const locationID = dropoff.locationID;
+        const locationObj = await locationUtil.findLocationByID(locationID);
+        currentFutureDropoff.id = id;
+        currentFutureDropoff.intendedPickupTimeStart = intendedPickupTimeStart;
+        currentFutureDropoff.intendedPickupTimeEnd = intendedPickupTimeEnd;
+        currentFutureDropoff.voteDateTimeBeg = voteDateTimeBeg;
+        currentFutureDropoff.voteDateTimeEnd = voteDateTimeEnd;
+        currentFutureDropoff.locationObj = locationObj;
+        currentFutureDropoffs.push(currentFutureDropoff);
+      }
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  return currentFutureDropoffs;
+};

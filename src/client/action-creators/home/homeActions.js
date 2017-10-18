@@ -1,21 +1,29 @@
 import actionTypes from './homeActionTypes';
 
 export function setDate(text) {
-  return { type: actionTypes.SET_DATE, text }
+  return { type: actionTypes.SET_DATE, text };
 }
 
 export function setVote(text) {
-  return { type: actionTypes.SET_VOTE, text }
+  return { type: actionTypes.SET_VOTE, text };
 }
 
 export function setRemainingCalendar(arr) {
-  return { type: actionTypes.SET_REMAINING_CALENDAR, arr }
+  return { type: actionTypes.SET_REMAINING_CALENDAR, arr };
 }
 
 export function setProvider(text) {
-  return { type: actionTypes.SET_PROVIDER, text }
+  return { type: actionTypes.SET_PROVIDER, text };
 }
 
 export function setLocation(text) {
-  return { type: actionTypes.SET_LOCATION, text }
+  return { type: actionTypes.SET_LOCATION, text };
+}
+
+export function setCurrentFutureDropoffs(arr) {
+  return { type: actionTypes.SET_CURRENT_FUTURE_DROPOFFS, arr };
+}
+
+export function toggleHomeMap(bool) {
+  return { type: actionTypes.TOGGLE_HOME_MAP, bool };
 }

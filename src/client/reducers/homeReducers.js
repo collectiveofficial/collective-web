@@ -1,16 +1,9 @@
 import actionTypes from '../action-creators/home/homeActionTypes.js';
 
 const initialState = {
-  date: '27 October 2017 from 9:00 AM to 12:00 PM',
-  vote: 'Voting window is from 16 October at 12:00 AM to 24 October at 11:59 PM',
-  remainingCalendar: [
-    ['9 November 2017', 'Voting window is from 25 October at 12:00 AM to 7 November at 11:59 PM'],
-    ['2 December 2017', 'Voting window is from 8 November at 12:00 AM to 29 November at 11:59 PM']
-  ],
+  currentFutureDropoffs: [],
+  showHomeMap: false,
   provider: 'DNO Produce',
-  location: 'https://www.google.com/maps/embed/v1/place?key=AIzaSyAe4udSuEN363saUqTCKlCd1l64D9zST5o&q=scott+house+ohio+state+university',
-  // initialLocationState: 'https://www.google.com/maps/embed/v1/place?q=place_id:ChIJ4dv6nYOOOIgRhBj1gY9yf8c&key=AIzaSyDcBcl_kMHNQwWHrQXAHZIb5Ig5I3mUkm0',
-
 };
 
 const homeReducers = (state = initialState, action) => {
@@ -41,6 +34,19 @@ const homeReducers = (state = initialState, action) => {
       return {
         ...state,
         location: action.text,
+      };
+    case 'SET_CURRENT_FUTURE_DROPOFFS':
+      return {
+        ...state,
+        currentFutureDropoffs: action.arr,
+      };
+    case 'TOGGLE_HOME_MAP':
+      if (action.bool === undefined) {
+        action.bool = !state.showHomeMap;
+      }
+      return {
+        ...state,
+        showHomeMap: action.bool,
       };
 
     default:

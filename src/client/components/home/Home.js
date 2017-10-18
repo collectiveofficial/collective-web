@@ -6,7 +6,9 @@ import {
 import { Image, Modal } from 'semantic-ui-react';
 import s from './Home.css';
 import { Card, CardMedia, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
-import { Message, Icon, Header } from 'semantic-ui-react'
+import { Message, Icon, Header } from 'semantic-ui-react';
+import momentTZ from 'moment-timezone';
+import HomeMapContainer from './containers/HomeMapContainer.js';
 
 const Home = (props) => {
   const styles = {
@@ -29,44 +31,45 @@ const Home = (props) => {
             </div>
             <h1 className={s.banner}>Upcoming Bulk Buys</h1>
           </div>
-          <Message color='blue'>Next pickup: 17 October 2017 from 4:00 PM to 7:00 PM at Buckeye Village Family Housing</Message>
-          <Card style={{ width: "800px", margin: "0 0 30px 0" }}>
-            {/* <Icon name="truck" size="huge" style={styles.foodTruckIcon} />
-            <Header as="h2" style={styles.header}>Food Truck Bulk Buy</Header> */}
-            <CardTitle
-              title={props.homeReducers.date}
-              subtitle={props.homeReducers.vote}
-            />
-            <iframe
-              className={s.map}
-              src={props.homeReducers.location}
-            />
-            <div className={s.links}>
-              <Link className={s.link} to="/voting">Vote and Pay</Link>
-              <Modal trigger={<a className={s.link} href="javascript:void(0)">Provider info</a>} closeIcon="close">
-                <Modal.Header>{props.homeReducers.provider}</Modal.Header>
-                <Modal.Content image>
-                  <Image wrapped size='medium' src='https://static1.squarespace.com/static/560d50c5e4b0f68fd092a78f/t/577cfee7893fc03a12adcedb/1495464043705/?format=1500w' />
-                  <Modal.Description>
-                    <p>DNO produce is a local food distributor committed to</p>
-                    <p>providing high quality produce to Central Ohio restaurants</p>
-                    <p>and stores. They do what they can to provide Ohio grown</p>
-                    <p>produce and they have been instrumental in providing healthy food</p>
-                    <p>for the Ohio State campus.</p>
-                    <p>For more info, check em out <a href="https://dnoinc.com/" target="/blank">here.</a></p>
-                  </Modal.Description>
-                </Modal.Content>
-              </Modal>
-            </div>
-          </Card>
-          {props.homeReducers.remainingCalendar.map(x => (
-            <Card style={{width: "800px", margin: "0 0 30px 0"}}>
-            <CardTitle
-              title={x[0]}
-              subtitle={x[1]}
-             />
+          {/* <Message color='blue'>Next pickup: 17 October 2017 from 4:00 PM to 7:00 PM at Buckeye Village Family Housing</Message> */}
+          {props.homeReducers.currentFutureDropoffs.map((currentFutureDropoff, index) => {
+            return (
+              <Card style={{ width: "800px", margin: "0 0 30px 0" }}>
+                {/* <Icon name="truck" size="huge" style={styles.foodTruckIcon} />
+                <Header as="h2" style={styles.header}>Food Truck Bulk Buy</Header> */}
+                <CardTitle
+                  title={`${momentTZ.tz(currentFutureDropoff.intendedPickupTimeStart, 'America/New_York').format('DD MMMM YYYY')} from ${momentTZ.tz(currentFutureDropoff.intendedPickupTimeStart, 'America/New_York').format('hh:mm a')} to ${momentTZ.tz(currentFutureDropoff.intendedPickupTimeEnd, 'America/New_York').format('hh:mm a')}`}
+                  subtitle={`Voting window is from ${momentTZ.tz(currentFutureDropoff.voteDateTimeBeg, 'America/New_York').format('DD MMMM YYYY hh:mm a')} to ${momentTZ.tz(currentFutureDropoff.voteDateTimeEnd, 'America/New_York').format('DD MMMM YYYY hh:mm a')}`}
+                />
+                {index === 0 ?
+                  <div>
+                    <div>
+                      <HomeMapContainer />
+                    </div>
+                    <div className={s.links}>
+                      <Link className={s.link} to="/voting">Vote and Pay</Link>
+                      <Modal trigger={<a className={s.link} href="javascript:void(0)">Provider info</a>} closeIcon="close">
+                      <Modal.Header>{props.homeReducers.provider}</Modal.Header>
+                      <Modal.Content image>
+                        <Image wrapped size='medium' src='https://static1.squarespace.com/static/560d50c5e4b0f68fd092a78f/t/577cfee7893fc03a12adcedb/1495464043705/?format=1500w' />
+                        <Modal.Description>
+                          <p>DNO produce is a local food distributor committed to</p>
+                          <p>providing high quality produce to Central Ohio restaurants</p>
+                          <p>and stores. They do what they can to provide Ohio grown</p>
+                          <p>produce and they have been instrumental in providing healthy food</p>
+                          <p>for the Ohio State campus.</p>
+                          <p>For more info, check em out <a href="https://dnoinc.com/" target="/blank">here.</a></p>
+                        </Modal.Description>
+                      </Modal.Content>
+                    </Modal>
+                    </div>
+                  </div>
+                  :
+                  <div></div>
+                }
             </Card>
-          ))}
+            )
+          })}
         </div>
       </div>
     </div>

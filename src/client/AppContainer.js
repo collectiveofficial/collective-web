@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 // Redux actions imports
 import * as appActionCreators from './action-creators/app/appActions.js';
 import * as adminActionCreators from './action-creators/admin/adminActions';
+import * as homeActionCreators from './action-creators/home/homeActions.js';
 import App from './App.js';
 
 const mapStateToProps = (state) => {
@@ -16,6 +17,7 @@ const mapStateToProps = (state) => {
 const bundledActionCreators = Object.assign({},
   appActionCreators,
   adminActionCreators,
+  homeActionCreators,
 );
 
 const mapDispatchToProps = dispatch => bindActionCreators(bundledActionCreators, dispatch);

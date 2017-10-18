@@ -199,6 +199,7 @@ class App extends React.Component {
       }),
     });
     const initialDataLoadResults = await initialDataLoad.json();
+    await this.props.setCurrentFutureDropoffs(initialDataLoadResults.currentFutureDropoffs);
     await this.props.setBallotsAndVotes(initialDataLoadResults.ballotsAndVotes);
     await this.props.setUserTransactionHistory(initialDataLoadResults.userTransactionHistory);
     await this.props.setAvailableDeliveriesLeft(initialDataLoadResults.availableDeliveriesLeft);

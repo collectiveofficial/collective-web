@@ -447,6 +447,7 @@ module.exports = {
       // TODO: Implement dynamic dropoffID
       const groupID = await userUtil.findGroupIDByUID(uid);
       req.body.dropoffID = await groupUtil.getCurrentVotingDropoffID(groupID);
+      const currentFutureDropoffs = await dropoffUtil.getCurrentFutureDropoffs(groupID);
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
       const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
       const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
@@ -460,6 +461,7 @@ module.exports = {
         adminFoodItems = await foodUtil.getAllFoodItems();
       }
       const responseObject = {
+        currentFutureDropoffs,
         ballotsAndVotes,
         userTransactionHistory,
         availableDeliveriesLeft,
