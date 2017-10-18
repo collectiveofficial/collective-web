@@ -1,6 +1,8 @@
 // @flow
 import React from 'react';
-import { Icon, Header, Table } from 'semantic-ui-react'
+import { Icon, Header, Table } from 'semantic-ui-react';
+import RaisedButton from 'material-ui/RaisedButton';
+import momentTZ from 'moment-timezone';
 
 type Props = {
   adminReducers: {
@@ -69,38 +71,49 @@ const AdminHome = (props: Props) => {
             <Table.HeaderCell>Export Summary</Table.HeaderCell>
             <Table.HeaderCell>Export Food Ballots</Table.HeaderCell>
             <Table.HeaderCell>Export Participant Data</Table.HeaderCell>
+            <Table.HeaderCell>Edit</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
 
         <Table.Body>
-            {props.adminReducers.adminData.map(data => (
-              <Table.Row>
-                <Table.Cell>{data.formattedIntendedPickupDateTimeStart} - {data.formattedIntendedPickupTimeEnd}</Table.Cell>
-                <Table.Cell>{data.formattedVoteDateTimeBeg} - {data.formattedVoteDateTimeEnd}</Table.Cell>
-                <Table.Cell>{data.locationObj.fullAddress}</Table.Cell>
-                <Table.Cell>{data.totalDormPackagesOrdered}</Table.Cell>
-                <Table.Cell>{data.totalCookingPackagesOrdered}</Table.Cell>
-                <Table.Cell>{data.totalDormPackagesOrdered + data.totalCookingPackagesOrdered}</Table.Cell>
-                <Table.Cell>{data.totalParticipants}</Table.Cell>
-                <Table.Cell>${data.netVolumeFromSalesAfterFees}</Table.Cell>
-                <Table.Cell>{data.status}</Table.Cell>
-                <Table.Cell>
-                  <a onClick={async () => { await props.setDownloadFile(data.id, 'summary'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
-                    Export as CSV
-                  </a>
-                </Table.Cell>
-                <Table.Cell>
-                  <a onClick={() => { props.setDownloadFile(data.id, 'ballot'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
-                    Export as CSV
-                  </a>
-                </Table.Cell>
-                <Table.Cell>
-                  <a onClick={() => { props.setDownloadFile(data.id, 'participant'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
-                    Export as CSV
-                  </a>
-                </Table.Cell>
-              </Table.Row>
-            ))}
+            {props.adminReducers.adminData.map((data) => {
+              const tzIntendedPickupTimeEnd = momentTZ.tz(data.intendedPickupDateTimeEnd, 'America/New_York');
+              const currentTzDate = momentTZ.tz(new Date(), 'America/New_York');
+              return (
+                <Table.Row>
+                  <Table.Cell>{data.formattedIntendedPickupDateTimeStart} - {data.formattedIntendedPickupTimeEnd}</Table.Cell>
+                  <Table.Cell>{data.formattedVoteDateTimeBeg} - {data.formattedVoteDateTimeEnd}</Table.Cell>
+                  <Table.Cell>{data.locationObj.fullAddress}</Table.Cell>
+                  <Table.Cell>{data.totalDormPackagesOrdered}</Table.Cell>
+                  <Table.Cell>{data.totalCookingPackagesOrdered}</Table.Cell>
+                  <Table.Cell>{data.totalDormPackagesOrdered + data.totalCookingPackagesOrdered}</Table.Cell>
+                  <Table.Cell>{data.totalParticipants}</Table.Cell>
+                  <Table.Cell>${data.netVolumeFromSalesAfterFees}</Table.Cell>
+                  <Table.Cell>{data.status}</Table.Cell>
+                  <Table.Cell>
+                    <a onClick={async () => { await props.setDownloadFile(data.id, 'summary'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
+                      Export as CSV
+                    </a>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <a onClick={() => { props.setDownloadFile(data.id, 'ballot'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
+                      Export as CSV
+                    </a>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <a onClick={() => { props.setDownloadFile(data.id, 'participant'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
+                      Export as CSV
+                    </a>
+                  </Table.Cell>
+                  <Table.Cell>
+                    {tzIntendedPickupTimeEnd.isAfter(currentTzDate) ?
+                      <RaisedButton label="Edit" primary={true} />
+                      :
+                      <div></div>
+                    }
+                  </Table.Cell>
+                </Table.Row>
+              )})}
         </Table.Body>
       </Table>
     </div>

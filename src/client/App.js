@@ -24,6 +24,7 @@ import Community from './components/community/Community.js';
 import About from './components/about/About.js';
 import Faq from './components/about/Faq.js';
 import VotingContainer from './components/voting/containers/VotingContainer.js';
+import PaymentContainer from './components/payment/containers/PaymentContainer.js';
 import HeaderContainer from './components/header/containers/HeaderContainer.js';
 import Footer from './components/footer/Footer.js';
 import CollectiveTerms from './components/legal/CollectiveTerms.js';
@@ -241,6 +242,7 @@ class App extends React.Component {
               />
               <PrivateRoute userAuthorized={this.props.appReducers.userAuthorized} path="/home" component={HomeContainer} />
               <PrivateRoute userAuthorized={this.props.appReducers.userAuthorized} path="/voting" component={VotingContainer}/>
+              <PrivateRoute userAuthorized={this.props.appReducers.userAuthorized} path="/payment" component={PaymentContainer}/>
               <PrivateRoute userAuthorized={this.props.appReducers.userAuthorized} path="/order-info" component={OrderInfo} />
               <AdminRoute userAuthorized={this.props.appReducers.userAuthorized} adminAuthorized={this.props.adminReducers.adminAuthorized} path="/admin-dashboard" component={AdminDashboardContainer} />
               <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/foodwiki" component={FoodWiki} />

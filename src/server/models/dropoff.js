@@ -292,6 +292,10 @@ module.exports.getAdminData = async (uid) => {
         id,
         locationObj,
         intendedShipDate,
+        intendedPickupDateTimeStart,
+        intendedPickupDateTimeEnd,
+        voteDateTimeBeg,
+        voteDateTimeEnd,
         formattedIntendedPickupDateTimeStart,
         formattedIntendedPickupTimeEnd,
         formattedVoteDateTimeBeg,
@@ -458,10 +462,9 @@ module.exports.getCurrentFutureDropoffs = async (groupID) => {
     for (let i = 0; i < dropoffs.length; i++) {
       const dropoff = dropoffs[i].dataValues;
       const voteDateTimeEnd = dropoff.voteDateTimeEnd;
-      const currentTzVoteDateTimeEnd = momentTZ.tz(voteDateTimeEnd, 'America/New_York');
-      console.log('------> currentTzVoteDateTimeEnd: ', currentTzVoteDateTimeEnd);
+      const tzVoteDateTimeEnd = momentTZ.tz(voteDateTimeEnd, 'America/New_York');
       const currentTzDate = momentTZ.tz(new Date(), 'America/New_York');
-      if (currentTzVoteDateTimeEnd.isAfter(currentTzDate)) {
+      if (tzVoteDateTimeEnd.isAfter(currentTzDate)) {
         const currentFutureDropoff = {};
         const id = dropoff.id;
         const voteDateTimeBeg = dropoff.voteDateTimeBeg;

@@ -10,7 +10,7 @@ import s from './Voting.css';
 import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
 import RaisedButton from 'material-ui/RaisedButton';
-import PaymentContainer from '../payment/containers/PaymentContainer.js';
+// import PaymentContainer from '../payment/containers/PaymentContainer.js';
 
 class Voting extends React.Component {
   constructor(props) {
@@ -112,7 +112,8 @@ class Voting extends React.Component {
     return (
       <div>
         {this.props.allowContinueToPayment ?
-          <PaymentContainer />
+          // <PaymentContainer />
+          <Redirect to="/payment" />
           :
           <div className={s.cont}>
             <h1 className={s.top}>You have {this.props.votes} votes left</h1>
