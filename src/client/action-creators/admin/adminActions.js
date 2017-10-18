@@ -217,3 +217,10 @@ export function setMarkerAddress(text) {
     text,
   };
 }
+
+export function setEditDropoff(obj) {
+  return {
+    type: actionTypes.SET_EDIT_DROPOFF,
+    obj,
+  };
+}

@@ -96,18 +96,18 @@ const AdminHome = (props: Props) => {
                     </a>
                   </Table.Cell>
                   <Table.Cell>
-                    <a onClick={() => { props.setDownloadFile(data.id, 'ballot'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
+                    <a onClick={async () => { await props.setDownloadFile(data.id, 'ballot'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
                       Export as CSV
                     </a>
                   </Table.Cell>
                   <Table.Cell>
-                    <a onClick={() => { props.setDownloadFile(data.id, 'participant'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
+                    <a onClick={async () => { await props.setDownloadFile(data.id, 'participant'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
                       Export as CSV
                     </a>
                   </Table.Cell>
                   <Table.Cell>
                     {tzIntendedPickupTimeEnd.isAfter(currentTzDate) ?
-                      <RaisedButton label="Edit" primary={true} />
+                      <RaisedButton label="Edit" primary={true} onTouchTap={() => { props.setEditDropoff(data) }}/>
                       :
                       <div></div>
                     }

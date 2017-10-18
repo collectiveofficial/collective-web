@@ -62,11 +62,14 @@ const initialState = {
   newItem: '',
   newImageUrl: '',
   isValidAddress: false,
+  editDropoff: {},
 };
 
 // const adminReducers = (state: State = initialState, action) => {
-const adminReducers = (state: State = initialState, action) => {
+const adminReducers = (state = initialState, action) => {
   switch (action.type) {
+    case actionTypes.LOGOUT:
+      return initialState;
     case actionTypes.SELECT_DASHBOARD_PAGE:
       return { ...state, dashboardPageSelected: action.text };
     case actionTypes.AUTHORIZE_ADMIN:
@@ -109,6 +112,8 @@ const adminReducers = (state: State = initialState, action) => {
       return { ...state, newItem: action.text };
     case actionTypes.SET_NEW_IMAGE_URL:
       return { ...state, newImageUrl: action.text };
+    case actionTypes.SET_EDIT_DROPOFF:
+      return { ...state, editDropoff: action.obj };
     default:
       return state;
   }
