@@ -136,6 +136,7 @@ export function handleNext(index, stepProps, newBulkBuyInfo) {
       }
       return await dispatch({
         type: actionTypes.SUBMIT_NEW_BULK_BUY,
+        userWantsEditDropoff: false,
         bulkBuySaved,
       });
     };
@@ -221,6 +222,17 @@ export function setMarkerAddress(text) {
 export function setEditDropoff(obj) {
   return {
     type: actionTypes.SET_EDIT_DROPOFF,
+    intendedPickupTimeStart: momentTZ.tz(obj.intendedPickupDateTimeStart, 'America/New_York'),
+    intendedPickupTimeEnd: momentTZ.tz(obj.intendedPickupDateTimeEnd, 'America/New_York'),
+    voteDateTimeBeg: momentTZ.tz(obj.voteDateTimeBeg, 'America/New_York'),
+    voteDateTimeEnd: momentTZ.tz(obj.voteDateTimeEnd, 'America/New_York'),
+    fullAddress: obj.locationObj.fullAddress,
+    streetNumber: obj.locationObj.streetNumber,
+    streetName: obj.locationObj.streetName,
+    city: obj.locationObj.city,
+    state: obj.locationObj.state,
+    zipCode: obj.locationObj.zipCode,
+    userWantsEditDropoff: true,
     obj,
   };
 }

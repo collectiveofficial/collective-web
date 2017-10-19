@@ -158,34 +158,36 @@ const BulkBuy = (props: Props) => {
           </Stepper>
           <div style={styles.bulkBuys}>
             <div style={styles.form}>
-              {stepProps.map((stepProp, index) => (
-                <div>
-                  {index === props.adminReducers.stepIndex && props.adminReducers.stepIndex < 4 ?
-                    <div>
-                      <div className="input">
-                        <TextField
-                          type="text"
-                          value={stepProp.state.format('llll')}
-                          readOnly
-                          floatingLabelText={stepProp.step}
-                          floatingLabelFixed={true}
+              {stepProps.map((stepProp, index) => {
+                console.log('---> stepProp.state: ', stepProp.state);
+                return (
+                  <div>
+                    {index === props.adminReducers.stepIndex && props.adminReducers.stepIndex < 4 ?
+                      <div>
+                        <div className="input">
+                          <TextField
+                            type="text"
+                            value={stepProp.state.format('llll')}
+                            readOnly
+                            floatingLabelText={stepProp.step}
+                            floatingLabelFixed={true}
+                          />
+                        </div>
+                        <br />
+                        <InputMoment
+                          moment={stepProp.state}
+                          onChange={async (dateTime) => {
+                            const tzLessDateTime = await momentTZ(dateTime).clone();
+                            const newDateTime = await tzLessDateTime.tz('America/New_York').add(dateTime.utcOffset() - tzLessDateTime.utcOffset(), 'minutes');
+                            stepProp.action(newDateTime);
+                          }}
                         />
                       </div>
-                      <br />
-                      <InputMoment
-                        moment={stepProp.state}
-                        onChange={async (dateTime) => {
-                          const tzLessDateTime = await momentTZ(dateTime).clone();
-                          const newDateTime = await tzLessDateTime.tz('America/New_York').add(dateTime.utcOffset() - tzLessDateTime.utcOffset(), 'minutes');
-                          stepProp.action(newDateTime);
-                        }}
-                      />
-                    </div>
-                    :
-                    <div></div>
-                  }
-                </div>
-              ))}
+                      :
+                      <div></div>
+                    }
+                  </div>
+              )})}
             </div>
             <div>
               {props.adminReducers.stepIndex === stepProps.length - 2 ?

@@ -63,6 +63,7 @@ const initialState = {
   newImageUrl: '',
   isValidAddress: false,
   editDropoff: {},
+  userWantsEditDropoff: false,
 };
 
 // const adminReducers = (state: State = initialState, action) => {
@@ -113,7 +114,21 @@ const adminReducers = (state = initialState, action) => {
     case actionTypes.SET_NEW_IMAGE_URL:
       return { ...state, newImageUrl: action.text };
     case actionTypes.SET_EDIT_DROPOFF:
-      return { ...state, editDropoff: action.obj };
+      return {
+        ...state,
+        intendedPickupTimeStart: action.intendedPickupTimeStart,
+        intendedPickupTimeEnd: action.intendedPickupTimeEnd,
+        voteDateTimeBeg: action.voteDateTimeBeg,
+        voteDateTimeEnd: action.voteDateTimeEnd,
+        fullAddress: action.fullAddress,
+        streetNumber: action.streetNumber,
+        streetName: action.streetName,
+        city: action.city,
+        state: action.state,
+        zipCode: action.zipCode,
+        editDropoff: action.obj,
+        userWantsEditDropoff: action.userWantsEditDropoff,
+       };
     default:
       return state;
   }
