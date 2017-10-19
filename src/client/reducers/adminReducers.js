@@ -126,6 +126,13 @@ const adminReducers = (state = initialState, action) => {
         city: action.city,
         state: action.state,
         zipCode: action.zipCode,
+        locationStreetNumber: action.locationStreetNumber,
+        locationStreetName: action.locationStreetName,
+        locationCity: action.locationCity,
+        locationState: action.locationState,
+        locationZipCode: action.locationZipCode,
+        formattedAddress: action.formattedAddress,
+        selectedFoodItems: action.selectedFoodItems,
         editDropoff: action.obj,
         userWantsEditDropoff: action.userWantsEditDropoff,
        };

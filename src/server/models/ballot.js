@@ -134,3 +134,22 @@ module.exports.findFoodID = async (foodName, dropoffID) => {
     console.log(err);
   }
 };
+
+module.exports.getFoodItemsByDropoffID = async (dropoffID) => {
+  const foodItems = [];
+  try {
+    const ballots = await models.Ballot.findAll({
+      where: {
+        dropoffID,
+      },
+    });
+    for (let i = 0; i < ballots.length; i++) {
+      const ballot = ballots[i].dataValues;
+      const foodItem = await foodUtil.findFoodItemByID(ballot.foodID);
+      foodItems.push(foodItem);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  return foodItems;
+};

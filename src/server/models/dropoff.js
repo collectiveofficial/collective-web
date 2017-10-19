@@ -267,6 +267,8 @@ module.exports.getAdminData = async (uid) => {
       const formattedVoteDateTimeBeg = await voteDateTimeBeg.format('MM/DD/YYYY hh:mm A');
       const formattedVoteDateTimeEnd = await voteDateTimeEnd.format('MM/DD/YYYY hh:mm A');
 
+      const foodItems = await ballotUtil.getFoodItemsByDropoffID(id);
+
       const totalDormPackagesOrdered = dropoffData[i].dataValues.totalDormPackagesOrdered;
       const totalCookingPackagesOrdered = dropoffData[i].dataValues.totalCookingPackagesOrdered;
       const customers = await transactionUtil.getCustomersForDropoff(id);
@@ -300,6 +302,7 @@ module.exports.getAdminData = async (uid) => {
         formattedIntendedPickupTimeEnd,
         formattedVoteDateTimeBeg,
         formattedVoteDateTimeEnd,
+        foodItems,
         totalDormPackagesOrdered,
         totalCookingPackagesOrdered,
         totalParticipants,

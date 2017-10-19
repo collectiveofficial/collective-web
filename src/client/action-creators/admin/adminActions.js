@@ -232,6 +232,13 @@ export function setEditDropoff(obj) {
     city: obj.locationObj.city,
     state: obj.locationObj.state,
     zipCode: obj.locationObj.zipCode,
+    locationStreetNumber: obj.locationObj.streetNumber,
+    locationStreetName: obj.locationObj.streetName,
+    locationCity: obj.locationObj.city,
+    locationState: obj.locationObj.state,
+    locationZipCode: obj.locationObj.zipCode,
+    formattedAddress: obj.locationObj.fullAddress,
+    selectedFoodItems: obj.foodItems,
     userWantsEditDropoff: true,
     obj,
   };

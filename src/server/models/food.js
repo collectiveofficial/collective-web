@@ -135,3 +135,19 @@ module.exports.getAllFoodItems = async () => {
   foodItems = _.uniqBy(foodItems, 'name');
   return foodItems;
 };
+
+module.exports.findFoodItemByID = async (id) => {
+  const foodItemObj = {};
+  try {
+    const foodItem = await models.Food.findOne({
+      where: {
+        id,
+      },
+    });
+    foodItemObj.name = foodItem.dataValues.name;
+    foodItemObj.imageUrl = foodItem.dataValues.imageUrl;
+  } catch (err) {
+    console.log(err);
+  }
+  return foodItemObj;
+}
