@@ -2,7 +2,7 @@ const models = require('../../database/models/index');
 const ballotUtil = require('./ballot');
 const _ = require('lodash');
 
-module.exports.doesFoodItemExist = (id) => {
+const doesFoodItemExist = (id) => {
   return models.Food.findOne({
     where: {
       id,
@@ -18,8 +18,7 @@ module.exports.doesFoodItemExist = (id) => {
   .catch(err => console.log(err));
 };
 
-module.exports.populateFoodItemsBallots = (foodItems, ballotID, dropoff) => {
-  console.log('Food items: ', foodItems);
+const populateFoodItemsBallots = (foodItems, ballotID, dropoff) => {
   foodItems.forEach(async (foodItem) => {
     try {
       const foodItemCreateResult = await models.Food.create({
@@ -44,7 +43,12 @@ module.exports.populateFoodItemsBallots = (foodItems, ballotID, dropoff) => {
   });
 };
 
-module.exports.doesPapayaExist = async () => {
+const editFoodItemsBallots = async (foodItems, dropoff) => {
+  await ballotUtil.deleteBallotsByDropoffID(dropoff.id);
+  await populateFoodItemsBallots(foodItems, null, dropoff);
+};
+
+const doesPapayaExist = async () => {
   try {
     const doesPapayaExistResult = await models.Food.findOne({
       where: {
@@ -61,7 +65,7 @@ module.exports.doesPapayaExist = async () => {
   }
 };
 
-module.exports.doesLimesExist = async () => {
+const doesLimesExist = async () => {
   try {
     const doesLimesExistResult = await models.Food.findOne({
       where: {
@@ -78,7 +82,7 @@ module.exports.doesLimesExist = async () => {
   }
 };
 
-module.exports.doesLemonsExist = async () => {
+const doesLemonsExist = async () => {
   try {
     const doesLemonsExistResult = await models.Food.findOne({
       where: {
@@ -95,7 +99,7 @@ module.exports.doesLemonsExist = async () => {
   }
 };
 
-module.exports.findAllFirstDropFoodItems = () => {
+const findAllFirstDropFoodItems = () => {
   return models.Food.findAll()
   .then((findAllFoodItemsResult) => {
     return findAllFoodItemsResult;
@@ -103,7 +107,7 @@ module.exports.findAllFirstDropFoodItems = () => {
   .catch(err => console.log(err));
 };
 
-module.exports.findFoodNameByID = async (id) => {
+const findFoodNameByID = async (id) => {
   try {
     const food = await models.Food.findOne({
       where: {
@@ -117,7 +121,7 @@ module.exports.findFoodNameByID = async (id) => {
   }
 };
 
-module.exports.getAllFoodItems = async () => {
+const getAllFoodItems = async () => {
   let foodItems = [];
   try {
     const food = await models.Food.findAll({
@@ -136,7 +140,7 @@ module.exports.getAllFoodItems = async () => {
   return foodItems;
 };
 
-module.exports.findFoodItemByID = async (id) => {
+const findFoodItemByID = async (id) => {
   const foodItemObj = {};
   try {
     const foodItem = await models.Food.findOne({
@@ -150,4 +154,17 @@ module.exports.findFoodItemByID = async (id) => {
     console.log(err);
   }
   return foodItemObj;
-}
+};
+
+module.exports = {
+  doesFoodItemExist,
+  populateFoodItemsBallots,
+  editFoodItemsBallots,
+  doesPapayaExist,
+  doesLimesExist,
+  doesLemonsExist,
+  findAllFirstDropFoodItems,
+  findFoodNameByID,
+  getAllFoodItems,
+  findFoodItemByID,
+};

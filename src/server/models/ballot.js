@@ -20,20 +20,36 @@ module.exports.doesBallotExist = (dropoffID) => {
 };
 
 module.exports.populateBallot = async (dropoff, food) => {
-  await models.Ballot.create({
-    dropoffID: dropoff.id,
-    foodID: food.id,
-    foodName: food.name,
-    imageUrl: food.imageUrl,
-    voteCount: 0,
-    wasShipped: false,
-    elected: false,
-    notShippedDesc: null,
-    notShippedClass: null,
-    shipDate: null,
-    voteDateTimeBeg: dropoff.voteDateTimeBeg,
-    voteDateTimeEnd: dropoff.voteDateTimeEnd,
-  });
+  try {
+    await models.Ballot.create({
+      dropoffID: dropoff.id,
+      foodID: food.id,
+      foodName: food.name,
+      imageUrl: food.imageUrl,
+      voteCount: 0,
+      wasShipped: false,
+      elected: false,
+      notShippedDesc: null,
+      notShippedClass: null,
+      shipDate: null,
+      voteDateTimeBeg: dropoff.voteDateTimeBeg,
+      voteDateTimeEnd: dropoff.voteDateTimeEnd,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports.deleteBallotsByDropoffID = async (dropoffID) => {
+  try {
+    await models.Ballot.destroy({
+      where: {
+        dropoffID,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 module.exports.findFoodInfo = async (foodName, dropoffID) => {

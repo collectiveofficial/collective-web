@@ -397,7 +397,7 @@ module.exports.getDataFile = async (requestBody) => {
   }
 };
 
-module.exports.saveNewBulkBuy = async (requestBody) => {
+module.exports.saveNewOrEditBulkBuy = async (requestBody) => {
   let bulkBuySaved = false;
   try {
     const groupID = await userUtil.findGroupIDByUID(requestBody.uid);
@@ -416,27 +416,49 @@ module.exports.saveNewBulkBuy = async (requestBody) => {
     const pctFeePerPackage = requestBody.newBulkBuyInfo.pctFeePerPackage;
     const totalRevenueBeforeStripe = requestBody.newBulkBuyInfo.totalRevenueBeforeStripe;
     const totalRevenueAftereStripe = requestBody.newBulkBuyInfo.totalRevenueAftereStripe;
-    const newBulkBuyData = {
-      groupID,
-      intendedShipDate,
-      intendedPickupTimeStart,
-      intendedPickupTimeEnd,
-      voteDateTimeBeg,
-      voteDateTimeEnd,
-      locationID,
-      pricePerDormPackage,
-      pricePerCookingPackage,
-      totalDormPackagesOrdered,
-      totalCookingPackagesOrdered,
-      totalDollarAmount,
-      pctFeePerPackage,
-      totalRevenueBeforeStripe,
-      totalRevenueAftereStripe,
-    };
-    const dropoff = await models.Dropoff.create(newBulkBuyData);
-    await foodUtil.populateFoodItemsBallots(selectedFoodItems, null, dropoff);
-    newBulkBuyData.dropoffID = dropoff.dataValues.id;
-    groupUtil.scheduleVotingDropoffSwitch(newBulkBuyData);
+    const userWantsEditDropoff = requestBody.newBulkBuyInfo.userWantsEditDropoff;
+    const editDropoffID = requestBody.newBulkBuyInfo.editDropoffID;
+    if (userWantsEditDropoff) {
+      const editBulkBuyData = {
+        intendedShipDate,
+        intendedPickupTimeStart,
+        intendedPickupTimeEnd,
+        voteDateTimeBeg,
+        voteDateTimeEnd,
+        locationID,
+      };
+      const dropoff = await models.Dropoff.update(editBulkBuyData, {
+        where: {
+          id: editDropoffID,
+          groupID,
+        },
+      });
+      await foodUtil.editFoodItemsBallots(selectedFoodItems, dropoff.dataValues);
+      editBulkBuyData.dropoffID = dropoff.id;
+      await groupUtil.scheduleVotingDropoffSwitch(editBulkBuyData);
+    } else {
+      const newBulkBuyData = {
+        groupID,
+        intendedShipDate,
+        intendedPickupTimeStart,
+        intendedPickupTimeEnd,
+        voteDateTimeBeg,
+        voteDateTimeEnd,
+        locationID,
+        pricePerDormPackage,
+        pricePerCookingPackage,
+        totalDormPackagesOrdered,
+        totalCookingPackagesOrdered,
+        totalDollarAmount,
+        pctFeePerPackage,
+        totalRevenueBeforeStripe,
+        totalRevenueAftereStripe,
+      };
+      const dropoff = await models.Dropoff.create(newBulkBuyData);
+      await foodUtil.populateFoodItemsBallots(selectedFoodItems, null, dropoff.dataValues);
+      newBulkBuyData.dropoffID = dropoff.id;
+      groupUtil.scheduleVotingDropoffSwitch(newBulkBuyData);
+    }
     bulkBuySaved = true;
   } catch(err) {
     console.log(err);

@@ -681,7 +681,7 @@ module.exports = {
         const isUserAdmin = await userUtil.checkIfUserIsAdmin(uid);
         let bulkBuySaved = false;
         if (isUserAdmin && userAuthorized) {
-          bulkBuySaved = await dropoffUtil.saveNewBulkBuy(req.body);
+          bulkBuySaved = await dropoffUtil.saveNewOrEditBulkBuy(req.body);
         }
         res.json({ bulkBuySaved });
       } catch (err) {

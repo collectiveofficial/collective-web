@@ -62,6 +62,7 @@ const initialState = {
   newItem: '',
   newImageUrl: '',
   isValidAddress: false,
+  editDropoffID: 0,
   editDropoff: {},
   userWantsEditDropoff: false,
 };
@@ -133,6 +134,7 @@ const adminReducers = (state = initialState, action) => {
         locationZipCode: action.locationZipCode,
         formattedAddress: action.formattedAddress,
         selectedFoodItems: action.selectedFoodItems,
+        editDropoffID: action.editDropoffID,
         editDropoff: action.obj,
         userWantsEditDropoff: action.userWantsEditDropoff,
        };

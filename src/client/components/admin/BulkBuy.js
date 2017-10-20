@@ -212,6 +212,7 @@ const BulkBuy = (props: Props) => {
                   primary={true}
                   onTouchTap={() => {
                     const newBulkBuyInfo = {
+                      userWantsEditDropoff: props.adminReducers.userWantsEditDropoff,
                       locationObj: {
                         formattedAddress: props.adminReducers.formattedAddress,
                         streetNumber: props.adminReducers.locationStreetNumber,

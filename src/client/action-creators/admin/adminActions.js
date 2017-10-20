@@ -240,6 +240,7 @@ export function setEditDropoff(obj) {
     formattedAddress: obj.locationObj.fullAddress,
     selectedFoodItems: obj.foodItems,
     userWantsEditDropoff: true,
+    editDropoffID: obj.id,
     obj,
   };
 }
