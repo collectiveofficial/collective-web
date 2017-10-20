@@ -1,4 +1,4 @@
-const initialDateState = '27 October 2017 from 9:00 AM to 12:00 PM';
+const initialDateState = '27 October 2017 from 9:00 AM to 4:00 PM';
 const initialVoteState = 'Voting window is from 16 October at 12:00 AM to 24 October at 11:59 PM';
 const initialRemainingCalendarState = [
   ['10 November 2017', 'Voting window is from 25 October at 12:00 AM to 8 November at 11:59 PM'],
