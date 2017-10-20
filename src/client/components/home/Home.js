@@ -6,7 +6,7 @@ import {
 import { Image, Modal } from 'semantic-ui-react';
 import s from './Home.css';
 import { Card, CardMedia, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
-import { Message, Icon, Header } from 'semantic-ui-react'
+import { Message, Icon, Header } from 'semantic-ui-react';
 
 const Home = (props) => {
   const styles = {
@@ -29,7 +29,7 @@ const Home = (props) => {
             </div>
             <h1 className={s.banner}>Upcoming Bulk Buys</h1>
           </div>
-          <Message color='blue'>Next pickup: 17 October 2017 from 4:00 PM to 7:00 PM at Buckeye Village Family Housing</Message>
+          {/* <Message color='blue'>Next pickup: 17 October 2017 from 4:00 PM to 7:00 PM at Buckeye Village Family Housing</Message> */}
           <Card style={{ width: "800px", margin: "0 0 30px 0" }}>
             {/* <Icon name="truck" size="huge" style={styles.foodTruckIcon} />
             <Header as="h2" style={styles.header}>Food Truck Bulk Buy</Header> */}
