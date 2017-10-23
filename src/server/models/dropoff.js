@@ -420,6 +420,7 @@ module.exports.saveNewOrEditBulkBuy = async (requestBody) => {
     const editDropoffID = requestBody.newBulkBuyInfo.editDropoffID;
     if (userWantsEditDropoff) {
       const editBulkBuyData = {
+        groupID,
         intendedShipDate,
         intendedPickupTimeStart,
         intendedPickupTimeEnd,
@@ -427,12 +428,18 @@ module.exports.saveNewOrEditBulkBuy = async (requestBody) => {
         voteDateTimeEnd,
         locationID,
       };
-      const dropoff = await models.Dropoff.update(editBulkBuyData, {
+      await models.Dropoff.update(editBulkBuyData, {
         where: {
           id: editDropoffID,
           groupID,
         },
       });
+      const dropoff = await models.Dropoff.findOne({
+        where: {
+          id: editDropoffID,
+          groupID,
+        }
+      })
       await foodUtil.editFoodItemsBallots(selectedFoodItems, dropoff.dataValues);
       editBulkBuyData.dropoffID = dropoff.id;
       await groupUtil.scheduleVotingDropoffSwitch(editBulkBuyData);
@@ -510,4 +517,12 @@ module.exports.getCurrentFutureDropoffs = async (groupID) => {
     console.log(err);
   }
   return currentFutureDropoffs;
+};
+
+module.exports.stopJobOnEditDropoff = async (job, id) => {
+  await models.Dropoff.beforeUpdate(async (dropoff) => {
+    if (dropoff.id === id) {
+      await job.stop();
+    }
+  });
 };

@@ -78,6 +78,7 @@ type Props = {
 };
 
 const BulkBuy = (props: Props) => {
+  props.clearBulkBuy();
   const styles = {
     confirmation: {
       display: 'flex',
@@ -213,6 +214,7 @@ const BulkBuy = (props: Props) => {
                   onTouchTap={() => {
                     const newBulkBuyInfo = {
                       userWantsEditDropoff: props.adminReducers.userWantsEditDropoff,
+                      editDropoffID: props.adminReducers.editDropoffID,
                       locationObj: {
                         formattedAddress: props.adminReducers.formattedAddress,
                         streetNumber: props.adminReducers.locationStreetNumber,

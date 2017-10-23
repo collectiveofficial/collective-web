@@ -114,6 +114,8 @@ const adminReducers = (state = initialState, action) => {
       return { ...state, newItem: action.text };
     case actionTypes.SET_NEW_IMAGE_URL:
       return { ...state, newImageUrl: action.text };
+    case actionTypes.SET_USER_WANTS_EDIT_DROPOFF:
+      return { ...state, userWantsEditDropoff: action.bool };
     case actionTypes.SET_EDIT_DROPOFF:
       return {
         ...state,
@@ -138,6 +140,32 @@ const adminReducers = (state = initialState, action) => {
         editDropoff: action.obj,
         userWantsEditDropoff: action.userWantsEditDropoff,
        };
+    // case actionTypes.CLEAR_BULK_BUY:
+    //   return {
+    //     ...state,
+    //     stepIndex: 0,
+    //     // Add time
+    //     intendedPickupTimeStart: moment(),
+    //     intendedPickupTimeEnd: moment(),
+    //     voteDateTimeBeg: moment(),
+    //     voteDateTimeEnd: moment(),
+    //     // Add location
+    //     locationStreetNumber: '',
+    //     locationStreetName: '',
+    //     locationCity: '',
+    //     locationState: '',
+    //     locationZipCode: '',
+    //     formattedAddress: '',
+    //     markerAddress: '',
+    //     // Add food items
+    //     selectedFoodItems: [],
+    //     bulkBuySaved: false,
+    //     newItem: '',
+    //     newImageUrl: '',
+    //     isValidAddress: false,
+    //     editDropoffID: 0,
+    //     editDropoff: {},
+    //   };
     default:
       return state;
   }

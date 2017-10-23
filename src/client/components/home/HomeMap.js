@@ -23,7 +23,10 @@ const HomeMap = compose(
 )(props =>
   <GoogleMap
     defaultZoom={16}
-    defaultCenter={{ lat: 40.0044817, lng: -83.0134412 }}
+    defaultCenter={{
+      lat: props.homeReducers.currentFutureDropoffs[0].locationObj.latitude,
+      lng: props.homeReducers.currentFutureDropoffs[0].locationObj.longitude,
+    }}
   >
     <Marker
       position={{

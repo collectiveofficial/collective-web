@@ -219,6 +219,13 @@ export function setMarkerAddress(text) {
   };
 }
 
+export function setUserWantsEditDropoff(bool) {
+  return {
+    type: actionTypes.SET_USER_WANTS_EDIT_DROPOFF,
+    bool,
+  };
+}
+
 export function setEditDropoff(obj) {
   return {
     type: actionTypes.SET_EDIT_DROPOFF,
@@ -243,4 +250,10 @@ export function setEditDropoff(obj) {
     editDropoffID: obj.id,
     obj,
   };
+}
+
+export function clearBulkBuy() {
+  return {
+    type: actionTypes.CLEAR_BULK_BUY,
+  }
 }

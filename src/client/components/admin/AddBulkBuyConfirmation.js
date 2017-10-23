@@ -37,7 +37,10 @@ const AddBulkBuyConfirmation = (props: Props) => {
       </Message>
       <Button
         positive
-        onClick={() => { props.selectDashboardPage('home'); }}
+        onClick={() => {
+          props.setUserWantsEditDropoff(false);
+          props.selectDashboardPage('home');
+        }}
         style={styles.returnHomeButton}
       >
         Return to Admin Home
