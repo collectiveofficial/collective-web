@@ -40,18 +40,6 @@ module.exports.populateBallot = async (dropoff, food) => {
   }
 };
 
-module.exports.deleteBallotsByDropoffID = async (dropoffID) => {
-  try {
-    await models.Ballot.destroy({
-      where: {
-        dropoffID,
-      },
-    });
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 module.exports.findFoodInfo = async (foodName, dropoffID) => {
   return models.Ballot.findOne({
     where: {
@@ -167,4 +155,21 @@ module.exports.getFoodItemsByDropoffID = async (dropoffID) => {
     console.log(err);
   }
   return foodItems;
+};
+
+module.exports.deleteBallotsByFoodNameAndDropoffID = async (itemsToRemove, dropoffID) => {
+  try {
+    for (let i = 0; i < itemsToRemove.length; i++) {
+      const itemToRemove = itemsToRemove[i];
+      await models.Ballot.destroy({
+        where: {
+          foodName: itemToRemove.name,
+          imageUrl: itemToRemove.imageUrl,
+          dropoffID,
+        },
+      });
+    }
+  } catch (err) {
+    console.log(err);
+  }
 };

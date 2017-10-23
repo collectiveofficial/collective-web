@@ -33,10 +33,7 @@ const populateFoodItemsBallots = (foodItems, ballotID, dropoff) => {
         name,
         imageUrl,
       };
-      const doesBallotExist = await ballotUtil.doesBallotExist(dropoff.id);
-      if (!doesBallotExist) {
-        await ballotUtil.populateBallot(dropoff, food);
-      }
+      await ballotUtil.populateBallot(dropoff, food);
     } catch (err) {
       console.log(err);
     }
@@ -45,9 +42,42 @@ const populateFoodItemsBallots = (foodItems, ballotID, dropoff) => {
 
 module.exports.populateFoodItemsBallots = populateFoodItemsBallots;
 
-module.exports.editFoodItemsBallots = async (foodItems, dropoff) => {
-  await ballotUtil.deleteBallotsByDropoffID(dropoff.id);
-  await populateFoodItemsBallots(foodItems, null, dropoff);
+module.exports.editFoodItemsBallots = async (newFoodItems, dropoff) => {
+  const dropoffFoodItems = await ballotUtil.getFoodItemsByDropoffID(dropoff.id);
+  let oldItems = dropoffFoodItems.map(foodItem => JSON.stringify(foodItem));
+  let newItems = newFoodItems.map(foodItem => JSON.stringify(foodItem));
+
+  Set.prototype.intersection = function (setB) {
+    const intersection = new Set();
+    for (const elem of setB) {
+      if (this.has(elem)) {
+        intersection.add(elem);
+      }
+    }
+    return intersection;
+  }
+
+  Set.prototype.difference = function (setB) {
+    const difference = new Set(this);
+    for (const elem of setB) {
+      difference.delete(elem);
+    }
+    return difference;
+  }
+
+  oldItems = new Set(oldItems);
+  newItems = new Set(newItems);
+
+  const setIntersection = newItems.intersection(oldItems);
+  const itemsToAddSet = newItems.difference(setIntersection);
+  const itemsToRemoveSet = oldItems.difference(setIntersection);
+  const itemsToAddArr = Array.from(itemsToAddSet);
+  const itemsToRemoveArr = Array.from(itemsToRemoveSet);
+  const itemsToAdd = itemsToAddArr.map(itemToAdd => JSON.parse(itemToAdd));
+  const itemsToRemove = itemsToRemoveArr.map(itemToRemove => JSON.parse(itemToRemove));
+
+  await ballotUtil.deleteBallotsByFoodNameAndDropoffID(itemsToRemove, dropoff.id);
+  await populateFoodItemsBallots(itemsToAdd, null, dropoff);
 };
 
 module.exports.doesPapayaExist = async () => {
