@@ -1,13 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
   Route,
   Link
 } from 'react-router-dom';
-import { connect } from 'react-redux';
 import s from './Header.css';
-import RaisedButton from 'material-ui/RaisedButton';
-import { ref, firebaseAuth } from '../../config';
-import { Button, Image, Modal } from 'semantic-ui-react';
 
 const Header = (props) => (
   <div className={s.root}>

@@ -4,8 +4,6 @@ import {
   Link,
   Redirect,
 } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import s from './Payment.css';
 import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label, Message, Grid } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
@@ -396,7 +394,7 @@ class Payment extends React.Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 

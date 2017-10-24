@@ -1,6 +1,42 @@
 import moment from 'moment';
 import actionTypes from '../action-creators/admin/adminActionTypes.js';
 
+// type State = {
+//   dashboardPageSelected: string,
+//   adminAuthorized: boolean,
+//   adminData: Array<{
+//     id: number,
+//     locationObj: {
+//       streetNumber: string,
+//       streetName: string,
+//       city: string,
+//       state: string,
+//       zipCode: string,
+//       fullAddress: string,
+//       latitude: string,
+//       longitude: string,
+//     },
+//     intendedShipDate: string,
+//     formattedIntendedPickupDateTimeStart: string,
+//     formattedIntendedPickupTimeEnd: string,
+//     formattedVoteDateTimeBeg: string,
+//     formattedVoteDateTimeEnd: string,
+//     totalDormPackagesOrdered: number,
+//     totalCookingPackagesOrdered: number,
+//     totalParticipants: number,
+//     netVolumeFromSalesAfterFees: number,
+//     status: string,
+//   }>,
+//   // users: Array<{
+//   //   id: string,
+//   //   name: string,
+//   //   age: number,
+//   //   phoneNumber: string,
+//   // }>,
+//   // activeUserID: string,
+//   // ...
+// }
+
 const initialState = {
   dashboardPageSelected: 'home',
   adminAuthorized: 'false',
@@ -26,10 +62,16 @@ const initialState = {
   newItem: '',
   newImageUrl: '',
   isValidAddress: false,
+  editDropoffID: 0,
+  editDropoff: {},
+  userWantsEditDropoff: false,
 };
 
+// const adminReducers = (state: State = initialState, action) => {
 const adminReducers = (state = initialState, action) => {
   switch (action.type) {
+    case actionTypes.LOGOUT:
+      return initialState;
     case actionTypes.SELECT_DASHBOARD_PAGE:
       return { ...state, dashboardPageSelected: action.text };
     case actionTypes.AUTHORIZE_ADMIN:
@@ -72,6 +114,58 @@ const adminReducers = (state = initialState, action) => {
       return { ...state, newItem: action.text };
     case actionTypes.SET_NEW_IMAGE_URL:
       return { ...state, newImageUrl: action.text };
+    case actionTypes.SET_USER_WANTS_EDIT_DROPOFF:
+      return { ...state, userWantsEditDropoff: action.bool };
+    case actionTypes.SET_EDIT_DROPOFF:
+      return {
+        ...state,
+        intendedPickupTimeStart: action.intendedPickupTimeStart,
+        intendedPickupTimeEnd: action.intendedPickupTimeEnd,
+        voteDateTimeBeg: action.voteDateTimeBeg,
+        voteDateTimeEnd: action.voteDateTimeEnd,
+        fullAddress: action.fullAddress,
+        streetNumber: action.streetNumber,
+        streetName: action.streetName,
+        city: action.city,
+        state: action.state,
+        zipCode: action.zipCode,
+        locationStreetNumber: action.locationStreetNumber,
+        locationStreetName: action.locationStreetName,
+        locationCity: action.locationCity,
+        locationState: action.locationState,
+        locationZipCode: action.locationZipCode,
+        formattedAddress: action.formattedAddress,
+        selectedFoodItems: action.selectedFoodItems,
+        editDropoffID: action.editDropoffID,
+        editDropoff: action.obj,
+        userWantsEditDropoff: action.userWantsEditDropoff,
+       };
+    // case actionTypes.CLEAR_BULK_BUY:
+    //   return {
+    //     ...state,
+    //     stepIndex: 0,
+    //     // Add time
+    //     intendedPickupTimeStart: moment(),
+    //     intendedPickupTimeEnd: moment(),
+    //     voteDateTimeBeg: moment(),
+    //     voteDateTimeEnd: moment(),
+    //     // Add location
+    //     locationStreetNumber: '',
+    //     locationStreetName: '',
+    //     locationCity: '',
+    //     locationState: '',
+    //     locationZipCode: '',
+    //     formattedAddress: '',
+    //     markerAddress: '',
+    //     // Add food items
+    //     selectedFoodItems: [],
+    //     bulkBuySaved: false,
+    //     newItem: '',
+    //     newImageUrl: '',
+    //     isValidAddress: false,
+    //     editDropoffID: 0,
+    //     editDropoff: {},
+    //   };
     default:
       return state;
   }

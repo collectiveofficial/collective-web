@@ -1,16 +1,21 @@
-import React, { Component } from 'react';
+// @flow
+import React from 'react';
 import {
   Route,
   Link,
 } from 'react-router-dom';
-import TextField from 'material-ui/TextField';
-import AutoComplete from 'material-ui/AutoComplete';
-import RaisedButton from 'material-ui/RaisedButton';
-import { Sidebar, Segment, Button, Menu, Image, Icon, Header, Grid } from 'semantic-ui-react';
+import { Menu, Grid } from 'semantic-ui-react';
 import AdminHomeContainer from './containers/AdminHomeContainer.js';
 import BulkBuyContainer from './containers/BulkBuyContainer.js';
 
-const AdminDashboard = (props) => {
+type Props = {
+  adminReducers: {
+    dashboardPageSelected: string,
+  },
+  selectDashboardPage: (string) => void,
+};
+
+const AdminDashboard = (props: Props) => {
   // const styles = {
   // };
   let menuComponent;

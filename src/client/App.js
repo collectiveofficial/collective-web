@@ -24,6 +24,7 @@ import Community from './components/community/Community.js';
 import About from './components/about/About.js';
 import Faq from './components/about/Faq.js';
 import VotingContainer from './components/voting/containers/VotingContainer.js';
+import PaymentContainer from './components/payment/containers/PaymentContainer.js';
 import HeaderContainer from './components/header/containers/HeaderContainer.js';
 import Footer from './components/footer/Footer.js';
 import CollectiveTerms from './components/legal/CollectiveTerms.js';
@@ -82,10 +83,19 @@ class App extends React.Component {
     this.logOut = this.logOut.bind(this);
     this.handleFacebookAuth = this.handleFacebookAuth.bind(this);
     this.authorizeUser = this.authorizeUser.bind(this);
+    this.firebaseListener = this.firebaseListener.bind(this);
   }
 
   componentWillMount() {
-    this.firebaseListener = firebaseAuth().onAuthStateChanged(async (user) => {
+    this.firebaseListener();
+  }
+
+  componentWillUnmount() {
+    this.firebaseListener();
+  }
+
+  async firebaseListener() {
+    await firebaseAuth().onAuthStateChanged(async (user) => {
       if (user) { // is signed in
         await console.log('Logged in');
         const firebaseAccessToken = await firebaseAuth().currentUser.getIdToken(/* forceRefresh */ true);
@@ -117,10 +127,6 @@ class App extends React.Component {
         await this.props.setUserAuthorized(false);
       }
     });
-  }
-
-  componentWillUnmount() {
-    this.firebaseListener();
   }
 
   async logOut() {
@@ -194,6 +200,7 @@ class App extends React.Component {
       }),
     });
     const initialDataLoadResults = await initialDataLoad.json();
+    await this.props.setCurrentFutureDropoffs(initialDataLoadResults.currentFutureDropoffs);
     await this.props.setBallotsAndVotes(initialDataLoadResults.ballotsAndVotes);
     await this.props.setUserTransactionHistory(initialDataLoadResults.userTransactionHistory);
     await this.props.setAvailableDeliveriesLeft(initialDataLoadResults.availableDeliveriesLeft);
@@ -218,7 +225,6 @@ class App extends React.Component {
               />
               <DenyAuthorizedRoute userAuthorized={this.props.appReducers.userAuthorized} path="/login" component={() =>
                 (<LoginContainer
-                  nativeLogin={this.nativeLogin}
                   handleFacebookAuth={this.handleFacebookAuth}
                   authorizeUser={this.authorizeUser}
                 />)}
@@ -231,12 +237,12 @@ class App extends React.Component {
               />
               <DenyAuthorizedRoute userAuthorized={this.props.appReducers.userAuthorized} path="/register-form" component={() =>
                 (<RegisterFormContainer
-                  authenticated={this.authenticated}
                   authorizeUser={this.authorizeUser}
                 />)}
               />
               <PrivateRoute userAuthorized={this.props.appReducers.userAuthorized} path="/home" component={HomeContainer} />
               <PrivateRoute userAuthorized={this.props.appReducers.userAuthorized} path="/voting" component={VotingContainer}/>
+              <PrivateRoute userAuthorized={this.props.appReducers.userAuthorized} path="/payment" component={PaymentContainer}/>
               <PrivateRoute userAuthorized={this.props.appReducers.userAuthorized} path="/order-info" component={OrderInfo} />
               <AdminRoute userAuthorized={this.props.appReducers.userAuthorized} adminAuthorized={this.props.adminReducers.adminAuthorized} path="/admin-dashboard" component={AdminDashboardContainer} />
               <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/foodwiki" component={FoodWiki} />

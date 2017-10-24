@@ -159,6 +159,10 @@ const initializeData = async () => {
     }
   };
 
+  const scheduleJobs = async () => {
+    await dropoffUtil.scheduleDropoffs();
+  };
+
   const testConfirmationEmail = async () => {
     try {
       const dropoffID = 4; //TODO: Address server start dropoffID
@@ -254,6 +258,7 @@ const initializeData = async () => {
   await initializeFourthDropFoodItemsBallots();
   await initializeRestrictedAddresses();
   await initializeLocations();
+  await scheduleJobs();
   // await sendVotingReminderCSVupdates();
   // await testConfirmationEmail();
 };
@@ -447,6 +452,7 @@ module.exports = {
       // TODO: Implement dynamic dropoffID
       const groupID = await userUtil.findGroupIDByUID(uid);
       req.body.dropoffID = await groupUtil.getCurrentVotingDropoffID(groupID);
+      const currentFutureDropoffs = await dropoffUtil.getCurrentFutureDropoffs(groupID);
       const ballotsAndVotes = await ballotUtil.getBallotUserVotes(req.body);
       const userTransactionHistory = await transactionUtil.getUserTransactionHistory(uid);
       const deliveriesOrderedCount = await dropoffUtil.findDeliveriesOrderedCount(req.body.dropoffID);
@@ -460,6 +466,7 @@ module.exports = {
         adminFoodItems = await foodUtil.getAllFoodItems();
       }
       const responseObject = {
+        currentFutureDropoffs,
         ballotsAndVotes,
         userTransactionHistory,
         availableDeliveriesLeft,
@@ -679,7 +686,7 @@ module.exports = {
         const isUserAdmin = await userUtil.checkIfUserIsAdmin(uid);
         let bulkBuySaved = false;
         if (isUserAdmin && userAuthorized) {
-          bulkBuySaved = await dropoffUtil.saveNewBulkBuy(req.body);
+          bulkBuySaved = await dropoffUtil.saveNewOrEditBulkBuy(req.body);
         }
         res.json({ bulkBuySaved });
       } catch (err) {

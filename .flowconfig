@@ -1,0 +1,11 @@
+[ignore]
+src/client/public/dist/
+node_modules/
+
+[include]
+
+[libs]
+
+[lints]
+
+[options]

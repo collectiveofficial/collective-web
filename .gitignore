@@ -67,10 +67,5 @@ typings/
 # bundle
 src/client/public/dist/
 
-# CSV Files
-src/server/adminData/foodNamesAndVoteCounts.csv
-src/server/adminData/userNamesAndPackagesOrdered.csv
-src/server/adminData/usersWhoHaveNotPaid.csv
-
 # QR Code
 src/server/adminData/qr.png
