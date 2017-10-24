@@ -159,6 +159,10 @@ const initializeData = async () => {
     }
   };
 
+  const scheduleJobs = async () => {
+    await dropoffUtil.scheduleDropoffs();
+  };
+
   const testConfirmationEmail = async () => {
     try {
       const dropoffID = 4; //TODO: Address server start dropoffID
@@ -254,6 +258,7 @@ const initializeData = async () => {
   await initializeFourthDropFoodItemsBallots();
   await initializeRestrictedAddresses();
   await initializeLocations();
+  await scheduleJobs();
   // await sendVotingReminderCSVupdates();
   // await testConfirmationEmail();
 };

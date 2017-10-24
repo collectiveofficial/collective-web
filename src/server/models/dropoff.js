@@ -526,3 +526,21 @@ module.exports.stopJobOnEditDropoff = async (job, id) => {
     }
   });
 };
+
+module.exports.scheduleDropoffs = async () => {
+  try {
+    const dropoffs = await models.Dropoff.findAll();
+    for (let i = 0; i < dropoffs.length; i++) {
+      const dropoff = dropoffs[i].dataValues;
+      const bulkBuyData = {
+        voteDateTimeBeg: dropoff.voteDateTimeBeg,
+        voteDateTimeEnd: dropoff.voteDateTimeEnd,
+        dropoffID: dropoff.id,
+        groupID: dropoff.groupID,
+      }
+      await groupUtil.scheduleVotingDropoffSwitch(bulkBuyData);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
