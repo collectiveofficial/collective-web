@@ -4,13 +4,12 @@ import {
   Link,
   Redirect,
 } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import s from './Voting.css';
-import { Card, Icon, Image, Checkbox, Popup, Dropdown, Feed, Modal, Header, Button } from 'semantic-ui-react';
-import StripeCheckout from 'react-stripe-checkout';
+import { Popup, Button } from 'semantic-ui-react';
+import { GridList, GridTile } from 'material-ui/GridList';
+import IconButton from 'material-ui/IconButton';
+import CheckCircle from 'material-ui/svg-icons/action/check-circle';
 import RaisedButton from 'material-ui/RaisedButton';
-// import PaymentContainer from '../payment/containers/PaymentContainer.js';
 
 class Voting extends React.Component {
   constructor(props) {
@@ -46,15 +45,21 @@ class Voting extends React.Component {
     }
   }
 
-  async handleChange(e, { value, checked }) {
-    if (this.props.votes === 0 && checked === true) {
-      checked = false;
+  // async handleChange(e, { value, checked }) {
+  async handleChange(value, checked) {
+    if (this.props.votes === 0 && checked === false) {
       return;
     }
+    checked = !checked;
+    console.log('---> checked: ', checked);
     const newBallotsAndVotes = this.props.appReducers.ballotsAndVotes;
+    console.log('---> newBallotsAndVotes: ', newBallotsAndVotes);
     for (let i = 0; i < newBallotsAndVotes.length; i++) {
       if (newBallotsAndVotes[i].name === value) {
+        console.log('---> newBallotsAndVotes[i].name: ', newBallotsAndVotes[i].name);
+        console.log('---> value: ', value);
         newBallotsAndVotes[i].isCurrent = checked;
+        console.log('---> newBallotsAndVotes[i].isCurrent: ', newBallotsAndVotes[i].isCurrent);
       }
     }
     await this.props.setBallotsAndVotes(newBallotsAndVotes);
@@ -108,66 +113,91 @@ class Voting extends React.Component {
   }
 
   render() {
-    console.log('Voting props: ', this.props);
+    const styles = {
+      root: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        'justify-content': 'center',
+        // margin: '1% 40% 1% 0',
+      },
+      gridList: {
+        width: '80%',
+        height: '50%',
+        overflowY: 'auto',
+      },
+      bottomButton: {
+        display: 'flex',
+        'justify-content': 'center',
+        margin: '0.5% 0 0.5% 0',
+      },
+    };
     return (
       <div>
         {this.props.allowContinueToPayment ?
-          // <PaymentContainer />
           <Redirect to="/payment" />
           :
-          <div className={s.cont}>
+          <div>
             <h1 className={s.top}>You have {this.props.votes} votes left</h1>
-            <div className={s.flexcontainer}>
-              {this.props.appReducers.ballotsAndVotes.map(ballotAndVote => (
-                <div className={s.ballot}>
-                  <Card>
-                    <Image src={ballotAndVote.imageUrl} />
-                    <Card.Content>
-                      <Card.Header>
-                        {ballotAndVote.name}
-                      </Card.Header>
-                    </Card.Content>
-                    <Card.Content extra>
-                      <Checkbox toggle
-                        value={ballotAndVote.name}
-                        onChange={this.handleChange}
-                        checked={ballotAndVote.isCurrent}
-                      />
-                    </Card.Content>
-                  </Card>
-                </div>
-              ))}
-              {this.props.hasUserPaid ?
-                <Popup
-                  trigger={
-                    <RaisedButton
-                      label="Update Votes"
-                      primary={true}
-                      onTouchTap={this.handleSubmitUpdateVotes}
-                    />
-                  }
-                  content={this.props.voteErrorMessage}
-                  open={this.props.votesHaveFinishedUpdating === false}
-                  offset={5}
-                  position="bottom left"
-                />
-                :
-                <Popup
-                  trigger={
-                    <Button
-                      positive
-                      onClick={this.handleContinueToPayment}
-                    >
-                      Continue to Payment
-                    </Button>
-                  }
-                  content={this.props.voteErrorMessage}
-                  open={this.props.allowContinueToPayment === false}
-                  offset={5}
-                  position="bottom left"
-                />
-              }
-            </div>
+            <div style={styles.root}>
+              <GridList
+                style={styles.gridList}
+                cols={3}
+              >
+                  {this.props.appReducers.ballotsAndVotes.map(ballotAndVote => (
+                    <GridTile
+                      key={ballotAndVote.imageUrl}
+                      title={ballotAndVote.name}
+                      actionIcon={
+                        <IconButton>
+                          <CheckCircle
+                            color={ballotAndVote.isCurrent ?
+                              'rgb(30, 227, 91)'
+                              :
+                              'rgb(162, 153, 158)'
+                            }
+                          />
+                        </IconButton>}
+                        onClick={() => {
+                          this.handleChange(ballotAndVote.name, ballotAndVote.isCurrent);
+                        }}
+                        >
+                          <img src={ballotAndVote.imageUrl} />
+                        </GridTile>
+                      ))}
+                    </GridList>
+                    </div>
+                    <div style={styles.bottomButton}>
+                      {this.props.hasUserPaid ?
+                        <Popup
+                          trigger={
+                            <RaisedButton
+                              label="Update Votes"
+                              primary={true}
+                              onTouchTap={this.handleSubmitUpdateVotes}
+                            />
+                          }
+                          content={this.props.voteErrorMessage}
+                          open={this.props.votesHaveFinishedUpdating === false}
+                          offset={5}
+                          position="bottom left"
+                        />
+                        :
+                        <Popup
+                          trigger={
+                            <Button
+                              positive
+                              onClick={this.handleContinueToPayment}
+                              >
+                                Continue to Payment
+                              </Button>
+                            }
+                            content={this.props.voteErrorMessage}
+                            open={this.props.allowContinueToPayment === false}
+                            offset={5}
+                            position="bottom left"
+                          />
+                        }
+                    </div>
           </div>
         }
         {this.props.votesHaveFinishedUpdating ?

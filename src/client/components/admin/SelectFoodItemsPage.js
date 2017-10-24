@@ -3,7 +3,7 @@ import {
   Route,
   Link
 } from 'react-router-dom';
-import { GridList, GridTile} from 'material-ui/GridList';
+import { GridList, GridTile } from 'material-ui/GridList';
 import IconButton from 'material-ui/IconButton';
 import Subheader from 'material-ui/Subheader';
 import CheckCircle from 'material-ui/svg-icons/action/check-circle';
