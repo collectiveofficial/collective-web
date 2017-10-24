@@ -37,12 +37,6 @@
   justify-content: center;
 }
 
-.bottomButton {
-  display: flex;
-  justify-content: center;
-  margin: 1% 0 1% 0;
-}
-
 /*.card {
   border: 1px solid #b3b3b3;
   border-top: 0px;

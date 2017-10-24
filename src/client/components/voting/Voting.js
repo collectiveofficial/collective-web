@@ -45,21 +45,15 @@ class Voting extends React.Component {
     }
   }
 
-  // async handleChange(e, { value, checked }) {
   async handleChange(value, checked) {
     if (this.props.votes === 0 && checked === false) {
       return;
     }
     checked = !checked;
-    console.log('---> checked: ', checked);
     const newBallotsAndVotes = this.props.appReducers.ballotsAndVotes;
-    console.log('---> newBallotsAndVotes: ', newBallotsAndVotes);
     for (let i = 0; i < newBallotsAndVotes.length; i++) {
       if (newBallotsAndVotes[i].name === value) {
-        console.log('---> newBallotsAndVotes[i].name: ', newBallotsAndVotes[i].name);
-        console.log('---> value: ', value);
         newBallotsAndVotes[i].isCurrent = checked;
-        console.log('---> newBallotsAndVotes[i].isCurrent: ', newBallotsAndVotes[i].isCurrent);
       }
     }
     await this.props.setBallotsAndVotes(newBallotsAndVotes);
@@ -118,7 +112,6 @@ class Voting extends React.Component {
         display: 'flex',
         flexWrap: 'wrap',
         'justify-content': 'center',
-        // margin: '1% 40% 1% 0',
       },
       gridList: {
         width: '80%',
