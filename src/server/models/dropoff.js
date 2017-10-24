@@ -484,7 +484,7 @@ module.exports.getAllDropoffs = async () => {
 };
 
 module.exports.getCurrentFutureDropoffs = async (groupID) => {
-  const currentFutureDropoffs = [];
+  let currentFutureDropoffs = [];
   try {
     const dropoffs = await models.Dropoff.findAll({
       where: {
@@ -516,6 +516,7 @@ module.exports.getCurrentFutureDropoffs = async (groupID) => {
   } catch (err) {
     console.log(err);
   }
+  currentFutureDropoffs = currentFutureDropoffs.sort((a,b) => new Date(a.intendedPickupTimeStart) - new Date(b.intendedPickupTimeStart));
   return currentFutureDropoffs;
 };
 
