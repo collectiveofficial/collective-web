@@ -1,9 +1,8 @@
 {
-  "presets": ["es2015", "stage-0", "react"],
+  "presets": ["es2015", "stage-0", "react", "flow"],
   "env": {
     "development": {
-      "plugins": [
-      ]
+      "plugins": ["react-flow-props-to-prop-types"]
     }
   }
 }

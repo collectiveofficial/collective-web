@@ -20,20 +20,24 @@ module.exports.doesBallotExist = (dropoffID) => {
 };
 
 module.exports.populateBallot = async (dropoff, food) => {
-  await models.Ballot.create({
-    dropoffID: dropoff.id,
-    foodID: food.id,
-    foodName: food.name,
-    imageUrl: food.imageUrl,
-    voteCount: 0,
-    wasShipped: false,
-    elected: false,
-    notShippedDesc: null,
-    notShippedClass: null,
-    shipDate: null,
-    voteDateTimeBeg: dropoff.voteDateTimeBeg,
-    voteDateTimeEnd: dropoff.voteDateTimeEnd,
-  });
+  try {
+    await models.Ballot.create({
+      dropoffID: dropoff.id,
+      foodID: food.id,
+      foodName: food.name,
+      imageUrl: food.imageUrl,
+      voteCount: 0,
+      wasShipped: false,
+      elected: false,
+      notShippedDesc: null,
+      notShippedClass: null,
+      shipDate: null,
+      voteDateTimeBeg: dropoff.voteDateTimeBeg,
+      voteDateTimeEnd: dropoff.voteDateTimeEnd,
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 module.exports.findFoodInfo = async (foodName, dropoffID) => {
@@ -121,7 +125,6 @@ module.exports.getFoodNamesAndVoteCounts = async (dropoffID) => {
 
 module.exports.findFoodID = async (foodName, dropoffID) => {
   try {
-    console.log('\n\n\nfoodName: ', foodName);
     const ballot = await models.Ballot.findOne({
       where: {
         foodName,
@@ -130,6 +133,42 @@ module.exports.findFoodID = async (foodName, dropoffID) => {
     });
     const foodID = ballot.dataValues.foodID;
     return foodID;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports.getFoodItemsByDropoffID = async (dropoffID) => {
+  const foodItems = [];
+  try {
+    const ballots = await models.Ballot.findAll({
+      where: {
+        dropoffID,
+      },
+    });
+    for (let i = 0; i < ballots.length; i++) {
+      const ballot = ballots[i].dataValues;
+      const foodItem = await foodUtil.findFoodItemByID(ballot.foodID);
+      foodItems.push(foodItem);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  return foodItems;
+};
+
+module.exports.deleteBallotsByFoodNameAndDropoffID = async (itemsToRemove, dropoffID) => {
+  try {
+    for (let i = 0; i < itemsToRemove.length; i++) {
+      const itemToRemove = itemsToRemove[i];
+      await models.Ballot.destroy({
+        where: {
+          foodName: itemToRemove.name,
+          imageUrl: itemToRemove.imageUrl,
+          dropoffID,
+        },
+      });
+    }
   } catch (err) {
     console.log(err);
   }

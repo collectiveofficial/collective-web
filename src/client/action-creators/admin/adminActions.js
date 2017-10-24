@@ -136,6 +136,7 @@ export function handleNext(index, stepProps, newBulkBuyInfo) {
       }
       return await dispatch({
         type: actionTypes.SUBMIT_NEW_BULK_BUY,
+        userWantsEditDropoff: false,
         bulkBuySaved,
       });
     };
@@ -216,4 +217,43 @@ export function setMarkerAddress(text) {
     type: actionTypes.SET_MARKER_ADDRESS,
     text,
   };
+}
+
+export function setUserWantsEditDropoff(bool) {
+  return {
+    type: actionTypes.SET_USER_WANTS_EDIT_DROPOFF,
+    bool,
+  };
+}
+
+export function setEditDropoff(obj) {
+  return {
+    type: actionTypes.SET_EDIT_DROPOFF,
+    intendedPickupTimeStart: momentTZ.tz(obj.intendedPickupDateTimeStart, 'America/New_York'),
+    intendedPickupTimeEnd: momentTZ.tz(obj.intendedPickupDateTimeEnd, 'America/New_York'),
+    voteDateTimeBeg: momentTZ.tz(obj.voteDateTimeBeg, 'America/New_York'),
+    voteDateTimeEnd: momentTZ.tz(obj.voteDateTimeEnd, 'America/New_York'),
+    fullAddress: obj.locationObj.fullAddress,
+    streetNumber: obj.locationObj.streetNumber,
+    streetName: obj.locationObj.streetName,
+    city: obj.locationObj.city,
+    state: obj.locationObj.state,
+    zipCode: obj.locationObj.zipCode,
+    locationStreetNumber: obj.locationObj.streetNumber,
+    locationStreetName: obj.locationObj.streetName,
+    locationCity: obj.locationObj.city,
+    locationState: obj.locationObj.state,
+    locationZipCode: obj.locationObj.zipCode,
+    formattedAddress: obj.locationObj.fullAddress,
+    selectedFoodItems: obj.foodItems,
+    userWantsEditDropoff: true,
+    editDropoffID: obj.id,
+    obj,
+  };
+}
+
+export function clearBulkBuy() {
+  return {
+    type: actionTypes.CLEAR_BULK_BUY,
+  }
 }

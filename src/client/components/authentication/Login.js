@@ -4,8 +4,6 @@ import {
   Link,
   Redirect,
 } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import TextField from 'material-ui/TextField';
 import MailOutline from 'material-ui/svg-icons/communication/mail-outline';
 import LockOutline from 'material-ui/svg-icons/action/lock-outline';

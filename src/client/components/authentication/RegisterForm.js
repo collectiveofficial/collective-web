@@ -4,8 +4,6 @@ import {
   Link,
   Redirect
 } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import s from './Register.css';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
