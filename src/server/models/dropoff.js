@@ -10,6 +10,30 @@ const foodUtil = require('./food');
 const groupUtil = require('./group');
 const locationUtil = require('./location');
 
+(function(){
+  if (typeof Object.defineProperty === 'function'){
+    try{Object.defineProperty(Array.prototype,'sortBy',{value:sb}); }catch(e){}
+  }
+  if (!Array.prototype.sortBy) Array.prototype.sortBy = sb;
+
+  function sb(f){
+    for (var i=this.length;i;){
+      var o = this[--i];
+      this[i] = [].concat(f.call(o,o,i),o);
+    }
+    this.sort(function(a,b){
+      for (var i=0,len=a.length;i<len;++i){
+        if (a[i]!=b[i]) return a[i]<b[i]?-1:1;
+      }
+      return 0;
+    });
+    for (var i=this.length;i;){
+      this[--i]=this[i][this[i].length-1];
+    }
+    return this;
+  }
+})();
+
 module.exports.doesDropoffExist = async (id) => {
   try {
     const doesDropoffExistResult = await models.Dropoff.findOne({
@@ -311,6 +335,7 @@ module.exports.getAdminData = async (uid) => {
       };
       data.push(dropoff);
     }
+    data = data.sortBy(dropoff => -dropoff.intendedPickupTimeStart);
     return data;
   } catch (err) {
     console.log(err);
@@ -516,7 +541,7 @@ module.exports.getCurrentFutureDropoffs = async (groupID) => {
   } catch (err) {
     console.log(err);
   }
-  currentFutureDropoffs = currentFutureDropoffs.sort((a,b) => new Date(a.intendedPickupTimeStart) - new Date(b.intendedPickupTimeStart));
+  currentFutureDropoffs = currentFutureDropoffs.sortBy(dropoff => dropoff.intendedPickupTimeStart);
   return currentFutureDropoffs;
 };
 
