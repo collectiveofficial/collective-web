@@ -335,7 +335,7 @@ module.exports.getAdminData = async (uid) => {
       };
       data.push(dropoff);
     }
-    data = data.sortBy(dropoff => -dropoff.intendedPickupTimeStart);
+    data = data.sortBy(dropoff => -new Date(dropoff.intendedPickupTimeStart));
     return data;
   } catch (err) {
     console.log(err);
@@ -541,7 +541,7 @@ module.exports.getCurrentFutureDropoffs = async (groupID) => {
   } catch (err) {
     console.log(err);
   }
-  currentFutureDropoffs = currentFutureDropoffs.sortBy(dropoff => dropoff.intendedPickupTimeStart);
+  currentFutureDropoffs = currentFutureDropoffs.sortBy(dropoff => new Date(dropoff.intendedPickupTimeStart));
   return currentFutureDropoffs;
 };
 
