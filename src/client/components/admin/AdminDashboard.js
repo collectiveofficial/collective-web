@@ -7,6 +7,7 @@ import {
 import { Menu, Grid } from 'semantic-ui-react';
 import AdminHomeContainer from './containers/AdminHomeContainer.js';
 import BulkBuyContainer from './containers/BulkBuyContainer.js';
+import s from './AdminDashboard.css';
 
 type Props = {
   adminReducers: {
