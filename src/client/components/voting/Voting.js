@@ -129,7 +129,7 @@ class Voting extends React.Component {
         {this.props.allowContinueToPayment ?
           <Redirect to="/payment" />
           :
-          <div>
+          <div className={s.root}>
             <h1 className={s.top}>You have {this.props.votes} votes left</h1>
             <div style={styles.root}>
               <GridList
@@ -177,12 +177,13 @@ class Voting extends React.Component {
                       :
                       <Popup
                         trigger={
-                          <Button
-                            positive
-                            onClick={this.handleContinueToPayment}
-                            >
-                              Continue to Payment
-                            </Button>
+                          // <Button
+                          //   positive
+                          //   onClick={this.handleContinueToPayment}
+                          //   >
+                          //     Continue to Payment
+                          //   </Button>
+                          <RaisedButton label="Continue to Payment" primary={true} onTouchTap={this.handleContinueToPayment} />
                           }
                           content={this.props.voteErrorMessage}
                           open={this.props.allowContinueToPayment === false}
