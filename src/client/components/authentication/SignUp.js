@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
   Route,
   Link,
@@ -12,6 +12,7 @@ import { Icon, Popup, List, Image } from 'semantic-ui-react';
 import s from './Register.css';
 import RegisterFormContainer from './containers/RegisterFormContainer.js';
 import { ref, firebaseAuth } from '../../config';
+import Logo from '../logo/Logo.js';
 
 class SignUp extends React.Component {
   constructor(props) {
@@ -182,12 +183,7 @@ class SignUp extends React.Component {
               />
               :
               <div>
-                <img
-                  src="https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/20842268_10203444885799076_8463083618137206538_n.jpg?oh=9d92d9a15f4d4eec45c6564d25b2b736&oe=5A19812C"
-                  alt="collective logo"
-                  height="30"
-                  width="30"
-                />
+                <Logo />
                 <h2 className={s.head}>Welcome to Collective</h2>
                 <h2 className={s.head}>Built to empower groups</h2>
                 <div>
