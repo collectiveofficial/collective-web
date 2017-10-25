@@ -1,0 +1,14 @@
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(80, 175, 80);
+  height: 250px;
+  width: 300px;
+}
+
+.logoName {
+  color: rgb(255, 255, 255);
+  font-size: 40px;
+  font-family: 'Amiko', sans-serif;
+}

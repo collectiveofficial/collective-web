@@ -136,61 +136,61 @@ class Voting extends React.Component {
                 style={styles.gridList}
                 cols={3}
               >
-                  {this.props.appReducers.ballotsAndVotes.map(ballotAndVote => (
-                    <GridTile
-                      key={ballotAndVote.imageUrl}
-                      title={ballotAndVote.name}
-                      actionIcon={
-                        <IconButton>
-                          <CheckCircle
-                            color={ballotAndVote.isCurrent ?
-                              'rgb(30, 227, 91)'
-                              :
-                              'rgb(162, 153, 158)'
-                            }
+                {this.props.appReducers.ballotsAndVotes.map(ballotAndVote => (
+                  <GridTile
+                    key={ballotAndVote.imageUrl}
+                    title={ballotAndVote.name}
+                    actionIcon={
+                      <IconButton>
+                        <CheckCircle
+                          color={ballotAndVote.isCurrent ?
+                            'rgb(30, 227, 91)'
+                            :
+                            'rgb(162, 153, 158)'
+                          }
+                        />
+                      </IconButton>}
+                      onClick={() => {
+                        this.handleChange(ballotAndVote.name, ballotAndVote.isCurrent);
+                      }}
+                      >
+                        <img src={ballotAndVote.imageUrl} />
+                      </GridTile>
+                    ))}
+                  </GridList>
+                  </div>
+                  <div style={styles.bottomButton}>
+                    {this.props.hasUserPaid ?
+                      <Popup
+                        trigger={
+                          <RaisedButton
+                            label="Update Votes"
+                            primary={true}
+                            onTouchTap={this.handleSubmitUpdateVotes}
                           />
-                        </IconButton>}
-                        onClick={() => {
-                          this.handleChange(ballotAndVote.name, ballotAndVote.isCurrent);
-                        }}
-                        >
-                          <img src={ballotAndVote.imageUrl} />
-                        </GridTile>
-                      ))}
-                    </GridList>
-                    </div>
-                    <div style={styles.bottomButton}>
-                      {this.props.hasUserPaid ?
-                        <Popup
-                          trigger={
-                            <RaisedButton
-                              label="Update Votes"
-                              primary={true}
-                              onTouchTap={this.handleSubmitUpdateVotes}
-                            />
+                        }
+                        content={this.props.voteErrorMessage}
+                        open={this.props.votesHaveFinishedUpdating === false}
+                        offset={5}
+                        position="bottom left"
+                      />
+                      :
+                      <Popup
+                        trigger={
+                          <Button
+                            positive
+                            onClick={this.handleContinueToPayment}
+                            >
+                              Continue to Payment
+                            </Button>
                           }
                           content={this.props.voteErrorMessage}
-                          open={this.props.votesHaveFinishedUpdating === false}
+                          open={this.props.allowContinueToPayment === false}
                           offset={5}
                           position="bottom left"
                         />
-                        :
-                        <Popup
-                          trigger={
-                            <Button
-                              positive
-                              onClick={this.handleContinueToPayment}
-                              >
-                                Continue to Payment
-                              </Button>
-                            }
-                            content={this.props.voteErrorMessage}
-                            open={this.props.allowContinueToPayment === false}
-                            offset={5}
-                            position="bottom left"
-                          />
-                        }
-                    </div>
+                      }
+                  </div>
           </div>
         }
         {this.props.votesHaveFinishedUpdating ?
