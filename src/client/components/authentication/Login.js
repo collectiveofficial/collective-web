@@ -12,6 +12,7 @@ import { Icon, Popup } from 'semantic-ui-react';
 import RegisterFormContainer from './containers/RegisterFormContainer.js';
 import { ref, firebaseAuth } from '../../config';
 import s from './Login.css';
+import Logo from '../logo/Logo.js';
 
 class Login extends React.Component {
   constructor(props) {
@@ -150,12 +151,7 @@ class Login extends React.Component {
               />
               :
               <div>
-                <img
-                  src="https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/20842268_10203444885799076_8463083618137206538_n.jpg?oh=9d92d9a15f4d4eec45c6564d25b2b736&oe=5A19812C"
-                  alt="collective logo"
-                  height="30"
-                  width="30"
-                />
+                <Logo />
                 <h2>Log in to Collective</h2>
                 <h2>Built to empower groups</h2>
                 <div>
