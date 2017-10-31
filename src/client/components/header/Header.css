@@ -1,5 +1,7 @@
 .root {
-  background: white;
+  position: absolute;
+  z-index: 9000;
+  /*background: white;*/
   color: #fff;
   display: flex;
   flex-direction: row;
@@ -8,12 +10,12 @@
   text-decoration: none;
 }
 
-.container {
-  margin: 0 auto;
-  padding: 20px 0;
-  max-width: $max-content-width;
+.cont {
   display: flex;
   flex-direction: row;
+  /*align-self: flex-end;*/
+  justify-content: flex-end;
+  color: grey;
 }
 
 .logoName {
@@ -25,17 +27,6 @@
 
 .logoName:hover {
   color: rgb(39, 40, 46);
-}
-
-.nav {
-  float: right;
-  margin-top: 6px;
-}
-
-.banner {
-  text-align: center;
-  flex: 2;
-  align-self: flex-end;
 }
 
 .link {
@@ -61,39 +52,4 @@
 
 .highlight:hover {
   color: rgb(39, 40, 46);
-}
-
-.sign {
-  display: inline-block;
-  padding: 3px 8px;
-  text-decoration: none;
-  font-size: 1.25em;
-  margin-right: 8px;
-  margin-left: 8px;
-  border-radius: 3px;
-  background: rgba(0, 0, 0, .15);
-  text-decoration: none;
-}
-
-
-.cont {
-  display: flex;
-  flex-direction: row;
-  align-self: flex-end;
-  color: grey;
-}
-
-.bannerTitle {
-  margin: 0;
-  padding: 10px;
-  font-weight: normal;
-  font-size: 2em;
-  line-height: 1em;
-}
-
-.bannerDesc {
-  padding: 0;
-  color: rgba(255, 255, 255, .5);
-  font-size: 1.25em;
-  margin: 0;
 }

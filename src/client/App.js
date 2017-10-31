@@ -10,10 +10,10 @@ import {
 import initReactFastclick from 'react-fastclick';
 // Firebase imports
 import firebase from 'firebase';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import { nativeLogout } from './utils/auth.js';
 import { ref, firebaseAuth } from './config';
 // Component imports
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import HomeContainer from './components/home/containers/HomeContainer.js';
 import LoginContainer from './components/authentication/containers/LoginContainer.js';
 import RegisterFormContainer from './components/authentication/containers/RegisterFormContainer.js';
@@ -32,6 +32,7 @@ import BffTerms from './components/legal/BffTerms.js';
 import PrivacyPolicy from './components/legal/PrivacyPolicy.js';
 import OrderInfo from './components/orderInfo/OrderInfo.js';
 import AdminDashboardContainer from './components/admin/containers/AdminDashboardContainer.js';
+import LandingContainer from './components/landing/containers/LandingContainer.js';
 
 initReactFastclick();
 
@@ -215,13 +216,10 @@ class App extends React.Component {
     return (
         <MuiThemeProvider>
           <div>
-            <HeaderContainer logOut={this.logOut}/>
+            {/* <HeaderContainer logOut={this.logOut} /> */}
             <Switch>
               <DenyAuthorizedRoute userAuthorized={this.props.appReducers.userAuthorized} path='/' exact component={() =>
-                (<SignUpContainer
-                  handleFacebookAuth={this.handleFacebookAuth}
-                  authorizeUser={this.authorizeUser}
-                />)}
+                (<LandingContainer />)}
               />
               <DenyAuthorizedRoute userAuthorized={this.props.appReducers.userAuthorized} path="/login" component={() =>
                 (<LoginContainer

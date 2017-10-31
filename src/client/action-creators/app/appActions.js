@@ -1,4 +1,5 @@
 import actionTypes from './appActionTypes';
+import { nativeLogout } from '../../utils/auth.js';
 
 export function setUserAuthenticated(bool) {
   return {
@@ -78,7 +79,14 @@ export function setDeliveryEligibilityObj(obj) {
 }
 
 export function logOut() {
-  return {
-    type: actionTypes.LOGOUT,
-  };
+  return async (dispatch) => {
+    try {
+      await nativeLogout();
+    } catch (err) {
+      console.log(err);
+    }
+    return await dispatch({
+      type: actionTypes.LOGOUT,
+    });
+  }
 }

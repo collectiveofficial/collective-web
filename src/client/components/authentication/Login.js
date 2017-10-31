@@ -9,6 +9,7 @@ import MailOutline from 'material-ui/svg-icons/communication/mail-outline';
 import LockOutline from 'material-ui/svg-icons/action/lock-outline';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Icon, Popup } from 'semantic-ui-react';
+import HeaderContainer from '../header/containers/HeaderContainer.js';
 import RegisterFormContainer from './containers/RegisterFormContainer.js';
 import { ref, firebaseAuth } from '../../config';
 import s from './Login.css';
@@ -138,6 +139,7 @@ class Login extends React.Component {
     };
     return (
       <div>
+        <HeaderContainer />
         <div className={s.root}>
           <div className={s.container}>
             {this.props.appReducers.routeToRegisterForm ?

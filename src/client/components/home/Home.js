@@ -7,6 +7,7 @@ import { Image, Modal } from 'semantic-ui-react';
 import s from './Home.css';
 import { Card, CardMedia, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
 import { Message, Icon, Header } from 'semantic-ui-react';
+import HeaderContainer from '../header/containers/HeaderContainer.js';
 import momentTZ from 'moment-timezone';
 import HomeMapContainer from './containers/HomeMapContainer.js';
 
@@ -21,6 +22,7 @@ const Home = (props) => {
   };
   return (
     <div>
+      <HeaderContainer />
       <div className={s.root}>
         <div className={s.container}>
           <div className={s.headcont}>
