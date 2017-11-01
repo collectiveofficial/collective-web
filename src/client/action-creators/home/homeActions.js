@@ -11,3 +11,21 @@ export function setCurrentFutureDropoffs(arr) {
 export function toggleHomeMap(bool) {
   return { type: actionTypes.TOGGLE_HOME_MAP, bool };
 }
+
+export function handlePrev(index) {
+  if (index > 0) {
+    return {
+      type: actionTypes.SET_PREV_STEP,
+      index: index - 1,
+    };
+  }
+}
+
+export function handleNext(index, stepProps) {
+  if (index < stepProps.length - 1) {
+    return {
+      type: actionTypes.SET_NEXT_STEP,
+      index: index + 1,
+    };
+  }
+}

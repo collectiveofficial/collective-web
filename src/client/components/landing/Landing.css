@@ -1,0 +1,106 @@
+.topContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+}
+
+.backgroundVideo {
+  /*opacity: 0.7;*/
+}
+
+.overlay {
+  position: absolute;
+}
+
+.videoContent {
+  text-align: center;
+  width: 640px;
+  padding: 10px 0;
+}
+
+.logoName {
+  color: rgb(255, 255, 255);
+  font-size: 60px;
+  font-family: 'Amiko', sans-serif;
+}
+
+.topButton {
+  border-radius: 46px;
+  background: rgb(80, 175, 80);
+  padding: 8px 14px;
+  margin-top: 2%;
+  color: white;
+  font-size: 20px;
+}
+
+.city {
+  font-size: 40px;
+  position: relative;
+  color: rgb(255, 255, 255);
+  white-space: pre;
+  margin-bottom: 40px;
+}
+
+.city:before, .city:after {
+    position: absolute;
+    top: 51%;
+    overflow: hidden;
+    width: 50%;
+    height: 1px;
+    content: '\a0';
+    background-color: rgb(255, 255, 255);
+}
+
+.city:before {
+    margin-left: -50%;
+    text-align: right;
+}
+
+.middleContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 600px;
+}
+
+.middleHeaderContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-bottom: 2.5%;
+}
+
+.middleHeader {
+  font-size: 40px;
+}
+
+.process {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+
+.processCardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.processCardContentIcon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.processDescriptionContainer {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+}
+
+.processCardContentDescription {
+  font-size: 20px;
+}

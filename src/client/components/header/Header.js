@@ -13,9 +13,6 @@ const Header = (props) => {
   });
   return (
     <div className={s.root}>
-      {/* <Link className={s.brand} to="/">
-        <span className={s.brandTxt}>COLLECTIVE</span>
-      </Link> */}
       <Link to="/">
         <h1 className={s.logoName}>COLLECTIVE</h1>
       </Link>
@@ -25,16 +22,16 @@ const Header = (props) => {
             {props.adminReducers.adminAuthorized === true ?
               <Link className={highlightButtons} to="/admin-dashboard/home">Admin Dashboard</Link>
               :
-              <div />
+              <div></div>
             }
             <Link className={highlightButtons} to="/voting">Vote Now</Link>
             <Link className={s.link} to="/order-info">Order Info</Link>
           </div>
           :
-          <div />
+          <div></div>
         }
-        <Link className={s.link} to="/about">About</Link>
-        <Link className={s.link} to="/faq">FAQ</Link>
+        {/* <Link className={s.link} to="/about">About</Link> */}
+        {/* <Link className={s.link} to="/faq">FAQ</Link> */}
         {/* <Link className={s.link} to="/foodwiki">FoodWiki</Link>
         <Link className={s.link} to="/community">Community</Link> */}
         {props.appReducers.authenticated ?
@@ -42,6 +39,7 @@ const Header = (props) => {
             className={s.link}
             onClick={() => {
               props.logOut();
+              props.setAuthorizeAdmin(false);
             }}
             href="javascript:void(0)">
             Log Out

@@ -177,12 +177,6 @@ class Voting extends React.Component {
                       :
                       <Popup
                         trigger={
-                          // <Button
-                          //   positive
-                          //   onClick={this.handleContinueToPayment}
-                          //   >
-                          //     Continue to Payment
-                          //   </Button>
                           <RaisedButton label="Continue to Payment" primary={true} onTouchTap={this.handleContinueToPayment} />
                           }
                           content={this.props.voteErrorMessage}
