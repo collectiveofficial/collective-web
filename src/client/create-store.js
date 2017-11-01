@@ -8,6 +8,8 @@ import homeReducers from './reducers/homeReducers';
 import * as paymentReducers from './reducers/paymentReducers';
 import * as votingReducers from './reducers/votingReducers';
 import adminReducers from './reducers/adminReducers.js';
+import landingReducers from './reducers/landingReducers.js';
+import contactReducers from './reducers/contactReducers.js';
 
 export default function (data) {
   const loginReducer = combineReducers(loginReducers);
@@ -24,6 +26,8 @@ export default function (data) {
     paymentReducer,
     votingReducer,
     adminReducers,
+    landingReducers,
+    contactReducers,
   };
   const rootReducer = combineReducers(reducers);
   const finalCreateStore = applyMiddleware(thunk)(createStore);

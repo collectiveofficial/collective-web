@@ -27,12 +27,13 @@ input {
 }
 
 .root {
-  padding-left: 20px;
-  padding-right: 20px;
+  padding-top: 9%;
+  /*padding-left: 20px;
+  padding-right: 20px;*/
   display: flex;
   font-family: "Roboto", sans-serif;
   justify-content: center;
-  background-image: url("https://static.pexels.com/photos/96715/pexels-photo-96715.jpeg");
+  background-image: url("http://res.cloudinary.com/jchen54/image/upload/v1509563554/farmPhoto_w3rcco.jpg");
   background-size: cover;
   flex: 1;
 }
