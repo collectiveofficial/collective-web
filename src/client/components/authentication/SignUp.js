@@ -170,7 +170,7 @@ class SignUp extends React.Component {
     };
     return (
       <div>
-        <HeaderContainer />
+        {/* <HeaderContainer /> */}
         <div className={s.root}>
           <div className={s.container}>
             {this.props.appReducers.routeToRegisterForm ?

@@ -52,7 +52,55 @@
     content: '\a0';
     background-color: rgb(255, 255, 255);
 }
+
 .city:before {
     margin-left: -50%;
     text-align: right;
+}
+
+.middleContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 600px;
+}
+
+.middleHeaderContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-bottom: 2.5%;
+}
+
+.middleHeader {
+  font-size: 40px;
+}
+
+.process {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+
+.processCardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.processCardContentIcon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.processDescriptionContainer {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+}
+
+.processCardContentDescription {
+  font-size: 20px;
 }

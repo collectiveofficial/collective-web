@@ -5,7 +5,9 @@
   color: #fff;
   display: flex;
   flex-direction: row;
+  flex-wrap: nowrap;
   margin: 0 auto;
+  width: 100%;
   justify-content: space-between;
   text-decoration: none;
 }
@@ -19,7 +21,10 @@
 }
 
 .logoName {
-  color: rgb(80, 175, 80);
+  display: flex;
+  flex-direction: row;
+  /*color: rgb(80, 175, 80);*/
+  color: rgb(126, 205, 126);
   font-size: 40px;
   font-family: 'Amiko', sans-serif;
   padding: 40px 0 20px 40px;
@@ -34,7 +39,8 @@
   font-family: 'Lato', sans-serif;
   margin: 40px 50px 20px 0;
   font-size: 20px;
-  color: grey;
+  /*color: grey;*/
+  color: rgb(126, 205, 126);
   text-decoration: none;
 }
 
