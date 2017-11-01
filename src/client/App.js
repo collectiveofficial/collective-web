@@ -33,6 +33,7 @@ import PrivacyPolicy from './components/legal/PrivacyPolicy.js';
 import OrderInfo from './components/orderInfo/OrderInfo.js';
 import AdminDashboardContainer from './components/admin/containers/AdminDashboardContainer.js';
 import LandingContainer from './components/landing/containers/LandingContainer.js';
+import ContactContainer from './components/contact/containers/ContactContainer.js';
 import styles from './App.css';
 
 initReactFastclick();
@@ -216,11 +217,9 @@ class App extends React.Component {
   render() {
     return (
       <MuiThemeProvider>
-        {/* <div className={styles.Site}> */}
         <div className={styles.Site}>
           <HeaderContainer />
           <Switch className={styles.SiteContent}>
-          {/* <Switch> */}
             <DenyAuthorizedRoute userAuthorized={this.props.appReducers.userAuthorized} path='/' exact component={() =>
               (<LandingContainer />)}
             />
@@ -251,9 +250,10 @@ class App extends React.Component {
             <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/terms" component={CollectiveTerms} />
             <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/bff" component={BffTerms} />
             <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/privacy" component={PrivacyPolicy} />
-            <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/about" component={About} />
+            {/* <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/about" component={About} /> */}
             <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/faq" component={Faq} />
             <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/feedback" component={Feedback} />
+            {/* <PublicRoute userAuthorized={this.props.appReducers.userAuthorized} path="/contact" component={ContactContainer} /> */}
             <PublicRoute render={() => <h3>No Match</h3>} />
           </Switch>
           <Footer />

@@ -214,7 +214,7 @@ img {
   padding-right: 20px;
   display: flex;
   justify-content: center;
-  background-image: url("https://static.pexels.com/photos/96715/pexels-photo-96715.jpeg");
+  background-image: url("http://res.cloudinary.com/jchen54/image/upload/v1509563554/farmPhoto_w3rcco.jpg");
   background-size: cover;
   flex: 1;
 }
@@ -230,11 +230,12 @@ img {
 }
 
 .conte {
+  padding-top: 9%;
   font-family: "Lato", sans-serif;
   /*background-image: url("https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/18011134_1016663535100980_507325607316796514_n.jpg?oh=6330a124653656d58dff6c30ba98b336&oe=59FB0B51");
   background-size: cover;
   flex: 1;*/
-  background-image: url("https://static.pexels.com/photos/96715/pexels-photo-96715.jpeg");
+  background-image: url("http://res.cloudinary.com/jchen54/image/upload/v1509563554/farmPhoto_w3rcco.jpg");
   background-size: cover;
   flex: 1;
   display: flex;

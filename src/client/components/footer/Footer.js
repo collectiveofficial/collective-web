@@ -12,12 +12,15 @@ const Footer = () => (
       <span className={s.spacer}>·</span>
       <Link className={s.link} to="/home">Home</Link>
       <span className={s.spacer}>·</span>
+      <Link className={s.link} to="/faq">FAQ</Link>
+      <span className={s.spacer}>·</span>
       <Link className={s.link} to="/terms">Terms of Use</Link>
       <span className={s.spacer}>·</span>
       <Link className={s.link} to="/privacy">Privacy</Link>
       <span className={s.spacer}>·</span>
       <Link className={s.link} to="/feedback">Feedback</Link>
       <span className={s.spacer}>·</span>
+      <Link className={s.link} to="/contact">Contact</Link>
     </div>
   </div>
 );

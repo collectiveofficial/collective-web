@@ -7,7 +7,7 @@ import {
 import { Menu, Grid } from 'semantic-ui-react';
 import AdminHomeContainer from './containers/AdminHomeContainer.js';
 import BulkBuyContainer from './containers/BulkBuyContainer.js';
-import s from './AdminDashboard.css';
+import styles from './AdminDashboard.css';
 
 type Props = {
   adminReducers: {
@@ -26,8 +26,8 @@ const AdminDashboard = (props: Props) => {
     menuComponent = <BulkBuyContainer />;
   }
   return (
-    <div>
-      <Grid>
+    <div className={styles.root}>
+      <Grid className={styles.dashboardGrid}>
         <Grid.Column stetched width={2}>
           <Menu inverted vertical>
             <Menu.Item name='Home' active={props.adminReducers.dashboardPageSelected === 'home'} onClick={() => { props.selectDashboardPage('home'); }} />

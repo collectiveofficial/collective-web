@@ -20,7 +20,7 @@ const LandingPage = () => {
         />
         <div className={videoContent}>
           <h1 className={styles.logoName}>COLLECTIVE</h1>
-          <h3 className={styles.city}>  COLUMBUS  </h3>
+          <h3 className={styles.city}>  BUILT TO EMPOWER GROUPS  </h3>
           <Link className={styles.topButton} to="/signup">GET FRESH PRODUCE FOR 50% LESS</Link>
         </div>
       </div>

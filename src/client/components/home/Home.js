@@ -7,15 +7,6 @@ import { Image, Modal } from 'semantic-ui-react';
 import s from './Home.css';
 import { Card, CardMedia, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
 import { Message, Icon, Header } from 'semantic-ui-react';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
-import {
-  Step,
-  Stepper,
-  StepLabel,
-} from 'material-ui/Stepper';
-import ArrowForwardIcon from 'material-ui/svg-icons/navigation/arrow-forward';
-import HeaderContainer from '../header/containers/HeaderContainer.js';
 import momentTZ from 'moment-timezone';
 import HomeMapContainer from './containers/HomeMapContainer.js';
 
@@ -28,10 +19,8 @@ const Home = (props) => {
       margin: '0 0 0 35%',
     }
   };
-  const stepProps = ['Select Package', 'Vote', 'Pay'];
   return (
     <div>
-      {/* <HeaderContainer /> */}
       <div className={s.root}>
         <div className={s.container}>
           <div className={s.headcont}>
@@ -42,43 +31,12 @@ const Home = (props) => {
             </div>
             <h1 className={s.banner}>Upcoming Bulk Buys</h1>
           </div>
-          <Card style={{ width: "800px", margin: "0 0 30px 0" }}>
-            <Stepper activeStep={props.homeReducers.stepIndex} connector={<ArrowForwardIcon />}>
-            {stepProps.map(stepProp => (
-              <Step>
-                <StepLabel>{stepProp}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-            {/* <CardTitle
-              title="hi"
-              // subtitle={`Voting window is from ${momentTZ.tz(currentFutureDropoff.voteDateTimeBeg, 'America/New_York').format('DD MMMM YYYY hh:mm a')} to ${momentTZ.tz(currentFutureDropoff.voteDateTimeEnd, 'America/New_York').format('DD MMMM YYYY hh:mm a')}`}
-            /> */}
-            <div>
-              <div>Choose a package: </div>
-              <RaisedButton label="Dorm Package" primary={true} />
-              <br /><br />
-              <RaisedButton label="Cooking Package" primary={true} />
-            </div>
-            <FlatButton
-              label="Back"
-              disabled={props.homeReducers.stepIndex === 0}
-              onTouchTap={() => {
-                props.handlePrev(props.homeReducers.stepIndex);
-              }}
-              style={{ marginRight: '1%' }}
-            />
-            <RaisedButton
-              label={props.homeReducers.stepIndex === stepProps.length - 1 ? 'Finish' : 'Next'}
-              primary={true}
-              onTouchTap={() => {
-                props.handleNext(props.homeReducers.stepIndex, stepProps);
-              }}
-            />
-          </Card>
-          {/* {props.homeReducers.currentFutureDropoffs.map((currentFutureDropoff, index) => {
+          {/* <Message color='blue'>Next pickup: 17 October 2017 from 4:00 PM to 7:00 PM at Buckeye Village Family Housing</Message> */}
+          {props.homeReducers.currentFutureDropoffs.map((currentFutureDropoff, index) => {
             return (
               <Card style={{ width: "800px", margin: "0 0 30px 0" }}>
+                {/* <Icon name="truck" size="huge" style={styles.foodTruckIcon} />
+                <Header as="h2" style={styles.header}>Food Truck Bulk Buy</Header> */}
                 <CardTitle
                   title={`${momentTZ.tz(currentFutureDropoff.intendedPickupTimeStart, 'America/New_York').format('DD MMMM YYYY')} from ${momentTZ.tz(currentFutureDropoff.intendedPickupTimeStart, 'America/New_York').format('hh:mm a')} to ${momentTZ.tz(currentFutureDropoff.intendedPickupTimeEnd, 'America/New_York').format('hh:mm a')}`}
                   subtitle={`Voting window is from ${momentTZ.tz(currentFutureDropoff.voteDateTimeBeg, 'America/New_York').format('DD MMMM YYYY hh:mm a')} to ${momentTZ.tz(currentFutureDropoff.voteDateTimeEnd, 'America/New_York').format('DD MMMM YYYY hh:mm a')}`}
@@ -111,10 +69,97 @@ const Home = (props) => {
                 }
             </Card>
             )
-          })} */}
+          })}
         </div>
       </div>
     </div>
 )};
 
 export default Home;
+
+
+
+
+
+
+
+
+// import React, { Component } from 'react';
+// import {
+//   Route,
+//   Link
+// } from 'react-router-dom';
+// import { Image, Modal } from 'semantic-ui-react';
+// import s from './Home.css';
+// import { Card, CardMedia, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
+// import { Message, Icon, Header } from 'semantic-ui-react';
+// import RaisedButton from 'material-ui/RaisedButton';
+// import FlatButton from 'material-ui/FlatButton';
+// import {
+//   Step,
+//   Stepper,
+//   StepLabel,
+// } from 'material-ui/Stepper';
+// import ArrowForwardIcon from 'material-ui/svg-icons/navigation/arrow-forward';
+// import HeaderContainer from '../header/containers/HeaderContainer.js';
+// import momentTZ from 'moment-timezone';
+// import HomeMapContainer from './containers/HomeMapContainer.js';
+//
+// const Home = (props) => {
+//   const styles = {
+//     foodTruckIcon: {
+//       margin: '0.5% 0 0 43.5%',
+//     },
+//     header: {
+//       margin: '0 0 0 35%',
+//     }
+//   };
+//   const stepProps = ['Select Package', 'Vote', 'Pay'];
+//   return (
+//     <div>
+//       <div className={s.root}>
+//         <div className={s.container}>
+//           <div className={s.headcont}>
+//             <div>
+//               <a href="https://hidden-reef-85880.herokuapp.com/" target="/blank">
+//                 <img className={s.head} src='https://scontent-sjc2-1.xx.fbcdn.net/v/t1.0-9/15726586_926945357406132_4915279900008217763_n.jpg?oh=9ecd45f3cf6d31be1f7837c120853bd9&oe=5A046CFF'/>
+//               </a>
+//             </div>
+//             <h1 className={s.banner}>Upcoming Bulk Buys</h1>
+//           </div>
+//           <Card className={s.mainContent}>
+//             <Stepper activeStep={props.homeReducers.stepIndex} connector={<ArrowForwardIcon />}>
+//             {stepProps.map(stepProp => (
+//               <Step>
+//                 <StepLabel>{stepProp}</StepLabel>
+//               </Step>
+//             ))}
+//           </Stepper>
+//             <div>
+//               <div>Choose a package: </div>
+//               <RaisedButton label="Dorm Package" primary={true} />
+//               <br /><br />
+//               <RaisedButton label="Cooking Package" primary={true} />
+//             </div>
+//             <FlatButton
+//               label="Back"
+//               disabled={props.homeReducers.stepIndex === 0}
+//               onTouchTap={() => {
+//                 props.handlePrev(props.homeReducers.stepIndex);
+//               }}
+//               style={{ marginRight: '1%' }}
+//             />
+//             <RaisedButton
+//               label={props.homeReducers.stepIndex === stepProps.length - 1 ? 'Finish' : 'Next'}
+//               primary={true}
+//               onTouchTap={() => {
+//                 props.handleNext(props.homeReducers.stepIndex, stepProps);
+//               }}
+//             />
+//           </Card>
+//         </div>
+//       </div>
+//     </div>
+// )};
+//
+// export default Home;
