@@ -8,6 +8,7 @@ import s from './Payment.css';
 import { Card, Icon, Popup, Dropdown, Feed, Modal, Segment, Checkbox, Label, Message, Grid } from 'semantic-ui-react';
 import StripeCheckout from 'react-stripe-checkout';
 import RaisedButton from 'material-ui/RaisedButton';
+import { Image } from 'cloudinary-react';
 import { ref, firebaseAuth } from '../../config';
 import PaymentConfirmation from './PaymentConfirmation.js';
 
@@ -196,10 +197,13 @@ class Payment extends React.Component {
                       <Feed.Content>
                         <Feed.Summary>
                           <Card centered fluid>
-                            {/* <Image src='https://static1.squarespace.com/static/54b3f75ee4b0cdf625ece0b0/t/56a01d17fb36b1be191dd048/1453333785451/market+basket+blueberries+radishes+cropped.jpg?format=1500w' /> */}
-                            <Card.Content header='Dorm Package' />
+                            <Image
+                              cloudName="jchen54"
+                              publicId="fruitsImage_tekmne.jpg"
+                            />
+                            <Card.Content header='Dorm Package $6' />
                             <Card.Content>
-                              Our dorm package is $6 and made especially for college kids on the run. Everything is fresh and nothing needs preparation.
+                              Made especially for college kids on the run. Everything is fresh and nothing needs preparation.
                             </Card.Content>
                             <Card.Content extra>
                               <Icon name="shop"/>
@@ -208,7 +212,7 @@ class Payment extends React.Component {
                                 <Dropdown inline options={dormNumOptions}
                                   onChange={this.handleDorm}
                                   defaultValue={dormNumOptions[0].value}
-                                />dorm packages ($6)
+                                />dorm packages
                               </span>
                             </Card.Content>
                           </Card>
@@ -220,10 +224,13 @@ class Payment extends React.Component {
                     <Feed.Content>
                       <Feed.Summary>
                         <Card centered fluid>
-                          {/* <Image src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_Q8v5MrzTAwShGf4JIT57AswNzO3wqaUWMFYRLTDxgdhGti5r' /> */}
-                          <Card.Content header='Cooking Package' />
+                          <Image
+                            cloudName="jchen54"
+                            publicId="vegetablesImage_elzfzh.jpg"
+                          />
+                          <Card.Content header='Cooking Package $6' />
                           <Card.Content>
-                            Our cooking package is $6 and includes food that, well...can be cooked! It is heavy on vegetables and has none of the items in the dorm package.
+                            Heavy on vegetables, starch and has none of the items in the dorm package
                           </Card.Content>
                           <Card.Content extra>
                             <Icon name="shop"/>
@@ -232,13 +239,39 @@ class Payment extends React.Component {
                               <Dropdown inline options={cookNumOptions}
                                 onChange={this.handleCook}
                                 defaultValue={cookNumOptions[0].value}
-                              />cooking packages ($6)
+                              />cooking packages
                             </span>
                           </Card.Content>
                         </Card>
                       </Feed.Summary>
                     </Feed.Content>
                   </Feed.Event>
+                  {/* <Feed.Event>
+                    <Feed.Content>
+                      <Feed.Summary>
+                        <Card centered fluid>
+                          <Image
+                            cloudName="jchen54"
+                            publicId="vegetablesImage_elzfzh.jpg"
+                          />
+                          <Card.Content header='Dried Goods Addon $2' />
+                          <Card.Content>
+                            Fuel your day with whole grains, rice or pasta
+                          </Card.Content>
+                          <Card.Content extra>
+                            <Icon name="shop"/>
+                            <span>
+                              I'd like {' '}
+                              <Dropdown inline options={cookNumOptions}
+                                onChange={this.handleDried}
+                                defaultValue={driedNumOptions[0].value}
+                              />dried goods packages
+                            </span>
+                          </Card.Content>
+                        </Card>
+                      </Feed.Summary>
+                    </Feed.Content>
+                  </Feed.Event> */}
                   {/* <Segment compact>
                     <Label color='red' floating>New!</Label>
                     <Checkbox inline checked={this.props.userWantsDelivery} onClick={this.handleDelivery} />
