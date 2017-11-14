@@ -340,7 +340,7 @@ module.exports.getAdminData = async (uid) => {
       }
       data.push(dropoff);
     }
-    data = data.sortBy(dropoff => -new Date(dropoff.intendedPickupTimeStart));
+    data = data.sortBy(dropoff => -new Date(dropoff.intendedShipDate));
     return data;
   } catch (err) {
     console.log(err);
