@@ -208,6 +208,7 @@ class App extends React.Component {
     await this.props.setUserTransactionHistory(initialDataLoadResults.userTransactionHistory);
     await this.props.setAvailableDeliveriesLeft(initialDataLoadResults.availableDeliveriesLeft);
     await this.props.setDeliveryEligibilityObj(initialDataLoadResults.deliveryEligibilityObj);
+    await this.props.setAuthorizeSuperAdmin(initialDataLoadResults.isUserSuperAdmin);
     if (initialDataLoadResults.isUserAdmin) {
       await this.props.setAdminData(initialDataLoadResults.adminData);
       await this.props.setAdminFoodItems(initialDataLoadResults.adminFoodItems);

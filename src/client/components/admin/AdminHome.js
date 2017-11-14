@@ -72,6 +72,11 @@ const AdminHome = (props: Props) => {
                 <Table.HeaderCell>Total Packages Ordered</Table.HeaderCell>
                 <Table.HeaderCell>Total Participants</Table.HeaderCell>
                 <Table.HeaderCell>Net Volume from Sales</Table.HeaderCell>
+                {props.adminReducers.superAdminAuthorized ?
+                  <Table.HeaderCell>Revenue for Collective</Table.HeaderCell>
+                  :
+                  <div></div>
+                }
                 <Table.HeaderCell>Status</Table.HeaderCell>
                 <Table.HeaderCell>Export Summary</Table.HeaderCell>
                 <Table.HeaderCell>Export Food Ballots</Table.HeaderCell>
@@ -94,6 +99,11 @@ const AdminHome = (props: Props) => {
                     <Table.Cell>{data.totalDormPackagesOrdered + data.totalCookingPackagesOrdered}</Table.Cell>
                     <Table.Cell>{data.totalParticipants}</Table.Cell>
                     <Table.Cell>${data.netVolumeFromSalesAfterFees}</Table.Cell>
+                    {props.adminReducers.superAdminAuthorized ?
+                      <Table.Cell>${data.revenueForCollective}</Table.Cell>
+                      :
+                      <div></div>
+                    }
                     <Table.Cell>{data.status}</Table.Cell>
                     <Table.Cell>
                       <a onClick={async () => { await props.setDownloadFile(data.id, 'summary'); }} href="javascript:void(0)" target="_blank" rel="noopener noreferrer">

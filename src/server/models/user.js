@@ -114,6 +114,26 @@ module.exports.checkIfUserIsAdmin = async (uid) => {
   }
 };
 
+module.exports.checkIfUserIsSuperAdmin = async (uid) => {
+  try {
+    const checkIfUserIsSuperAdminResult = await models.User.findOne({
+      where: {
+        firebaseUID: uid,
+        hasUserFinishedSignUp: true,
+        isAdmin: true,
+        isSuperAdmin: true,
+      },
+    });
+    if (checkIfUserIsSuperAdminResult !== null) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch(err) {
+    console.log(err);
+  }
+};
+
 module.exports.checkIfUserFinishedSignUp = function (uid) {
   return models.User.findOne({
     where: {
