@@ -327,9 +327,7 @@ module.exports.getRevenueForCollective = async (dropoffID) => {
     for (let i = 0; i < transactions.length; i++) {
       revenueForCollective += Number(transactions[i].dataValues.revenueAfterStripe);
     }
-    console.log('revenueForCollective: ', revenueForCollective);
-    console.log('typeof revenueForCollective: ', typeof revenueForCollective);
-    return revenueForCollective;
+    return revenueForCollective.toFixed(2);
   } catch (err) {
     console.log(err);
   }
