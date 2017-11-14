@@ -315,3 +315,20 @@ module.exports.findSalesAfterFeesByDropoffID = async (dropoffID) => {
     console.log(err);
   }
 };
+
+module.exports.getRevenueForCollective = async (dropoffID) => {
+  try {
+    let revenueForCollective = 0;
+    const transactions = await models.Transaction.findAll({
+      where: {
+        dropoffID,
+      },
+    });
+    for (let i = 0; i < transactions.length; i++) {
+      revenueForCollective += transactions[i].dataValues.revenueAfterStripe;
+    }
+    return revenueForCollective;
+  } catch (err) {
+    console.log(err);
+  }
+};

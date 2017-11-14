@@ -333,6 +333,11 @@ module.exports.getAdminData = async (uid) => {
         netVolumeFromSalesAfterFees,
         status,
       };
+      const isUserSuperAdmin = await userUtil.checkIfUserIsSuperAdmin(uid);
+      if (isUserSuperAdmin) {
+        const revenueForCollective = await transactionUtil.getRevenueForCollective(id);
+        dropoff.revenueForCollective = revenueForCollective;
+      }
       data.push(dropoff);
     }
     data = data.sortBy(dropoff => -new Date(dropoff.intendedPickupTimeStart));

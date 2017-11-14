@@ -18,6 +18,13 @@ export function setAuthorizeAdmin(bool) {
   };
 }
 
+export function setAuthorizeSuperAdmin(bool) {
+  return {
+    type: actionTypes.AUTHORIZE_SUPER_ADMIN,
+    bool,
+  };
+}
+
 export function setAdminData(dataArr) {
   return {
     type: actionTypes.SET_ADMIN_DATA,
