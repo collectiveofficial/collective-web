@@ -23,6 +23,7 @@ module.exports = function(sequelize, DataTypes) {
     latitude: DataTypes.STRING,
     longitude: DataTypes.STRING,
     isAdmin: DataTypes.BOOLEAN,
+    isSuperAdmin: DataTypes.BOOLEAN,
   }, {
     classMethods: {
       associate: function(models) {

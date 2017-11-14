@@ -274,9 +274,11 @@ module.exports = {
       let uid = decodedToken.uid;
       const userAuthorized = await userUtil.checkIfUserAuthorized(uid);
       const isUserAdmin = await userUtil.checkIfUserIsAdmin(uid);
+      const isUserSuperAdmin = await userUtil.checkIfUserIsSuperAdmin(uid);
       res.json({
         userAuthorized,
         isUserAdmin,
+        isUserSuperAdmin,
       });
     },
   },
@@ -459,6 +461,7 @@ module.exports = {
       const availableDeliveriesLeft = 50 - deliveriesOrderedCount;
       const deliveryEligibilityObj = await userUtil.checkIfUserEligibleForDelivery(uid);
       const isUserAdmin = await userUtil.checkIfUserIsAdmin(uid);
+      const isUserSuperAdmin = await userUtil.checkIfUserIsSuperAdmin(uid);
       let adminData;
       let adminFoodItems;
       if (isUserAdmin) {
@@ -472,6 +475,7 @@ module.exports = {
         availableDeliveriesLeft,
         deliveryEligibilityObj,
         isUserAdmin,
+        isUserSuperAdmin,
         adminData,
         adminFoodItems,
       };

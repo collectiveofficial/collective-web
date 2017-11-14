@@ -39,7 +39,8 @@ import actionTypes from '../action-creators/admin/adminActionTypes.js';
 
 const initialState = {
   dashboardPageSelected: 'home',
-  adminAuthorized: 'false',
+  adminAuthorized: false,
+  superAdminAuthorized: false,
   adminData: [],
   stepIndex: 0,
   // Add time
@@ -76,6 +77,8 @@ const adminReducers = (state = initialState, action) => {
       return { ...state, dashboardPageSelected: action.text };
     case actionTypes.AUTHORIZE_ADMIN:
       return { ...state, adminAuthorized: action.bool };
+    case actionTypes.AUTHORIZE_SUPER_ADMIN:
+      return { ...state, superAdminAuthorized: action.bool };
     case actionTypes.SET_ADMIN_DATA:
       return { ...state, adminData: action.dataArr };
     case actionTypes.SET_PICKUP_TIME_START:
